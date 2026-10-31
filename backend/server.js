@@ -1,4 +1,3 @@
-const cors = require("cors");
 const express = require("express");
 const cors = require("cors");
 const crypto = require("crypto");
@@ -8,7 +7,10 @@ const pool = require("./config/db");
 const { sendOtpEmail } = require("./services/emailService");
 const shBillRoutes = require("./routes/shBillRoutes");
 const giRoutes = require("./routes/giRoutes");
+
 const app = express();
+
+// CORS configuration
 app.use(cors({
     origin: [
         "http://localhost:5173",
@@ -18,8 +20,11 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+// Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// API routes
 app.use("/api/sh-bills", shBillRoutes);
 app.use("/api/gi", giRoutes);
 
