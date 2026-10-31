@@ -37,7 +37,7 @@ const SHOP = {
   address:
     "Grampanchayat Gala No.04, Main Road - mandai, Dighanchi, Maharashtra - 415315",
   phone: "+91 9421124579",
-  by: "Prakash Dixit(sir)",
+  by: "BY - Prakash Dixit(sir)",
   email: "pranalijewellers@gmail.com",
   footer: "Your Trust  •  Our Heritage  •  Timeless Jewellery",
 };
@@ -639,8 +639,11 @@ export default function NewSHBill({ onNavigate }) {
     doc.text(SHOP.tagline, W / 2, 22, {
       align: "center",
     });
+    doc.text(SHOP.by,  W / 2, 27, {
+      align: "center",
+    });
 
-    doc.text(SHOP.address, W / 2, 27, {
+    doc.text(SHOP.address, W / 2, 32, {
       align: "center",
       maxWidth: CW - 8,
     });
@@ -648,7 +651,7 @@ export default function NewSHBill({ onNavigate }) {
     doc.text(
       `Phone: ${SHOP.phone}  |  Email: ${SHOP.email}`,
       W / 2,
-      32,
+      37,
       { align: "center" }
     );
 
@@ -656,7 +659,7 @@ export default function NewSHBill({ onNavigate }) {
     doc.setFontSize(13);
     doc.setTextColor(125, 83, 20);
 
-    doc.text("SALES INVOICE", W / 2, 40, {
+    doc.text("SALES INVOICE", W / 2, 43, {
       align: "center",
     });
 
