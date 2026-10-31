@@ -18,7 +18,7 @@ export default App;*/
 
 import { useState } from "react";
 import Login from "./Login.jsx";
-import Dashboard from "./Dashboard.jsx";
+import Dashboard from "./dashboard.jsx";
 
 function App() {
   const [user, setUser] = useState(null);

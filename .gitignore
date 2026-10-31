@@ -32,3 +32,4 @@ dist/
 backend/.env
 backend/.env.*
 !backend/.env.example
+backup.sql
