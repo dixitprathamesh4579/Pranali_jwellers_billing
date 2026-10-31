@@ -1,0 +1,371 @@
+.gi-statistics-page {
+    width: 100%;
+    padding: 25px;
+    box-sizing: border-box;
+    color: #252525;
+    font-family: inherit;
+}
+
+/* HEADER */
+
+.gi-stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.gi-stats-header h2 {
+    font-size: 25px;
+    font-weight: 700;
+    margin: 0 0 7px;
+}
+
+.gi-stats-header p {
+    margin: 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.gi-stats-refresh {
+    background: #252525;
+    color: white;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.gi-stats-refresh:hover {
+    background: #444;
+}
+
+/* SECTION TITLE */
+
+.gi-stats-section-title {
+    margin: 28px 0 15px;
+}
+
+.gi-stats-section-title h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* STATISTICS GRID */
+
+.gi-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.gi-stat-card {
+    background: #fff;
+    border: 1px solid #eaeaea;
+    border-radius: 11px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    min-width: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.035);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.gi-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+}
+
+.gi-stat-card p {
+    margin: 0 0 9px;
+    color: #777;
+    font-size: 13px;
+}
+
+.gi-stat-card h2 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.gi-stat-highlight {
+    border-color: #d9c49a;
+    background: #fffdf8;
+}
+
+/* ICONS */
+
+.gi-stat-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.gi-stat-icon.purple {
+    background: #f0eaff;
+    color: #7852c8;
+}
+
+.gi-stat-icon.green {
+    background: #e5f7ed;
+    color: #23965b;
+}
+
+.gi-stat-icon.blue {
+    background: #e7f1ff;
+    color: #3678d7;
+}
+
+.gi-stat-icon.orange {
+    background: #fff1df;
+    color: #db8a23;
+}
+
+.gi-stat-icon.red {
+    background: #ffebeb;
+    color: #d84c4c;
+}
+
+.gi-stat-icon.dark {
+    background: #f2ead9;
+    color: #99752d;
+}
+
+/* ANALYTICS */
+
+.gi-stats-analytics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.gi-analytics-card {
+    background: white;
+    border: 1px solid #eaeaea;
+    border-radius: 11px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.035);
+    min-width: 0;
+}
+
+.gi-analytics-card h3 {
+    font-size: 16px;
+    margin: 0 0 25px;
+}
+
+/* PROGRESS BARS */
+
+.gi-progress-item {
+    margin-bottom: 22px;
+}
+
+.gi-progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.gi-progress-label span {
+    color: #666;
+}
+
+.gi-progress-label strong {
+    color: #252525;
+}
+
+.gi-progress-track {
+    width: 100%;
+    height: 10px;
+    background: #eeeeee;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.gi-progress-fill {
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+.active-fill {
+    background: #23965b;
+}
+
+.completed-fill {
+    background: #3678d7;
+}
+
+.gi-account-total {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #eee;
+    padding-top: 17px;
+    margin-top: 25px;
+    font-size: 14px;
+}
+
+/* RECOVERY */
+
+.gi-recovery-percentage {
+    font-size: 38px;
+    font-weight: 750;
+    margin-bottom: 7px;
+    color: #23965b;
+}
+
+.gi-recovery-subtitle {
+    color: #777;
+    font-size: 12px;
+    margin-bottom: 22px;
+    line-height: 1.5;
+}
+
+.gi-recovery-track {
+    height: 13px;
+}
+
+.recovery-fill {
+    background: #23965b;
+}
+
+.gi-recovery-details {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 22px;
+}
+
+.gi-recovery-details div {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.gi-recovery-details span {
+    color: #777;
+    font-size: 12px;
+}
+
+.gi-recovery-details strong {
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+/* LOADING */
+
+.gi-stats-loading {
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    gap: 15px;
+}
+
+.gi-stats-spinner {
+    width: 35px;
+    height: 35px;
+    border: 4px solid #eee;
+    border-top-color: #99752d;
+    border-radius: 50%;
+    animation: giStatsSpin 0.8s linear infinite;
+}
+
+@keyframes giStatsSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ERROR */
+
+.gi-stats-error {
+    margin: 30px;
+    padding: 30px;
+    text-align: center;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 10px;
+}
+
+.gi-stats-error h3 {
+    margin-top: 0;
+}
+
+.gi-stats-error p {
+    color: #d84c4c;
+}
+
+.gi-stats-error button {
+    background: #252525;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+    .gi-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .gi-stats-analytics {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .gi-stat-card {
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .gi-stats-page {
+        padding: 15px;
+    }
+
+    .gi-stats-header {
+        align-items: flex-start;
+    }
+
+    .gi-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gi-stat-card h2 {
+        font-size: 19px;
+    }
+
+    .gi-stats-header h2 {
+        font-size: 21px;
+    }
+
+    .gi-stat-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+    }
+
+    .gi-analytics-card {
+        padding: 18px;
+    }
+}
