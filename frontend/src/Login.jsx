@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import "./Login.css";
 
@@ -69,14 +68,26 @@ export default function Login({ onLogin }) {
         throw new Error(data.message || "OTP verification failed.");
       }
 
-      if (data.authenticated !== true || !data.user) {
+      if (
+        data.authenticated !== true ||
+        !data.token ||
+        !data.user
+      ) {
         throw new Error("Authentication could not be completed.");
       }
 
-      // This callback changes the visible page.
-      // A secure server-managed session is still needed
-      // before protecting real billing data.
+      // Save JWT token for 24-hour login session
+      localStorage.setItem("token", data.token);
+
+      // Save user information
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
+
+      // Update React login state
       onLogin(data.user);
+
     } catch (err) {
       setError(true);
       setMessage(err.message || "OTP verification failed.");
@@ -159,8 +170,10 @@ export default function Login({ onLogin }) {
         )}
 
         {message && (
-          <p className={error ? "error-message" : "success-message"}
-             role="status">
+          <p
+            className={error ? "error-message" : "success-message"}
+            role="status"
+          >
             {message}
           </p>
         )}

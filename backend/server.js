@@ -3,6 +3,8 @@ const cors = require("cors");
 const crypto = require("crypto");
 require("dotenv").config();
 
+const jwt = require("jsonwebtoken");
+
 const pool = require("./config/db");
 const { sendOtpEmail } = require("./services/emailService");
 const shBillRoutes = require("./routes/shBillRoutes");
@@ -174,14 +176,26 @@ app.post("/api/auth/verify-otp", async (req, res) => {
         // OTP must be single-use.
         otpStore.delete(email);
 
-        // Authentication is verified, but session creation
-        // will be implemented in the next stage.
+        // Generate JWT token valid for 24 hours.
+        const token = jwt.sign(
+            {
+                userId: users[0].id,
+                email: email
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "24h"
+            }
+        );
+
         return res.status(200).json({
             message: "OTP verified successfully.",
             authenticated: true,
+            token: token,
+            expiresIn: 86400,
             user: {
                 id: users[0].id,
-                email
+                email: email
             }
         });
 
@@ -190,6 +204,50 @@ app.post("/api/auth/verify-otp", async (req, res) => {
 
         return res.status(500).json({
             message: "An internal server error occurred."
+        });
+    }
+});
+
+// Check existing login session (JWT verification)
+app.get("/api/auth/me", async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({
+                authenticated: false,
+                message: "No token provided"
+            });
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const [users] = await pool.execute(
+            `SELECT id, email
+             FROM authorized_users
+             WHERE id = ? AND is_active = TRUE
+             LIMIT 1`,
+            [decoded.userId]
+        );
+
+        if (users.length === 0) {
+            return res.status(401).json({
+                authenticated: false,
+                message: "User is not authorized"
+            });
+        }
+
+        return res.status(200).json({
+            authenticated: true,
+            user: users[0]
+        });
+
+    } catch (error) {
+        return res.status(401).json({
+            authenticated: false,
+            message: "Session expired or invalid"
         });
     }
 });
