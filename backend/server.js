@@ -1,4 +1,4 @@
-
+const cors = require("cors");
 const express = require("express");
 const cors = require("cors");
 const crypto = require("crypto");
@@ -9,9 +9,13 @@ const { sendOtpEmail } = require("./services/emailService");
 const shBillRoutes = require("./routes/shBillRoutes");
 const giRoutes = require("./routes/giRoutes");
 const app = express();
-
 app.use(cors({
-    origin: "http://localhost:5173"
+    origin: [
+        "http://localhost:5173",
+        "https://pranali-jwellers-billing.dixitprathamesh4579.workers.dev"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(express.json());

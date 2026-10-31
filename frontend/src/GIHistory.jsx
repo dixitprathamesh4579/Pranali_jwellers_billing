@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./GIHistory.css";
 
-const API_URL = "http://localhost:5000/api/gi";
+const API_URL = "https://pranali-jwellers-billing.onrender.com/api/gi";
 
 const currency = (amount) => {
     return new Intl.NumberFormat("en-IN", {

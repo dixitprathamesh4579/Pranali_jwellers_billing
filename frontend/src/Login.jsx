@@ -2,7 +2,7 @@
 import { useState } from "react";
 import "./Login.css";
 
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = "https://pranali-jwellers-billing.onrender.com/api/auth";
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState("");

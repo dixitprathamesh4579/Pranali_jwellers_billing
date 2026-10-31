@@ -215,7 +215,7 @@ export default function NewGIBill() {
             setIsSaving(true);
 
             const response = await fetch(
-                "http://localhost:5000/api/gi",
+                "https://pranali-jwellers-billing.onrender.com/api/gi",
                 {
                     method: "POST",
                     headers: {

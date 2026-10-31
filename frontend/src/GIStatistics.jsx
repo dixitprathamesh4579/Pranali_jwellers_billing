@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./GIStatistics.css";
 
-const API_URL = "http://localhost:5000/api/gi/statistics";
+const API_URL = "https://pranali-jwellers-billing.onrender.com/api/gi/statistics";
 
 function GIStatistics() {
     const [statistics, setStatistics] = useState(null);

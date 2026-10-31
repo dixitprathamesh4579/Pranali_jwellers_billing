@@ -63,10 +63,10 @@ function Dashboard({ user, onNavigate, onLogout }) {
         activeGIResponse,
         completedGIResponse
       ] = await Promise.all([
-        fetch("http://localhost:5000/api/sh-bills/"),
-        fetch("http://localhost:5000/api/sh-bills/customers"),
-        fetch("http://localhost:5000/api/gi/customers?filter=active"),
-        fetch("http://localhost:5000/api/gi/customers?filter=completed")
+        fetch("https://pranali-jwellers-billing.onrender.com/api/sh-bills/"),
+        fetch("https://pranali-jwellers-billing.onrender.com/api/sh-bills/customers"),
+        fetch("https://pranali-jwellers-billing.onrender.com/api/gi/customers?filter=active"),
+        fetch("https://pranali-jwellers-billing.onrender.com/api/gi/customers?filter=completed")
       ]);
 
       const responses = [

@@ -55,7 +55,7 @@ function GICustomer() {
             setError("");
 
             const response = await fetch(
-                `http://localhost:5000/api/gi/customers?search=${encodeURIComponent(search)}`
+                `https://pranali-jwellers-billing.onrender.com/api/gi/customers?search=${encodeURIComponent(search)}`
             );
 
             const data = await response.json();
@@ -135,7 +135,7 @@ function GICustomer() {
             setPaymentError("");
 
             const response = await fetch(
-                "http://localhost:5000/api/gi/payment",
+                "https://pranali-jwellers-billing.onrender.com/api/gi/payment",
                 {
                     method: "POST",
                     headers: {
@@ -213,7 +213,7 @@ function GICustomer() {
 
         try {
             const response = await fetch(
-                "http://localhost:5000/api/gi/payment",
+                "https://pranali-jwellers-billing.onrender.com/api/gi/payment",
                 {
                     method: "POST",
                     headers: {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./SHCustomers.css";
 
 const API_URL =
-    `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/sh-bills`;
+    `${import.meta.env.VITE_API_BASE_URL || "https://pranali-jwellers-billing.onrender.com"}/api/sh-bills`;
 
 const money = (value) =>
     new Intl.NumberFormat("en-IN", {
