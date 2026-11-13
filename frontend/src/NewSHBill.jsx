@@ -1460,7 +1460,7 @@ export default function NewSHBill({ onNavigate }) {
                         <input
                           type="text"
                           inputMode="decimal"
-                          value={item.itemPurity}
+                          value={item.purity}
                           onChange={(e) =>
                             updateItem(
                               item.id,
@@ -1692,9 +1692,9 @@ export default function NewSHBill({ onNavigate }) {
                         <input
                           type="text"
                           inputMode="decimal"
-                          value={item.itemPurity}
+                          value={item.purity}
                           onChange={(e) =>
-                            updateItem(
+                            updateExchangeItem(
                               item.id,
                               "purity",
                               e.target.value.replace(/[^0-9.]/g, "")
@@ -1714,7 +1714,7 @@ export default function NewSHBill({ onNavigate }) {
                           <select
                             value={item.purity}
                             onChange={(e) =>
-                              updateItem(
+                              updateExchangeItem(
                                 item.id,
                                 "purity",
                                 e.target.value
