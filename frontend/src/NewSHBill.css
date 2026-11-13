@@ -2483,66 +2483,77 @@
         order: 2;
     }
 
-    .shbill-page .shbill-summary-card {
-        position: static;
-    }
-}
+    /* =========================================
+   FIX: EXCHANGE BUTTON MOBILE OVERFLOW
+   ========================================= */
 
-@media (max-width: 780px) {
-    .shbill-page {
-        padding: 15px 14px 110px;
-    }
-
-    .shbill-hero-heading {
-        padding: 22px 0 17px;
+    .shbill-page .shbill-exchange-section {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
     }
 
-    .shbill-workflow {
-        gap: 7px;
-        padding: 11px 9px;
+    .shbill-page .shbill-exchange-heading {
+        display: grid !important;
+        grid-template-columns: 35px minmax(0, 1fr) !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        gap: 10px !important;
+        align-items: start !important;
     }
 
-    .shbill-workflow-step {
-        gap: 5px;
+    .shbill-page .shbill-exchange-heading-copy {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        width: 100% !important;
+        min-width: 0 !important;
     }
 
-    .shbill-workflow-step b {
-        font-size: 9px;
+    .shbill-page .shbill-exchange-heading-copy h2 {
+        overflow-wrap: anywhere !important;
+        word-break: normal !important;
     }
 
-    .shbill-workflow-step span {
-        width: 24px;
-        height: 24px;
-        flex-basis: 24px;
+    .shbill-page .shbill-exchange-add-button {
+        grid-column: 1 / -1 !important;
+        grid-row: 2 !important;
+
+        display: flex !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+
+        margin: 8px 0 0 !important;
+        padding: 12px !important;
+
+        min-height: 46px !important;
+        box-sizing: border-box !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        white-space: normal !important;
+        position: static !important;
     }
 
-    .shbill-page .shbill-summary-rows {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .shbill-page .shbill-exchange-empty {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
     }
 
-    .shbill-page .shbill-summary-card {
-        padding: 17px;
-    }
-}
+    @media (min-width: 601px) {
+        .shbill-page .shbill-exchange-heading {
+            display: flex !important;
+            flex-wrap: wrap !important;
+        }
 
-@media (max-width: 540px) {
-    .shbill-page {
-        padding: 10px 10px calc(108px + env(safe-area-inset-bottom));
-    }
-
-    .shbill-redesign-header {
-        padding-bottom: 12px;
-    }
-
-    .shbill-brand-emblem {
-        width: 37px;
-        height: 37px;
-        flex-basis: 37px;
-        border-radius: 11px;
-    }
-
-    .shbill-brand-lockup {
-        gap: 8px;
+        .shbill-page .shbill-exchange-add-button {
+            width: auto !important;
+            margin-left: auto !important;
+        }
     }
 
     .shbill-brand-lockup strong {
