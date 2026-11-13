@@ -1221,24 +1221,43 @@ export default function NewSHBill({ onNavigate }) {
   // ---------------- UI ----------------
 
   return (
-    <main className="shbill-page shbill-mobile-first">
+    <main className="shbill-page">
       <header className="shbill-redesign-header">
-        <div className="shbill-redesign-title">
-          <span className="shbill-redesign-kicker">PRANALI JEWELLERS · BILLING DESK</span>
-          <h1>New SH Bill</h1>
-          <p>Create a jewellery invoice</p>
+        <div className="shbill-brand-lockup">
+          <span className="shbill-brand-emblem">✦</span>
+          <div>
+            <strong>PRANALI JEWELLERS</strong>
+            <small>GOLD · SILVER · CUSTOM JEWELLERY</small>
+          </div>
         </div>
-        <div className="shbill-redesign-bill-id">
+        <div className="shbill-header-status">
+          <span className="shbill-live-dot" /> NEW INVOICE
+        </div>
+      </header>
+
+      <section className="shbill-hero-heading">
+        <div>
+          <p className="shbill-hero-kicker">SALES &amp; BILLING</p>
+          <h1>Create new bill</h1>
+          <p className="shbill-hero-description">Enter customer and jewellery details to prepare the invoice.</p>
+        </div>
+        <div className="shbill-hero-billno">
           <span>INVOICE NUMBER</span>
           <strong>{billNumber}</strong>
           <small>Auto-generated</small>
         </div>
-      </header>
-      <nav className="shbill-redesign-steps" aria-label="Billing sections">
-        <span><b>1</b> Customer</span><i />
-        <span><b>2</b> Jewellery</span><i />
-        <span><b>3</b> Payment</span>
+      </section>
+
+      <nav className="shbill-workflow" aria-label="Billing workflow">
+        <div className="shbill-workflow-step active"><span>1</span><b>Bill type</b></div>
+        <i />
+        <div className="shbill-workflow-step"><span>2</span><b>Customer</b></div>
+        <i />
+        <div className="shbill-workflow-step"><span>3</span><b>Items &amp; exchange</b></div>
+        <i />
+        <div className="shbill-workflow-step"><span>4</span><b>Payment</b></div>
       </nav>
+
       <form
         onSubmit={(event) => event.preventDefault()}
         className="shbill-layout"
@@ -1477,9 +1496,9 @@ export default function NewSHBill({ onNavigate }) {
                         <input
                           type="text"
                           inputMode="decimal"
-                          value={item.itemPurity}
+                          value={item.purity}
                           onChange={(e) =>
-                            updateItem(
+                            updateExchangeItem(
                               item.id,
                               "purity",
                               e.target.value.replace(/[^0-9.]/g, "")
@@ -1499,7 +1518,7 @@ export default function NewSHBill({ onNavigate }) {
                           <select
                             value={item.purity}
                             onChange={(e) =>
-                              updateItem(
+                              updateExchangeItem(
                                 item.id,
                                 "purity",
                                 e.target.value
@@ -1709,9 +1728,9 @@ export default function NewSHBill({ onNavigate }) {
                         <input
                           type="text"
                           inputMode="decimal"
-                          value={item.itemPurity}
+                          value={item.purity}
                           onChange={(e) =>
-                            updateItem(
+                            updateExchangeItem(
                               item.id,
                               "purity",
                               e.target.value.replace(/[^0-9.]/g, "")
@@ -1731,7 +1750,7 @@ export default function NewSHBill({ onNavigate }) {
                           <select
                             value={item.purity}
                             onChange={(e) =>
-                              updateItem(
+                              updateExchangeItem(
                                 item.id,
                                 "purity",
                                 e.target.value
