@@ -128,3 +128,16 @@
   }
 }
 
+
+
+
+/* ===== Mobile usability improvements ===== */
+.login-page { min-height: 100vh; min-height: 100dvh; padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom)); }
+.login-card { width: min(100%, 410px); }
+.login-card input, .login-card button { min-height: 46px; }
+@media (max-width: 480px) {
+  .login-page { align-items: center; padding-inline: 14px; }
+  .login-card { padding: 26px 20px; border-radius: 15px; }
+  .login-card h1 { font-size: clamp(22px, 6vw, 27px); }
+  .login-card input { font-size: 16px; }
+}

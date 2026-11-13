@@ -423,3 +423,24 @@
     }
 
 }
+
+
+/* ===== Mobile usability improvements ===== */
+.gi-history-container { min-width: 0; }
+.gi-history-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.gi-history-table { min-width: 720px; }
+@media (max-width: 600px) {
+  .gi-history-container { padding: 14px 11px; }
+  .gi-history-header { flex-direction: column; align-items: stretch; }
+  .gi-history-refresh { width: 100%; min-height: 44px; }
+  .gi-history-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .gi-history-stat-card { padding: 13px; min-width: 0; }
+  .gi-history-stat-card h2 { font-size: 18px; overflow-wrap: anywhere; }
+  .gi-history-toolbar { flex-direction: column; align-items: stretch; }
+  .gi-history-search { width: 100%; }
+  .gi-history-modal-overlay { padding: 10px; align-items: flex-end; }
+  .gi-history-modal { width: 100%; max-width: 100%; max-height: 92dvh; overflow-y: auto; }
+}
+@media (max-width: 360px) {
+  .gi-history-stats { grid-template-columns: 1fr; }
+}

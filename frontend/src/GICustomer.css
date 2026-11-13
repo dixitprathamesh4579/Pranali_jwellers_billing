@@ -634,3 +634,24 @@
         width: 100%;
     }
 }
+
+
+/* ===== Mobile usability improvements ===== */
+.gi-customer-page, .gi-customer-panel { min-width: 0; }
+.gi-customer-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.gi-customer-table { min-width: 760px; }
+@media (max-width: 650px) {
+  .gi-customer-header { flex-direction: column; align-items: stretch; gap: 12px; }
+  .gi-customer-header button { width: 100%; min-height: 44px; }
+  .gi-customer-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .gi-customer-stat-card { padding: 13px; min-height: 100px; }
+  .gi-customer-stat-card h2 { font-size: 19px; }
+  .gi-customer-panel { padding: 15px; }
+  .gi-customer-panel-header { align-items: flex-start; flex-direction: column; }
+  .gi-search-box { width: 100%; max-width: none; }
+  .gi-modal-overlay { padding: 10px; align-items: flex-end; }
+  .gi-payment-modal { width: 100%; max-width: 100%; max-height: 92dvh; overflow-y: auto; border-radius: 16px 16px 10px 10px; }
+}
+@media (max-width: 380px) {
+  .gi-customer-stats { grid-template-columns: 1fr; }
+}

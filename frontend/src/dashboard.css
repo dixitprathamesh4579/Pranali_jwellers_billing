@@ -921,3 +921,32 @@
     margin-top: 14px;
   }
 }
+
+
+/* ===== Mobile usability improvements ===== */
+.sh-dashboard { overflow-x: clip; }
+.sh-dashboard-content, .sh-dashboard-body, .sh-panel { min-width: 0; }
+.sh-table-wrapper, .sh-girvi-table-wrapper { width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.sh-table-wrapper table, .sh-girvi-table { min-width: 620px; }
+.sh-dashboard button { touch-action: manipulation; }
+@media (max-width: 650px) {
+  .sh-dashboard .sh-sidebar { position: relative; }
+  .sh-sidebar-navigation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sh-dashboard .sh-sidebar-link { justify-content: flex-start; min-width: 0; overflow-wrap: anywhere; }
+  .sh-dashboard .sidebar-logout { padding: 12px 0 0; }
+  .sh-dashboard .logout-button { min-height: 44px; }
+  .sh-dashboard-body > .sh-dashboard-content { overflow: hidden; }
+  .sh-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sh-stat-card { min-width: 0; }
+}
+@media (max-width: 420px) {
+  .sh-topbar { padding-inline: 11px; }
+  .sh-dashboard-body > .sh-dashboard-content { padding: 16px 10px; }
+  .sh-sidebar-brand h2 { font-size: 17px; }
+  .sh-sidebar-brand p { font-size: 10px; }
+  .sh-sidebar-navigation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sh-dashboard .sh-sidebar-link { font-size: 11px; padding: 9px 7px; }
+  .sh-stats-grid { gap: 8px; }
+  .sh-stat-card { padding: 11px; }
+  .sh-stat-information h2 { font-size: 18px; }
+}

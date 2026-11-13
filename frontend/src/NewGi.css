@@ -392,3 +392,16 @@
         flex-wrap: wrap;
     }
 }
+
+
+/* ===== Mobile usability improvements ===== */
+.gi-page, .gi-layout, .gi-main { min-width: 0; }
+@media (max-width: 600px) {
+  .gi-page { padding: 14px 11px; }
+  .gi-page-header { gap: 12px; }
+  .gi-page-header h1 { font-size: 23px; }
+  .gi-card, .gi-summary { padding: 14px; }
+  .gi-fields { grid-template-columns: minmax(0, 1fr); gap: 13px; }
+  .gi-fields input, .gi-fields select, .gi-fields textarea { min-height: 44px; font-size: 16px; }
+  .gi-save-button { min-height: 46px; }
+}
