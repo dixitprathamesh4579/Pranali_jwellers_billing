@@ -1221,7 +1221,24 @@ export default function NewSHBill({ onNavigate }) {
   // ---------------- UI ----------------
 
   return (
-    <main className="shbill-page">
+    <main className="shbill-page shbill-mobile-first">
+      <header className="shbill-redesign-header">
+        <div className="shbill-redesign-title">
+          <span className="shbill-redesign-kicker">PRANALI JEWELLERS · BILLING DESK</span>
+          <h1>New SH Bill</h1>
+          <p>Create a jewellery invoice</p>
+        </div>
+        <div className="shbill-redesign-bill-id">
+          <span>INVOICE NUMBER</span>
+          <strong>{billNumber}</strong>
+          <small>Auto-generated</small>
+        </div>
+      </header>
+      <nav className="shbill-redesign-steps" aria-label="Billing sections">
+        <span><b>1</b> Customer</span><i />
+        <span><b>2</b> Jewellery</span><i />
+        <span><b>3</b> Payment</span>
+      </nav>
       <form
         onSubmit={(event) => event.preventDefault()}
         className="shbill-layout"
@@ -1460,7 +1477,7 @@ export default function NewSHBill({ onNavigate }) {
                         <input
                           type="text"
                           inputMode="decimal"
-                          value={item.purity}
+                          value={item.itemPurity}
                           onChange={(e) =>
                             updateItem(
                               item.id,
@@ -1692,9 +1709,9 @@ export default function NewSHBill({ onNavigate }) {
                         <input
                           type="text"
                           inputMode="decimal"
-                          value={item.purity}
+                          value={item.itemPurity}
                           onChange={(e) =>
-                            updateExchangeItem(
+                            updateItem(
                               item.id,
                               "purity",
                               e.target.value.replace(/[^0-9.]/g, "")
@@ -1714,7 +1731,7 @@ export default function NewSHBill({ onNavigate }) {
                           <select
                             value={item.purity}
                             onChange={(e) =>
-                              updateExchangeItem(
+                              updateItem(
                                 item.id,
                                 "purity",
                                 e.target.value
