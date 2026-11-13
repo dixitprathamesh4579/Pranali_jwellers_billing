@@ -1401,27 +1401,205 @@
   background: #f8eed9;
   margin-top: 10px;
 }
-
-
-/* ===== Mobile usability improvements ===== */
-.shbill-page { width: 100%; min-width: 0; overflow-x: clip; }
-.shbill-page input, .shbill-page select, .shbill-page textarea { max-width: 100%; }
-.shbill-page .shbill-layout, .shbill-page .shbill-main-column, .shbill-page .shbill-summary-column { min-width: 0; }
-.shbill-page .shbill-table-wrapper, .shbill-page .shbill-items-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-@media screen and (max-width: 780px) {
-  .shbill-page { padding: 15px 10px 22px; }
-  .shbill-page .shbill-topbar { flex-wrap: wrap; }
-  .shbill-page .shbill-shop-mark { min-width: 0; }
-  .shbill-page .shbill-page-heading h1 { font-size: 23px; }
-  .shbill-page .shbill-layout { gap: 14px; }
-  .shbill-page .shbill-card, .shbill-page .shbill-section-card { padding: 14px; }
-  .shbill-page .shbill-fields-grid { grid-template-columns: minmax(0, 1fr) !important; }
-  .shbill-page input, .shbill-page select, .shbill-page textarea { min-height: 43px; font-size: 16px; }
-  .shbill-page button { min-height: 42px; }
-  .shbill-page .shbill-summary-card { width: 100%; }
+/* =========================================================
+   PRANALI JEWELLERS — MODERN MOBILE-FIRST BILLING REFRESH
+   UI-only overrides. Existing React state, calculations,
+   validation, API calls and PDF logic remain unchanged.
+   ========================================================= */
+.shbill-page {
+  --navy: #172b4d;
+  --navy-light: #29466f;
+  --gold: #bd9650;
+  --gold-light: #fbf6eb;
+  --text: #24344d;
+  --muted: #78869a;
+  --line: #e8edf3;
+  --canvas: #f4f6f9;
+  padding: 24px clamp(14px, 3vw, 40px) 34px;
+  background: #f4f6f9;
 }
-@media screen and (max-width: 420px) {
-  .shbill-page { padding-inline: 8px; }
-  .shbill-page .shbill-topbar { gap: 8px; }
-  .shbill-page .shbill-shop-mark strong { font-size: 11px; }
+.shbill-page .shbill-topbar { padding-bottom: 18px; border-color: #e6ebf1; }
+.shbill-page .shbill-back { border-radius: 11px; padding: 10px 14px; box-shadow: 0 2px 8px #172b4d0a; }
+.shbill-page .shbill-mark-icon { border-radius: 13px; box-shadow: 0 5px 14px #172b4d20; }
+.shbill-page .shbill-page-heading { padding: 28px 0 22px; }
+.shbill-page .shbill-page-heading h1 { letter-spacing: -.8px; }
+.shbill-page .shbill-bill-id { border: 1px solid #eadfc9; border-radius: 15px; background: linear-gradient(135deg,#fff,#fdfaf4); box-shadow: 0 5px 18px #172b4d08; }
+.shbill-page .shbill-progress { border: 1px solid #e8edf3; border-radius: 15px; background: #fff; box-shadow: 0 4px 16px #172b4d06; }
+.shbill-page .shbill-layout { gap: 22px; align-items: start; }
+.shbill-page .shbill-main-column { display: grid; gap: 18px; min-width: 0; }
+.shbill-page .shbill-card,
+.shbill-page .shbill-summary-card { border: 1px solid #e8edf3; border-radius: 17px; background: #fff; box-shadow: 0 5px 20px #172b4d08; }
+.shbill-page .shbill-card { padding: clamp(18px,2.2vw,25px); }
+.shbill-page .shbill-section-heading { margin-bottom: 20px; }
+.shbill-page .shbill-section-icon { border-radius: 11px; background: #f7f0e2; color: #987337; font-weight: 800; }
+.shbill-page .shbill-section-heading h2 { color: #1d3152; letter-spacing: -.2px; }
+.shbill-page .shbill-section-heading p { line-height: 1.55; }
+.shbill-page .shbill-current-bill-number { border: 1px solid #e9dfcd; border-radius: 12px; background: #fdfaf4; }
+.shbill-page .shbill-type-options { gap: 12px; }
+.shbill-page .shbill-type-option { min-height: 76px; border: 1px solid #e4eaf1; border-radius: 13px; background: #fff; transition: .18s ease; }
+.shbill-page .shbill-type-option:hover { border-color: #d2b477; transform: translateY(-1px); }
+.shbill-page .shbill-type-option.selected { border-color: #bd9650; background: #fdf9f0; box-shadow: 0 0 0 3px #bd965014; }
+.shbill-page .shbill-type-symbol { border-radius: 10px; }
+.shbill-page .shbill-field { gap: 8px; }
+.shbill-page .shbill-field > span { color: #34445d; font-weight: 700; }
+.shbill-page .shbill-field input,
+.shbill-page .shbill-field select,
+.shbill-page .shbill-field textarea,
+.shbill-page .shbill-discount-input { min-height: 46px; border: 1px solid #dfe6ee; border-radius: 10px; background: #fff; color: #233650; transition: border-color .18s,box-shadow .18s; }
+.shbill-page .shbill-field input,
+.shbill-page .shbill-field select,
+.shbill-page .shbill-field textarea { padding: 11px 13px; }
+.shbill-page .shbill-field input:focus,
+.shbill-page .shbill-field select:focus,
+.shbill-page .shbill-field textarea:focus,
+.shbill-page .shbill-discount-input:focus-within { outline: none; border-color: #bd9650; box-shadow: 0 0 0 3px #bd96501c; }
+.shbill-page .shbill-item-card { padding: 17px; border: 1px solid #e8edf3; border-radius: 14px; background: #fbfcfe; }
+.shbill-page .shbill-item-title { padding-bottom: 13px; border-bottom: 1px solid #edf0f4; }
+.shbill-page .shbill-add-button,
+.shbill-page .shbill-add-another { min-height: 42px; border-radius: 10px; font-weight: 800; }
+.shbill-page .shbill-summary-card { padding: 21px; }
+.shbill-page .shbill-summary-heading { padding-bottom: 15px; border-bottom: 1px solid #edf0f4; }
+.shbill-page .shbill-total-panel { border-radius: 14px; background: linear-gradient(135deg,#172b4d,#29466f); box-shadow: 0 8px 20px #172b4d20; }
+.shbill-page .shbill-grand-total { border-radius: 11px; }
+.shbill-page .shbill-primary-button,
+.shbill-page .shbill-secondary-button { min-height: 47px; border-radius: 11px; font-weight: 800; }
+.shbill-page .shbill-primary-button { box-shadow: 0 5px 13px #172b4d20; }
+.shbill-page .shbill-primary-button:active,
+.shbill-page .shbill-secondary-button:active,
+.shbill-page .shbill-add-button:active { transform: translateY(1px); }
+.shbill-page .shbill-notice { border-radius: 10px; }
+.shbill-page .shbill-footer { padding-top: 18px; }
+
+/* Tablet: summary stays above the form and remains easy to scan. */
+@media (max-width: 780px) {
+  .shbill-page { padding: 16px 14px 28px; }
+  .shbill-page .shbill-layout { gap: 15px; }
+  .shbill-page .shbill-main-column { gap: 14px; }
+  .shbill-page .shbill-summary-card { padding: 17px; }
+  .shbill-page .shbill-summary-rows { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+
+/* Phone: comfortable touch targets, stacked cards, no sideways scrolling. */
+@media (max-width: 540px) {
+  .shbill-page { width: 100%; padding: 10px 10px 22px; overflow-x: clip; }
+  .shbill-page .shbill-topbar { gap: 8px; padding-bottom: 12px; }
+  .shbill-page .shbill-shop-mark { min-width: 0; }
+  .shbill-page .shbill-shop-mark strong { font-size: 10px; letter-spacing: .045em; }
+  .shbill-page .shbill-shop-mark small { font-size: 8px; }
+  .shbill-page .shbill-status { white-space: nowrap; }
+  .shbill-page .shbill-page-heading { gap: 12px; padding: 18px 0 14px; }
+  .shbill-page .shbill-page-heading h1 { font-size: 25px; }
+  .shbill-page .shbill-subtitle { font-size: 12px; }
+  .shbill-page .shbill-bill-id { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 13px; }
+  .shbill-page .shbill-bill-id strong { margin-left: auto; font-size: 15px; }
+  .shbill-page .shbill-progress { padding: 10px 8px; border-radius: 12px; }
+  .shbill-page .shbill-progress-step strong { font-size: 9px; }
+  .shbill-page .shbill-card { padding: 16px 13px; border-radius: 14px; }
+  .shbill-page .shbill-section-heading { align-items: center; gap: 10px; margin-bottom: 15px; }
+  .shbill-page .shbill-section-heading h2 { font-size: 15px; }
+  .shbill-page .shbill-section-heading p { font-size: 11px; }
+  .shbill-page .shbill-section-icon { flex: 0 0 31px; height: 31px; }
+  .shbill-page .shbill-type-options { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .shbill-page .shbill-type-option { min-width: 0; min-height: 82px; padding: 10px 8px; gap: 7px; }
+  .shbill-page .shbill-type-copy strong { font-size: 12px; }
+  .shbill-page .shbill-type-copy small { font-size: 9px; line-height: 1.35; }
+  .shbill-page .shbill-fields-grid { grid-template-columns: minmax(0,1fr); gap: 13px; }
+  .shbill-page .shbill-field input,
+  .shbill-page .shbill-field select,
+  .shbill-page .shbill-field textarea { width: 100%; min-height: 47px; font-size: 16px; }
+  .shbill-page .shbill-field textarea { min-height: 76px; }
+  .shbill-page .shbill-jewellery-heading { flex-wrap: wrap; }
+  .shbill-page .shbill-jewellery-heading .shbill-add-button { margin-left: auto; }
+  .shbill-page .shbill-item-card { padding: 13px 11px; border-radius: 12px; }
+  .shbill-page .shbill-item-title { gap: 8px; }
+  .shbill-page .shbill-item-number { font-size: 12px; }
+  .shbill-page .shbill-add-button,
+  .shbill-page .shbill-add-another { min-height: 43px; padding: 0 12px; font-size: 12px; }
+  .shbill-page .shbill-summary-card { padding: 15px 13px; border-radius: 14px; }
+  .shbill-page .shbill-summary-heading { padding-bottom: 12px; }
+  .shbill-page .shbill-total-panel { margin: 12px 0; padding: 15px; }
+  .shbill-page .shbill-total-panel strong { font-size: 25px; }
+  .shbill-page .shbill-summary-rows { grid-template-columns: 1fr 1fr; column-gap: 10px; row-gap: 12px; }
+  .shbill-page .shbill-summary-rows > div,
+  .shbill-page .shbill-summary-rows > label { padding: 0; }
+  .shbill-page .shbill-grand-total { padding: 12px; }
+  .shbill-page .shbill-primary-button,
+  .shbill-page .shbill-secondary-button { width: 100%; min-height: 48px; margin-top: 9px; }
+  .shbill-page .shbill-help-text { font-size: 10px; }
+  .shbill-page .shbill-footer { flex-direction: column; align-items: center; gap: 5px; text-align: center; }
+}
+
+@media (max-width: 360px) {
+  .shbill-page .shbill-type-options { grid-template-columns: 1fr; }
+  .shbill-page .shbill-summary-rows { grid-template-columns: 1fr; }
+  .shbill-page .shbill-status { display: none; }
+}
+
+
+/* ===== New mobile-first billing polish ===== */
+.shbill-page .shbill-layout {
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 370px);
+  gap: 24px;
+}
+.shbill-page .shbill-main-column { min-width: 0; }
+.shbill-page .shbill-summary-column { min-width: 0; }
+@media (min-width: 781px) {
+  .shbill-page .shbill-summary-card { position: sticky; top: 18px; }
+}
+.shbill-page .shbill-card,
+.shbill-page .shbill-summary-card {
+  border: 1px solid #e8edf3;
+  box-shadow: 0 8px 28px rgba(24, 43, 73, .055);
+}
+.shbill-page .shbill-field input:focus,
+.shbill-page .shbill-field select:focus,
+.shbill-page .shbill-field textarea:focus,
+.shbill-page .shbill-discount-input input:focus {
+  outline: 3px solid rgba(195, 154, 75, .17);
+  border-color: #c39a4b;
+}
+.shbill-mobile-actions { display: none; }
+
+@media (max-width: 780px) {
+  .shbill-page { padding-bottom: 96px; }
+  .shbill-page .shbill-layout { grid-template-columns: minmax(0, 1fr); }
+  .shbill-page .shbill-summary-column { order: 2; }
+  .shbill-page .shbill-summary-card { position: static; }
+  .shbill-mobile-actions {
+    position: fixed;
+    z-index: 50;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+    gap: 10px;
+    padding: 11px max(12px, env(safe-area-inset-right)) calc(11px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    background: rgba(255,255,255,.96);
+    border-top: 1px solid #e5e9ef;
+    box-shadow: 0 -8px 24px rgba(24,43,73,.09);
+    backdrop-filter: blur(12px);
+  }
+  .shbill-mobile-actions button {
+    min-height: 48px;
+    width: 100%;
+    margin: 0;
+    border-radius: 12px;
+    font-size: 14px;
+  }
+  .shbill-summary-card > .shbill-secondary-button,
+  .shbill-summary-card > .shbill-primary-button { display: none; }
+}
+@media (max-width: 540px) {
+  .shbill-page { padding-bottom: 100px; }
+  .shbill-page .shbill-card,
+  .shbill-page .shbill-summary-card { box-shadow: 0 5px 18px rgba(24,43,73,.045); }
+  .shbill-page .shbill-current-bill-number {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 7px 10px;
+  }
+  .shbill-page .shbill-current-bill-number strong { margin-left: auto; }
+  .shbill-page .shbill-item-card { overflow: hidden; }
+  .shbill-page .shbill-summary-rows > div,
+  .shbill-page .shbill-summary-rows > label { min-width: 0; }
 }

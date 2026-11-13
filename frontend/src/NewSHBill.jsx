@@ -2010,6 +2010,25 @@ export default function NewSHBill({ onNavigate }) {
         </aside>
       </form>
 
+      {/* Mobile-only quick actions. These call the same existing handlers. */}
+      <div className="shbill-mobile-actions" aria-label="Bill actions">
+        <button
+          className="shbill-secondary-button"
+          type="button"
+          onClick={previewPDF}
+        >
+          Preview
+        </button>
+        <button
+          className="shbill-primary-button"
+          type="button"
+          onClick={downloadPDF}
+          disabled={isSaving}
+        >
+          {isSaving ? "Saving..." : "Save / PDF"}
+        </button>
+      </div>
+
       <footer className="shbill-footer">
         <span>✦ PRANALI JEWELLERS</span>
         <span>Clear billing. Confident customers.</span>
