@@ -2479,3 +2479,68 @@
 @media (min-width: 601px) {
   .shbill-mobile-actions { display: none !important; }
 }
+
+
+/* Dedicated responsive layout for the exchange section action. */
+.shbill-page .shbill-exchange-section { min-width: 0; }
+.shbill-page .shbill-exchange-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.shbill-page .shbill-exchange-heading-copy {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.shbill-page .shbill-exchange-add-button {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 142px;
+  min-height: 44px;
+  margin-left: auto;
+  padding: 10px 16px;
+  white-space: nowrap;
+  line-height: 1.2;
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 600px) {
+  .shbill-page .shbill-exchange-heading {
+    display: grid;
+    grid-template-columns: 35px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+  }
+  .shbill-page .shbill-exchange-heading .shbill-section-icon {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .shbill-page .shbill-exchange-heading-copy {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .shbill-page .shbill-exchange-heading-copy h2 {
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+  }
+  .shbill-page .shbill-exchange-add-button {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    margin: 2px 0 0;
+    padding: 12px 14px;
+    white-space: normal;
+    font-size: 12px;
+  }
+}
+@media (max-width: 360px) {
+  .shbill-page .shbill-exchange-heading-copy h2 { font-size: 13px; }
+  .shbill-page .shbill-exchange-add-button { min-height: 46px; }
+}

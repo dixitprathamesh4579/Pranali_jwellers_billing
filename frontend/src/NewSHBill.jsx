@@ -1629,11 +1629,11 @@ export default function NewSHBill({ onNavigate }) {
 
           {/* GOLD / SILVER / OTHER EXCHANGE MODULE */}
 
-          <section className="shbill-card">
-            <div className="shbill-section-heading">
+          <section className="shbill-card shbill-exchange-section">
+            <div className="shbill-section-heading shbill-exchange-heading">
               <span className="shbill-section-icon">04</span>
 
-              <div>
+              <div className="shbill-exchange-heading-copy">
                 <h2>Gold / Silver / Other Exchange</h2>
                 <p>
                   Add old jewellery or other items received from the
@@ -1642,7 +1642,7 @@ export default function NewSHBill({ onNavigate }) {
               </div>
 
               <button
-                className="shbill-add-button"
+                className="shbill-add-button shbill-exchange-add-button"
                 type="button"
                 onClick={addExchangeItem}
               >
