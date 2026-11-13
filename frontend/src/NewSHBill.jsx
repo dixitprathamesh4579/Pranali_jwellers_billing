@@ -1629,7 +1629,7 @@ export default function NewSHBill({ onNavigate }) {
 
           {/* GOLD / SILVER / OTHER EXCHANGE MODULE */}
 
-          <section className="shbill-card shbill-exchange-card">
+          <section className="shbill-card shbill-exchange-section">
             <div className="shbill-section-heading shbill-exchange-heading">
               <span className="shbill-section-icon">04</span>
 

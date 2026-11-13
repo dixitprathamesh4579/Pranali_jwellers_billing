@@ -4212,3 +4212,49 @@
     }
 
 }
+
+/* FINAL FIX - EXCHANGE BUTTON OVERFLOW */
+
+@media screen and (max-width: 600px) {
+
+    .shbill-page .shbill-exchange-section {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    .shbill-page .shbill-exchange-heading {
+        display: grid !important;
+        grid-template-columns: 35px minmax(0, 1fr) !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        gap: 10px !important;
+    }
+
+    .shbill-page .shbill-exchange-heading-copy {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+
+    .shbill-page .shbill-exchange-add-button {
+        grid-column: 1 / -1 !important;
+        grid-row: 2 !important;
+
+        display: flex !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+
+        box-sizing: border-box !important;
+        margin: 4px 0 0 !important;
+        padding: 12px !important;
+
+        justify-content: center !important;
+        align-items: center !important;
+        white-space: normal !important;
+    }
+}
