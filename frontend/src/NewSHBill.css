@@ -1773,3 +1773,80 @@
 @media (min-width:781px) {
   .shbill-mobile-actions { display:none !important; }
 }
+
+/* MOBILE OVERFLOW FIX — section headings and action buttons */
+.shbill-page,
+.shbill-page * {
+  box-sizing: border-box;
+}
+.shbill-page {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+.shbill-page .shbill-layout,
+.shbill-page .shbill-main-column,
+.shbill-page .shbill-card,
+.shbill-page .shbill-section-heading {
+  min-width: 0;
+  max-width: 100%;
+}
+.shbill-page .shbill-section-heading > div {
+  flex: 1 1 0%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.shbill-page .shbill-section-heading h2 {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.shbill-page .shbill-section-heading > button {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+}
+@media (max-width: 600px) {
+  .shbill-page .shbill-section-heading {
+    display: grid !important;
+    grid-template-columns: 38px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 11px;
+    row-gap: 13px;
+  }
+  .shbill-page .shbill-section-heading > .shbill-section-icon {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .shbill-page .shbill-section-heading > div {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+  }
+  .shbill-page .shbill-section-heading > button {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
+    margin: 0;
+    padding: 11px 14px;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+  .shbill-page .shbill-card {
+    padding: 16px !important;
+  }
+  .shbill-page .shbill-item-card {
+    padding: 14px;
+  }
+  .shbill-page .shbill-fields-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .shbill-page input,
+  .shbill-page select,
+  .shbill-page textarea,
+  .shbill-page button {
+    max-width: 100%;
+  }
+}
