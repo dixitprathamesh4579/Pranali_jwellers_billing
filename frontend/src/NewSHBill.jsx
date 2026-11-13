@@ -639,7 +639,7 @@ export default function NewSHBill({ onNavigate }) {
     doc.text(SHOP.tagline, W / 2, 22, {
       align: "center",
     });
-    doc.text(SHOP.by,  W / 2, 27, {
+    doc.text(SHOP.by, W / 2, 27, {
       align: "center",
     });
 
@@ -1629,15 +1629,14 @@ export default function NewSHBill({ onNavigate }) {
 
           {/* GOLD / SILVER / OTHER EXCHANGE MODULE */}
 
-          <section className="shbill-card shbill-exchange-section">
+          <section className="shbill-card shbill-exchange-card">
             <div className="shbill-section-heading shbill-exchange-heading">
               <span className="shbill-section-icon">04</span>
 
               <div className="shbill-exchange-heading-copy">
                 <h2>Gold / Silver / Other Exchange</h2>
                 <p>
-                  Add old jewellery or other items received from the
-                  customer.
+                  Add old jewellery or other items received from the customer.
                 </p>
               </div>
 
