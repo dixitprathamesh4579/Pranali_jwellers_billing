@@ -735,15 +735,15 @@ export default function NewSHBill({ onNavigate }) {
       }
 
       if (!response.ok) {
+        console.error("Backend response:", {
+          status: response.status,
+          data: result
+        });
 
         throw new Error(
-
           result.message ||
-
           `Bill saving failed (HTTP ${response.status}).`
-
         );
-
       }
 
       const generatedBillNumber = result.bill_number;
@@ -1954,291 +1954,115 @@ export default function NewSHBill({ onNavigate }) {
 
           <section className="shbill-card">
 
-      <div className="shbill-section-heading">
+            <div className="shbill-section-heading">
 
-        <span className="shbill-section-icon">01</span>
+              <span className="shbill-section-icon">01</span>
 
-        <div className="shbill-section-copy">
+              <div className="shbill-section-copy">
 
-          <h2>Bill information</h2>
+                <h2>Bill information</h2>
 
-          <p>Choose the invoice type and date.</p>
+                <p>Choose the invoice type and date.</p>
 
-        </div>
-
-      </div>
-
-      <p className="shbill-type-label">Billing type</p>
-
-      <div className="shbill-type-options">
-
-        <button
-
-          type="button"
-
-          className={`shbill-type-option ${billingType === "GST" ? "selected" : ""}`}
-
-          onClick={() => {
-
-            setBillingType("GST");
-
-            clearNotice();
-
-          }}
-
-          aria-pressed={billingType === "GST"}
-
-        >
-
-          <span className="shbill-type-symbol">%</span>
-
-          <span className="shbill-type-copy">
-
-            <strong>With GST</strong>
-
-            <small>3% demonstration GST is included.</small>
-
-          </span>
-
-          <span className="shbill-radio" aria-hidden="true">
-
-            {billingType === "GST" ? "✓" : ""}
-
-          </span>
-
-        </button>
-
-        <button
-
-          type="button"
-
-          className={`shbill-type-option ${billingType === "NON_GST" ? "selected" : ""}`}
-
-          onClick={() => {
-
-            setBillingType("NON_GST");
-
-            clearNotice();
-
-          }}
-
-          aria-pressed={billingType === "NON_GST"}
-
-        >
-
-          <span className="shbill-type-symbol">₹</span>
-
-          <span className="shbill-type-copy">
-
-            <strong>Without GST</strong>
-
-            <small>No GST is added to the total.</small>
-
-          </span>
-
-          <span className="shbill-radio" aria-hidden="true">
-
-            {billingType === "NON_GST" ? "✓" : ""}
-
-          </span>
-
-        </button>
-
-      </div>
-
-      <label className="shbill-field shbill-date-field">
-
-        <span>Bill date <b>*</b></span>
-
-        <input
-
-          type="date"
-
-          value={billDate}
-
-          onChange={(event) => {
-
-            setBillDate(event.target.value);
-
-            clearNotice();
-
-          }}
-
-          required
-
-        />
-
-      </label>
-
-    </section>
-
-    {/* CUSTOMER DETAILS */ }
-
-    <section className="shbill-card">
-
-      <div className="shbill-section-heading">
-
-        <span className="shbill-section-icon">02</span>
-
-        <div className="shbill-section-copy">
-
-          <h2>Customer details</h2>
-
-          <p>Enter the customer information for this invoice.</p>
-
-        </div>
-
-      </div>
-
-      <div className="shbill-fields-grid">
-
-        <label className="shbill-field">
-
-          <span>Customer name <b>*</b></span>
-
-          <input
-
-            value={customer.name}
-
-            onChange={(event) => updateCustomer("name", event.target.value)}
-
-            placeholder="e.g. Priya Patil"
-
-            autoComplete="name"
-
-            required
-
-          />
-
-        </label>
-
-        <label className="shbill-field">
-
-          <span>Mobile number <b>*</b></span>
-
-          <input
-
-            type="tel"
-
-            inputMode="numeric"
-
-            maxLength={10}
-
-            value={customer.phone}
-
-            onChange={(event) =>
-
-              updateCustomer("phone", event.target.value.replace(/\D/g, "").slice(0, 10))
-
-            }
-
-            placeholder="Enter 10-digit number"
-
-            autoComplete="tel"
-
-            required
-
-          />
-
-          <small>Enter a 10-digit mobile number.</small>
-
-        </label>
-
-        <label className="shbill-field shbill-full">
-
-          <span>Address <em>Optional</em></span>
-
-          <textarea
-
-            rows={2}
-
-            value={customer.address}
-
-            onChange={(event) => updateCustomer("address", event.target.value)}
-
-            placeholder="Area, city, PIN code"
-
-          />
-
-        </label>
-
-      </div>
-
-    </section>
-
-    {/* NEW JEWELLERY ITEMS */ }
-
-    <section className="shbill-card">
-
-      <div className="shbill-section-heading shbill-action-heading shbill-jewellery-heading">
-
-        <span className="shbill-section-icon">03</span>
-
-        <div className="shbill-section-copy">
-
-          <h2>Jewellery items</h2>
-
-          <p>Choose the metal and purity, then enter the weight and rates.</p>
-
-        </div>
-
-        <button className="shbill-add-button" type="button" onClick={addItem}>
-
-          + Add item
-
-        </button>
-
-      </div>
-
-      {items.map((item, index) => (
-
-        <article className="shbill-item-card" key={item.id}>
-
-          <div className="shbill-item-title">
-
-            <span className="shbill-item-number">{String(index + 1).padStart(2, "0")}</span>
-
-            <div className="shbill-item-copy">
-
-              <h3>{item.name.trim() || `Jewellery item ${index + 1}`}</h3>
-
-              <p>Item details and price calculation</p>
+              </div>
 
             </div>
 
-            <button
+            <p className="shbill-type-label">Billing type</p>
 
-              type="button"
+            <div className="shbill-type-options">
 
-              className="shbill-remove-button"
+              <button
 
-              onClick={() => removeItem(item.id)}
+                type="button"
 
-              disabled={items.length === 1}
+                className={`shbill-type-option ${billingType === "GST" ? "selected" : ""}`}
 
-              aria-label={`Remove jewellery item ${index + 1}`}
+                onClick={() => {
 
-            >
+                  setBillingType("GST");
 
-              Remove
+                  clearNotice();
 
-            </button>
+                }}
 
-          </div>
+                aria-pressed={billingType === "GST"}
 
-          <div className="shbill-fields-grid shbill-item-fields">
+              >
 
-            <label className="shbill-field shbill-full">
+                <span className="shbill-type-symbol">%</span>
 
-              <span>Item name <b>*</b></span>
+                <span className="shbill-type-copy">
+
+                  <strong>With GST</strong>
+
+                  <small>3% demonstration GST is included.</small>
+
+                </span>
+
+                <span className="shbill-radio" aria-hidden="true">
+
+                  {billingType === "GST" ? "✓" : ""}
+
+                </span>
+
+              </button>
+
+              <button
+
+                type="button"
+
+                className={`shbill-type-option ${billingType === "NON_GST" ? "selected" : ""}`}
+
+                onClick={() => {
+
+                  setBillingType("NON_GST");
+
+                  clearNotice();
+
+                }}
+
+                aria-pressed={billingType === "NON_GST"}
+
+              >
+
+                <span className="shbill-type-symbol">₹</span>
+
+                <span className="shbill-type-copy">
+
+                  <strong>Without GST</strong>
+
+                  <small>No GST is added to the total.</small>
+
+                </span>
+
+                <span className="shbill-radio" aria-hidden="true">
+
+                  {billingType === "NON_GST" ? "✓" : ""}
+
+                </span>
+
+              </button>
+
+            </div>
+
+            <label className="shbill-field shbill-date-field">
+
+              <span>Bill date <b>*</b></span>
 
               <input
 
-                value={item.name}
+                type="date"
 
-                onChange={(event) => updateItem(item.id, "name", event.target.value)}
+                value={billDate}
 
-                placeholder="e.g. Gold ring, necklace, bangles"
+                onChange={(event) => {
+
+                  setBillDate(event.target.value);
+
+                  clearNotice();
+
+                }}
 
                 required
 
@@ -2246,401 +2070,261 @@ export default function NewSHBill({ onNavigate }) {
 
             </label>
 
-            <label className="shbill-field">
+          </section>
 
-              <span>Metal type <b>*</b></span>
+          {/* CUSTOMER DETAILS */}
 
-              <select
+          <section className="shbill-card">
 
-                value={item.metal}
+            <div className="shbill-section-heading">
 
-                onChange={(event) => updateItem(item.id, "metal", event.target.value)}
+              <span className="shbill-section-icon">02</span>
 
-              >
+              <div className="shbill-section-copy">
 
-                <option>Gold</option>
+                <h2>Customer details</h2>
 
-                <option>Silver</option>
-
-                <option>Other</option>
-
-              </select>
-
-            </label>
-
-            {item.metal === "Gold" ? (
-
-              <label className="shbill-field">
-
-                <span>Purity / Karat <b>*</b></span>
-
-                <select
-
-                  value={item.purity}
-
-                  onChange={(event) => updateItem(item.id, "purity", event.target.value)}
-
-                >
-
-                  <option value="24K">24K</option>
-
-                  <option value="22K">22K</option>
-
-                  <option value="20K">20K</option>
-
-                  <option value="18K">18K</option>
-
-                  <option value="14K">14K</option>
-
-                  <option value="9K">9K</option>
-
-                </select>
-
-              </label>
-
-            ) : (
-
-              <label className="shbill-field">
-
-                <span>Purity (%) <b>*</b></span>
-
-                <input
-
-                  type="text"
-
-                  inputMode="decimal"
-
-                  value={item.purity}
-
-                  onChange={(event) => updateItem(item.id, "purity", event.target.value.replace(/[^0-9.]/g, ""))}
-
-                  placeholder="e.g. 92.5"
-
-                />
-
-              </label>
-
-            )}
-
-            <label className="shbill-field">
-
-              <span>Weight (g) <b>*</b></span>
-
-              <div className="shbill-input-unit">
-
-                <input
-
-                  type="text"
-
-                  inputMode="decimal"
-
-                  value={item.weight}
-
-                  onChange={(event) => updateItem(item.id, "weight", event.target.value.replace(/[^0-9.]/g, ""))}
-
-                  placeholder="Enter weight"
-
-                  required
-
-                />
-
-                <span>g</span>
+                <p>Enter the customer information for this invoice.</p>
 
               </div>
-
-            </label>
-
-            <label className="shbill-field">
-
-              <span>Rate per gram (₹) <b>*</b></span>
-
-              <div className="shbill-input-unit">
-
-                <span>₹</span>
-
-                <input
-
-                  type="text"
-
-                  inputMode="decimal"
-
-                  value={item.rate}
-
-                  onChange={(event) => updateItem(item.id, "rate", event.target.value.replace(/[^0-9.]/g, ""))}
-
-                  placeholder="0.00"
-
-                  required
-
-                />
-
-              </div>
-
-            </label>
-
-            <label className="shbill-field">
-
-              <span>Making charges (₹)</span>
-
-              <div className="shbill-input-unit">
-
-                <span>₹</span>
-
-                <input
-
-                  type="text"
-
-                  inputMode="decimal"
-
-                  value={item.makingCharges}
-
-                  onChange={(event) => updateItem(item.id, "makingCharges", event.target.value.replace(/[^0-9.]/g, ""))}
-
-                  placeholder="0.00"
-
-                />
-
-              </div>
-
-            </label>
-
-            <div className="shbill-item-total">
-
-              <span>Item total</span>
-
-              <strong>{money(totals.items[index]?.itemTotal || 0)}</strong>
 
             </div>
 
-          </div>
+            <div className="shbill-fields-grid">
 
-        </article>
+              <label className="shbill-field">
 
-      ))}
+                <span>Customer name <b>*</b></span>
 
-      <button className="shbill-add-another" type="button" onClick={addItem}>
+                <input
 
-        <span className="shbill-add-another-icon">+</span>
+                  value={customer.name}
 
-        <span>
+                  onChange={(event) => updateCustomer("name", event.target.value)}
 
-          <strong>Add another jewellery item</strong>
+                  placeholder="e.g. Priya Patil"
 
-          <small>Use this when the customer is buying more than one item.</small>
+                  autoComplete="name"
 
-        </span>
+                  required
 
-      </button>
+                />
 
-    </section>
+              </label>
 
-    {/* OLD GOLD / SILVER / OTHER EXCHANGE */ }
+              <label className="shbill-field">
 
-    <section className="shbill-card shbill-exchange-section">
+                <span>Mobile number <b>*</b></span>
 
-      <div className="shbill-section-heading shbill-action-heading shbill-exchange-heading">
+                <input
 
-        <span className="shbill-section-icon">04</span>
+                  type="tel"
 
-        <div className="shbill-section-copy shbill-exchange-heading-copy">
+                  inputMode="numeric"
 
-          <h2>Gold / Silver / Other Exchange</h2>
+                  maxLength={10}
 
-          <p>Add old jewellery or other items received from the customer.</p>
+                  value={customer.phone}
 
-        </div>
+                  onChange={(event) =>
 
-        <button
+                    updateCustomer("phone", event.target.value.replace(/\D/g, "").slice(0, 10))
 
-          className="shbill-add-button"
+                  }
 
-          type="button"
+                  placeholder="Enter 10-digit number"
 
-          onClick={addExchangeItem}
+                  autoComplete="tel"
 
-        >
+                  required
 
-          + Add Exchange Item
+                />
 
-        </button>
+                <small>Enter a 10-digit mobile number.</small>
 
-      </div>
+              </label>
 
-      {calculatedExchangeItems.length === 0 ? (
+              <label className="shbill-field shbill-full">
 
-        <div className="shbill-exchange-empty">
+                <span>Address <em>Optional</em></span>
 
-          <strong>No exchange items added.</strong>
+                <textarea
 
-          <span>Add an item when the customer exchanges old jewellery.</span>
+                  rows={2}
 
-        </div>
+                  value={customer.address}
 
-      ) : (
+                  onChange={(event) => updateCustomer("address", event.target.value)}
 
-        calculatedExchangeItems.map((item, index) => (
+                  placeholder="Area, city, PIN code"
 
-          <article className="shbill-item-card" key={item.id}>
+                />
 
-            <div className="shbill-item-title">
+              </label>
 
-              <span className="shbill-item-number">{String(index + 1).padStart(2, "0")}</span>
+            </div>
 
-              <div className="shbill-item-copy">
+          </section>
 
-                <h3>{item.description.trim() || `Exchange item ${index + 1}`}</h3>
+          {/* NEW JEWELLERY ITEMS */}
 
-                <p>Details of the item received from the customer</p>
+          <section className="shbill-card">
+
+            <div className="shbill-section-heading shbill-action-heading shbill-jewellery-heading">
+
+              <span className="shbill-section-icon">03</span>
+
+              <div className="shbill-section-copy">
+
+                <h2>Jewellery items</h2>
+
+                <p>Choose the metal and purity, then enter the weight and rates.</p>
 
               </div>
 
-              <button
+              <button className="shbill-add-button" type="button" onClick={addItem}>
 
-                type="button"
-
-                className="shbill-remove-button"
-
-                onClick={() => removeExchangeItem(item.id)}
-
-                aria-label={`Remove exchange item ${index + 1}`}
-
-              >
-
-                Remove
+                + Add item
 
               </button>
 
             </div>
 
-            <div className="shbill-fields-grid shbill-item-fields">
+            {items.map((item, index) => (
 
-              <label className="shbill-field">
+              <article className="shbill-item-card" key={item.id}>
 
-                <span>Exchange type <b>*</b></span>
+                <div className="shbill-item-title">
 
-                <select
+                  <span className="shbill-item-number">{String(index + 1).padStart(2, "0")}</span>
 
-                  value={item.metal}
+                  <div className="shbill-item-copy">
 
-                  onChange={(event) => updateExchangeItem(item.id, "metal", event.target.value)}
+                    <h3>{item.name.trim() || `Jewellery item ${index + 1}`}</h3>
 
-                >
-
-                  <option>Gold</option>
-
-                  <option>Silver</option>
-
-                  <option>Other</option>
-
-                </select>
-
-              </label>
-
-              <label className="shbill-field">
-
-                <span>Description <b>*</b></span>
-
-                <input
-
-                  value={item.description}
-
-                  onChange={(event) => updateExchangeItem(item.id, "description", event.target.value)}
-
-                  placeholder="e.g. Old gold chain"
-
-                />
-
-              </label>
-
-              {item.metal === "Gold" ? (
-
-                <label className="shbill-field">
-
-                  <span>Purity / Karat <b>*</b></span>
-
-                  <select
-
-                    value={item.purity}
-
-                    onChange={(event) => updateExchangeItem(item.id, "purity", event.target.value)}
-
-                  >
-
-                    <option value="24K">24K</option>
-
-                    <option value="22K">22K</option>
-
-                    <option value="20K">20K</option>
-
-                    <option value="18K">18K</option>
-
-                    <option value="14K">14K</option>
-
-                    <option value="9K">9K</option>
-
-                  </select>
-
-                </label>
-
-              ) : item.metal === "Silver" ? (
-
-                <label className="shbill-field">
-
-                  <span>Purity (%)</span>
-
-                  <input
-
-                    type="text"
-
-                    inputMode="decimal"
-
-                    value={item.purity}
-
-                    onChange={(event) => updateExchangeItem(item.id, "purity", event.target.value.replace(/[^0-9.]/g, ""))}
-
-                    placeholder="e.g. 92.5"
-
-                  />
-
-                </label>
-
-              ) : null}
-
-              {item.metal === "Other" ? (
-
-                <label className="shbill-field">
-
-                  <span>Exchange value (₹) <b>*</b></span>
-
-                  <div className="shbill-input-unit">
-
-                    <span>₹</span>
-
-                    <input
-
-                      type="text"
-
-                      inputMode="decimal"
-
-                      value={item.manualValue}
-
-                      onChange={(event) => updateExchangeItem(item.id, "manualValue", event.target.value.replace(/[^0-9.]/g, ""))}
-
-                      placeholder="0.00"
-
-                    />
+                    <p>Item details and price calculation</p>
 
                   </div>
 
-                </label>
+                  <button
 
-              ) : (
+                    type="button"
 
-                <>
+                    className="shbill-remove-button"
+
+                    onClick={() => removeItem(item.id)}
+
+                    disabled={items.length === 1}
+
+                    aria-label={`Remove jewellery item ${index + 1}`}
+
+                  >
+
+                    Remove
+
+                  </button>
+
+                </div>
+
+                <div className="shbill-fields-grid shbill-item-fields">
+
+                  <label className="shbill-field shbill-full">
+
+                    <span>Item name <b>*</b></span>
+
+                    <input
+
+                      value={item.name}
+
+                      onChange={(event) => updateItem(item.id, "name", event.target.value)}
+
+                      placeholder="e.g. Gold ring, necklace, bangles"
+
+                      required
+
+                    />
+
+                  </label>
 
                   <label className="shbill-field">
 
-                    <span>Gross weight (g) <b>*</b></span>
+                    <span>Metal type <b>*</b></span>
+
+                    <select
+
+                      value={item.metal}
+
+                      onChange={(event) => updateItem(item.id, "metal", event.target.value)}
+
+                    >
+
+                      <option>Gold</option>
+
+                      <option>Silver</option>
+
+                      <option>Other</option>
+
+                    </select>
+
+                  </label>
+
+                  {item.metal === "Gold" ? (
+
+                    <label className="shbill-field">
+
+                      <span>Purity / Karat <b>*</b></span>
+
+                      <select
+
+                        value={item.purity}
+
+                        onChange={(event) => updateItem(item.id, "purity", event.target.value)}
+
+                      >
+
+                        <option value="24K">24K</option>
+
+                        <option value="22K">22K</option>
+
+                        <option value="20K">20K</option>
+
+                        <option value="18K">18K</option>
+
+                        <option value="14K">14K</option>
+
+                        <option value="9K">9K</option>
+
+                      </select>
+
+                    </label>
+
+                  ) : (
+
+                    <label className="shbill-field">
+
+                      <span>Purity (%) <b>*</b></span>
+
+                      <input
+
+                        type="text"
+
+                        inputMode="decimal"
+
+                        value={item.purity}
+
+                        onChange={(event) => updateItem(item.id, "purity", event.target.value.replace(/[^0-9.]/g, ""))}
+
+                        placeholder="e.g. 92.5"
+
+                      />
+
+                    </label>
+
+                  )}
+
+                  <label className="shbill-field">
+
+                    <span>Weight (g) <b>*</b></span>
 
                     <div className="shbill-input-unit">
 
@@ -2650,51 +2334,19 @@ export default function NewSHBill({ onNavigate }) {
 
                         inputMode="decimal"
 
-                        value={item.grossWeight}
+                        value={item.weight}
 
-                        onChange={(event) => updateExchangeItem(item.id, "grossWeight", event.target.value.replace(/[^0-9.]/g, ""))}
+                        onChange={(event) => updateItem(item.id, "weight", event.target.value.replace(/[^0-9.]/g, ""))}
 
-                        placeholder="0.000"
+                        placeholder="Enter weight"
 
-                      />
-
-                      <span>g</span>
-
-                    </div>
-
-                  </label>
-
-                  <label className="shbill-field">
-
-                    <span>Deduction weight (g)</span>
-
-                    <div className="shbill-input-unit">
-
-                      <input
-
-                        type="text"
-
-                        inputMode="decimal"
-
-                        value={item.deductionWeight}
-
-                        onChange={(event) => updateExchangeItem(item.id, "deductionWeight", event.target.value.replace(/[^0-9.]/g, ""))}
-
-                        placeholder="0.000"
+                        required
 
                       />
 
                       <span>g</span>
 
                     </div>
-
-                  </label>
-
-                  <label className="shbill-field">
-
-                    <span>Net weight (g)</span>
-
-                    <input value={item.netWeight.toFixed(3)} readOnly />
 
                   </label>
 
@@ -2714,7 +2366,35 @@ export default function NewSHBill({ onNavigate }) {
 
                         value={item.rate}
 
-                        onChange={(event) => updateExchangeItem(item.id, "rate", event.target.value.replace(/[^0-9.]/g, ""))}
+                        onChange={(event) => updateItem(item.id, "rate", event.target.value.replace(/[^0-9.]/g, ""))}
+
+                        placeholder="0.00"
+
+                        required
+
+                      />
+
+                    </div>
+
+                  </label>
+
+                  <label className="shbill-field">
+
+                    <span>Making charges (₹)</span>
+
+                    <div className="shbill-input-unit">
+
+                      <span>₹</span>
+
+                      <input
+
+                        type="text"
+
+                        inputMode="decimal"
+
+                        value={item.makingCharges}
+
+                        onChange={(event) => updateItem(item.id, "makingCharges", event.target.value.replace(/[^0-9.]/g, ""))}
 
                         placeholder="0.00"
 
@@ -2724,169 +2404,489 @@ export default function NewSHBill({ onNavigate }) {
 
                   </label>
 
-                </>
+                  <div className="shbill-item-total">
 
-              )}
+                    <span>Item total</span>
 
-              <div className="shbill-exchange-value">
+                    <strong>{money(totals.items[index]?.itemTotal || 0)}</strong>
 
-                <span>Calculated exchange value</span>
+                  </div>
 
-                <strong>{money(item.exchangeValue)}</strong>
+                </div>
+
+              </article>
+
+            ))}
+
+            <button className="shbill-add-another" type="button" onClick={addItem}>
+
+              <span className="shbill-add-another-icon">+</span>
+
+              <span>
+
+                <strong>Add another jewellery item</strong>
+
+                <small>Use this when the customer is buying more than one item.</small>
+
+              </span>
+
+            </button>
+
+          </section>
+
+          {/* OLD GOLD / SILVER / OTHER EXCHANGE */}
+
+          <section className="shbill-card shbill-exchange-section">
+
+            <div className="shbill-section-heading shbill-action-heading shbill-exchange-heading">
+
+              <span className="shbill-section-icon">04</span>
+
+              <div className="shbill-section-copy shbill-exchange-heading-copy">
+
+                <h2>Gold / Silver / Other Exchange</h2>
+
+                <p>Add old jewellery or other items received from the customer.</p>
 
               </div>
 
+              <button
+
+                className="shbill-add-button"
+
+                type="button"
+
+                onClick={addExchangeItem}
+
+              >
+
+                + Add Exchange Item
+
+              </button>
+
             </div>
 
-          </article>
+            {calculatedExchangeItems.length === 0 ? (
 
-        ))
+              <div className="shbill-exchange-empty">
 
-      )}
+                <strong>No exchange items added.</strong>
 
-      {exchangeTotal > 0 && (
+                <span>Add an item when the customer exchanges old jewellery.</span>
 
-        <div className="shbill-exchange-total">
+              </div>
 
-          <span>Total exchange value</span>
+            ) : (
 
-          <strong>{money(exchangeTotal)}</strong>
+              calculatedExchangeItems.map((item, index) => (
 
-        </div>
+                <article className="shbill-item-card" key={item.id}>
 
-      )}
+                  <div className="shbill-item-title">
 
-    </section>
+                    <span className="shbill-item-number">{String(index + 1).padStart(2, "0")}</span>
+
+                    <div className="shbill-item-copy">
+
+                      <h3>{item.description.trim() || `Exchange item ${index + 1}`}</h3>
+
+                      <p>Details of the item received from the customer</p>
+
+                    </div>
+
+                    <button
+
+                      type="button"
+
+                      className="shbill-remove-button"
+
+                      onClick={() => removeExchangeItem(item.id)}
+
+                      aria-label={`Remove exchange item ${index + 1}`}
+
+                    >
+
+                      Remove
+
+                    </button>
+
+                  </div>
+
+                  <div className="shbill-fields-grid shbill-item-fields">
+
+                    <label className="shbill-field">
+
+                      <span>Exchange type <b>*</b></span>
+
+                      <select
+
+                        value={item.metal}
+
+                        onChange={(event) => updateExchangeItem(item.id, "metal", event.target.value)}
+
+                      >
+
+                        <option>Gold</option>
+
+                        <option>Silver</option>
+
+                        <option>Other</option>
+
+                      </select>
+
+                    </label>
+
+                    <label className="shbill-field">
+
+                      <span>Description <b>*</b></span>
+
+                      <input
+
+                        value={item.description}
+
+                        onChange={(event) => updateExchangeItem(item.id, "description", event.target.value)}
+
+                        placeholder="e.g. Old gold chain"
+
+                      />
+
+                    </label>
+
+                    {item.metal === "Gold" ? (
+
+                      <label className="shbill-field">
+
+                        <span>Purity / Karat <b>*</b></span>
+
+                        <select
+
+                          value={item.purity}
+
+                          onChange={(event) => updateExchangeItem(item.id, "purity", event.target.value)}
+
+                        >
+
+                          <option value="24K">24K</option>
+
+                          <option value="22K">22K</option>
+
+                          <option value="20K">20K</option>
+
+                          <option value="18K">18K</option>
+
+                          <option value="14K">14K</option>
+
+                          <option value="9K">9K</option>
+
+                        </select>
+
+                      </label>
+
+                    ) : item.metal === "Silver" ? (
+
+                      <label className="shbill-field">
+
+                        <span>Purity (%)</span>
+
+                        <input
+
+                          type="text"
+
+                          inputMode="decimal"
+
+                          value={item.purity}
+
+                          onChange={(event) => updateExchangeItem(item.id, "purity", event.target.value.replace(/[^0-9.]/g, ""))}
+
+                          placeholder="e.g. 92.5"
+
+                        />
+
+                      </label>
+
+                    ) : null}
+
+                    {item.metal === "Other" ? (
+
+                      <label className="shbill-field">
+
+                        <span>Exchange value (₹) <b>*</b></span>
+
+                        <div className="shbill-input-unit">
+
+                          <span>₹</span>
+
+                          <input
+
+                            type="text"
+
+                            inputMode="decimal"
+
+                            value={item.manualValue}
+
+                            onChange={(event) => updateExchangeItem(item.id, "manualValue", event.target.value.replace(/[^0-9.]/g, ""))}
+
+                            placeholder="0.00"
+
+                          />
+
+                        </div>
+
+                      </label>
+
+                    ) : (
+
+                      <>
+
+                        <label className="shbill-field">
+
+                          <span>Gross weight (g) <b>*</b></span>
+
+                          <div className="shbill-input-unit">
+
+                            <input
+
+                              type="text"
+
+                              inputMode="decimal"
+
+                              value={item.grossWeight}
+
+                              onChange={(event) => updateExchangeItem(item.id, "grossWeight", event.target.value.replace(/[^0-9.]/g, ""))}
+
+                              placeholder="0.000"
+
+                            />
+
+                            <span>g</span>
+
+                          </div>
+
+                        </label>
+
+                        <label className="shbill-field">
+
+                          <span>Deduction weight (g)</span>
+
+                          <div className="shbill-input-unit">
+
+                            <input
+
+                              type="text"
+
+                              inputMode="decimal"
+
+                              value={item.deductionWeight}
+
+                              onChange={(event) => updateExchangeItem(item.id, "deductionWeight", event.target.value.replace(/[^0-9.]/g, ""))}
+
+                              placeholder="0.000"
+
+                            />
+
+                            <span>g</span>
+
+                          </div>
+
+                        </label>
+
+                        <label className="shbill-field">
+
+                          <span>Net weight (g)</span>
+
+                          <input value={item.netWeight.toFixed(3)} readOnly />
+
+                        </label>
+
+                        <label className="shbill-field">
+
+                          <span>Rate per gram (₹) <b>*</b></span>
+
+                          <div className="shbill-input-unit">
+
+                            <span>₹</span>
+
+                            <input
+
+                              type="text"
+
+                              inputMode="decimal"
+
+                              value={item.rate}
+
+                              onChange={(event) => updateExchangeItem(item.id, "rate", event.target.value.replace(/[^0-9.]/g, ""))}
+
+                              placeholder="0.00"
+
+                            />
+
+                          </div>
+
+                        </label>
+
+                      </>
+
+                    )}
+
+                    <div className="shbill-exchange-value">
+
+                      <span>Calculated exchange value</span>
+
+                      <strong>{money(item.exchangeValue)}</strong>
+
+                    </div>
+
+                  </div>
+
+                </article>
+
+              ))
+
+            )}
+
+            {exchangeTotal > 0 && (
+
+              <div className="shbill-exchange-total">
+
+                <span>Total exchange value</span>
+
+                <strong>{money(exchangeTotal)}</strong>
+
+              </div>
+
+            )}
+
+          </section>
 
         </div >
 
-    {/* SUMMARY IS FIRST ON MOBILE, SECOND ON DESKTOP */ }
+        {/* SUMMARY IS FIRST ON MOBILE, SECOND ON DESKTOP */}
 
-    < BillSummary
+        < BillSummary
 
-  money = { money }
+          money={money}
 
-  netPayable = { netPayable }
+          netPayable={netPayable}
 
-  items = { items }
+          items={items}
 
-  totals = { totals }
+          totals={totals}
 
-  discount = { discount }
+          discount={discount}
 
-  setDiscount = { setDiscount }
+          setDiscount={setDiscount}
 
-  clearNotice = { clearNotice }
+          clearNotice={clearNotice}
 
-  billingType = { billingType }
+          billingType={billingType}
 
-  exchangeTotal = { exchangeTotal }
+          exchangeTotal={exchangeTotal}
 
-  paidAmount = { paidAmount }
+          paidAmount={paidAmount}
 
-  setPaidAmount = { setPaidAmount }
+          setPaidAmount={setPaidAmount}
 
-  dueAmount = { dueAmount }
+          dueAmount={dueAmount}
 
-  notice = { notice }
+          notice={notice}
 
-  noticeType = { noticeType }
+          noticeType={noticeType}
 
-  previewPDF = { previewPDF }
+          previewPDF={previewPDF}
 
-  downloadPDF = { downloadPDF }
+          downloadPDF={downloadPDF}
 
-  isSaving = { isSaving }
+          isSaving={isSaving}
 
-    />
+        />
 
       </form >
 
-    <BillFooter tagline={SHOP.footer} />
+      <BillFooter tagline={SHOP.footer} />
 
-  {
-    previewOpen && (
+      {
+        previewOpen && (
 
-      <div
+          <div
 
-        className="shbill-preview-overlay"
+            className="shbill-preview-overlay"
 
-        role="dialog"
+            role="dialog"
 
-        aria-modal="true"
+            aria-modal="true"
 
-        aria-label="Invoice PDF preview"
+            aria-label="Invoice PDF preview"
 
-        onMouseDown={(event) => {
+            onMouseDown={(event) => {
 
-          if (event.target === event.currentTarget) setPreviewOpen(false);
+              if (event.target === event.currentTarget) setPreviewOpen(false);
 
-        }}
+            }}
 
-      >
+          >
 
-        <section className="shbill-preview-modal">
+            <section className="shbill-preview-modal">
 
-          <header className="shbill-preview-header">
+              <header className="shbill-preview-header">
 
-            <div>
+                <div>
 
-              <strong>Invoice preview</strong>
+                  <strong>Invoice preview</strong>
 
-              <small>Bill {billNumber || "DRAFT"} · A4 portrait · one page</small>
+                  <small>Bill {billNumber || "DRAFT"} · A4 portrait · one page</small>
 
-            </div>
+                </div>
 
-            <button type="button" onClick={() => setPreviewOpen(false)} aria-label="Close preview">×</button>
+                <button type="button" onClick={() => setPreviewOpen(false)} aria-label="Close preview">×</button>
 
-          </header>
+              </header>
 
-          <iframe title="Pranali Jewellers invoice preview" src={previewUrl} />
+              <iframe title="Pranali Jewellers invoice preview" src={previewUrl} />
 
-          <footer className="shbill-preview-actions">
+              <footer className="shbill-preview-actions">
 
-            <button type="button" className="shbill-secondary-button" onClick={() => setPreviewOpen(false)}>Close</button>
+                <button type="button" className="shbill-secondary-button" onClick={() => setPreviewOpen(false)}>Close</button>
 
-            <button type="button" className="shbill-primary-button" onClick={downloadPDF} disabled={isSaving}>
+                <button type="button" className="shbill-primary-button" onClick={downloadPDF} disabled={isSaving}>
 
-              {isSaving ? "Saving..." : "Save & download"}
+                  {isSaving ? "Saving..." : "Save & download"}
 
-            </button>
+                </button>
 
-            <button
+                <button
 
-              type="button"
+                  type="button"
 
-              className="shbill-primary-button"
+                  className="shbill-primary-button"
 
-              onClick={() => {
+                  onClick={() => {
 
-                const printWindow = window.open(previewUrl, "_blank");
+                    const printWindow = window.open(previewUrl, "_blank");
 
-                if (!printWindow) {
+                    if (!printWindow) {
 
-                  setNotice("Allow pop-ups to open the PDF for printing.");
+                      setNotice("Allow pop-ups to open the PDF for printing.");
 
-                  setNoticeType("error");
+                      setNoticeType("error");
 
-                }
+                    }
 
-              }}
+                  }}
 
-            >
+                >
 
-              Open to print
+                  Open to print
 
-            </button>
+                </button>
 
-          </footer>
+              </footer>
 
-        </section>
+            </section>
 
-      </div>
+          </div>
 
-    )
-  }
+        )
+      }
 
     </div >
 

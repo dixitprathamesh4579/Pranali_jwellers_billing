@@ -200,22 +200,7 @@ const createSHBill = async (req, res) => {
             bill_number
         });
 
-    } catch (error) {
-        await connection.rollback();
 
-        console.error("Create SH Bill Error:", error);
-
-        if (error.code === "ER_DUP_ENTRY") {
-            return res.status(409).json({
-                success: false,
-                message: "This bill number already exists."
-            });
-        }
-
-        return res.status(500).json({
-            success: false,
-            message: "Failed to save SH Bill."
-        });
 
     } finally {
         connection.release();

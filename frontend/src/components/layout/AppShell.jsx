@@ -55,11 +55,7 @@ export default function AppShell({ user, onLogout }) {
           ))}
         </nav>
         <main className={`page-stage ${active === "Overview" ? "overview-stage" : "module-stage"}`}>
-          {active !== "Overview" && active !== "More" && (
-            <div className="page-heading">
-              <div><span className="eyebrow">PRANALI JEWELLERS / WORKSPACE</span><h1>{pageTitles[active]}</h1><p>Manage your shop operations in one place.</p></div>
-            </div>
-          )}
+        
           <div className="module-host">{content}</div>
         </main>
         <MobileNav active={active} onNavigate={navigate} />
