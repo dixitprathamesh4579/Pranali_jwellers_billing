@@ -1507,10 +1507,11 @@ export default function NewSHBill({ onNavigate }) {
                 <h2>Gold / Silver / Other Exchange</h2>
                 <p>Add old jewellery or other items received from the customer.</p>
               </div>
+            
+            </div>
               <button className="shbill-add-button shbill-exchange-add-button" type="button" onClick={addExchangeItem}>
                 + Add exchange
               </button>
-            </div>
 
             {calculatedExchangeItems.length === 0 ? (
               <div className="shbill-exchange-empty">
