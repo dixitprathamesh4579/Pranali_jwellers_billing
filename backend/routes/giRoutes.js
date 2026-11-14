@@ -1,33 +1,5 @@
-const express = require("express");
-const router = express.Router();
-
-const {
-    createGI,
-    getAllGICustomers,
-    recordGIPayment,
-    getGIHistory,
-    getGIStatistics
-} = require("../controllers/giController");
-
-
-// CREATE GI ACCOUNT
-router.post("/", createGI);
-
-
-// GET GI CUSTOMERS
-router.get("/customers", getAllGICustomers);
-
-
-// RECORD GI PAYMENT
-router.post("/payment", recordGIPayment);
-
-
-// GET GI HISTORY
-router.get("/history", getGIHistory);
-
-
-// GET GI STATISTICS
-router.get("/statistics", getGIStatistics);
-
-
+const express = require("express"); const router = express.Router();
+const { createGI, getAllGICustomers, recordGIPayment, getGIHistory, getGIStatistics, deleteGIAccount } = require("../controllers/giController");
+const { createDeleteCaptcha } = require("../utils/deleteCaptcha");
+router.post("/", createGI); router.get("/customers", getAllGICustomers); router.post("/payment", recordGIPayment); router.get("/history", getGIHistory); router.get("/statistics", getGIStatistics); router.get("/delete-captcha", createDeleteCaptcha); router.delete("/:id", deleteGIAccount);
 module.exports = router;

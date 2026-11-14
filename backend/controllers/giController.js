@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const { verifyDeleteCaptcha } = require("../utils/deleteCaptcha");
 
 const {
     generateGINumber,
@@ -1219,10 +1220,28 @@ const getGIStatistics = async (req, res) => {
 
 };
 
+
+const deleteGIAccount = async (req, res) => {
+    const id = Number(req.params.id); const { captchaToken, captchaAnswer } = req.body || {};
+    if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ success: false, message: "Invalid GI account ID." });
+    if (!verifyDeleteCaptcha({ token: captchaToken, answer: captchaAnswer })) return res.status(400).json({ success: false, message: "Invalid or expired CAPTCHA. Please try again." });
+    let connection; try {
+        connection = await pool.getConnection(); await connection.beginTransaction();
+        const [rows] = await connection.query("SELECT id FROM gi_accounts WHERE id=? FOR UPDATE", [id]);
+        if (!rows.length) { await connection.rollback(); return res.status(404).json({ success: false, message: "GI account not found." }); }
+        await connection.query("DELETE FROM gi_items WHERE gi_account_id=?", [id]);
+        await connection.query("DELETE FROM gi_transactions WHERE gi_account_id=?", [id]);
+        await connection.query("DELETE FROM gi_accounts WHERE id=?", [id]); await connection.commit();
+        return res.json({ success: true, message: "Selected GI account and its records deleted successfully." });
+    } catch (e) { if (connection) await connection.rollback(); console.error("Delete GI Account Error:", e); return res.status(500).json({ success: false, message: "Failed to delete GI account." }); }
+    finally { if (connection) connection.release(); }
+};
+
 module.exports = {
     createGI,
     getAllGICustomers,
     recordGIPayment,
     getGIHistory,
-    getGIStatistics
+    getGIStatistics,
+    deleteGIAccount
 };

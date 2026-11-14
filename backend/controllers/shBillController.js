@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const { verifyDeleteCaptcha } = require("../utils/deleteCaptcha");
 
 // Convert 0 -> A, 25 -> Z, 26 -> AA, 27 -> AB, etc.
 const numberToLetters = (number) => {
@@ -568,6 +569,21 @@ const getSHBillPaymentHistory = async (req, res) => {
     }
 };
 
+
+const deleteSHBill = async (req,res) => {
+ const id=Number(req.params.id); const {captchaToken,captchaAnswer}=req.body||{};
+ if(!Number.isInteger(id)||id<=0) return res.status(400).json({success:false,message:"Invalid bill ID."});
+ if(!verifyDeleteCaptcha({token:captchaToken,answer:captchaAnswer})) return res.status(400).json({success:false,message:"Invalid or expired CAPTCHA. Please try again."});
+ let connection; try { connection=await pool.getConnection(); await connection.beginTransaction();
+ const [rows]=await connection.query("SELECT id FROM sh_bills WHERE id=? FOR UPDATE",[id]);
+ if(!rows.length){await connection.rollback();return res.status(404).json({success:false,message:"SH Bill not found."});}
+ await connection.query("DELETE FROM sh_bill_payments WHERE bill_id=?",[id]);
+ await connection.query("DELETE FROM sh_bills WHERE id=?",[id]); await connection.commit();
+ return res.json({success:true,message:"Selected SH Bill and its payment history deleted successfully."});
+ } catch(e){if(connection) await connection.rollback(); console.error("Delete SH Bill Error:",e); return res.status(500).json({success:false,message:"Failed to delete SH Bill."});}
+ finally{if(connection) connection.release();}
+};
+
 module.exports = {
     createSHBill,
     getAllSHBills,
@@ -575,5 +591,6 @@ module.exports = {
     getAllSHCustomers,
     getSHCustomerBills,
     recordSHBillPayment,
-    getSHBillPaymentHistory
+    getSHBillPaymentHistory,
+    deleteSHBill
 };
