@@ -7,40 +7,58 @@ const jwt = require("jsonwebtoken");
 
 const pool = require("./config/db");
 const { sendOtpEmail } = require("./services/emailService");
+
 const shBillRoutes = require("./routes/shBillRoutes");
 const giRoutes = require("./routes/giRoutes");
-
-const app = express();
 const dailyAccountsRoutes = require("./routes/dailyAccountsRoutes");
 
+const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// ======================================
+// 1. CORS CONFIGURATION
+// ======================================
 
-app.use("/api/daily-accounts", dailyAccountsRoutes);
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://pranali-jwellers-billing.dixitprathamesh4579.workers.dev"
+];
 
-// CORS configuration
 app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        "https://pranali-jwellers-billing.dixitprathamesh4579.workers.dev"
-    ],
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error("Not allowed by CORS"));
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// Body parsing middleware
+// ======================================
+// 2. BODY PARSING
+// ======================================
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ======================================
+// 3. REQUEST LOGGING
+// ======================================
 
 app.use((req, res, next) => {
     console.log("Method:", req.method);
     console.log("URL:", req.url);
+    console.log("Origin:", req.headers.origin);
     console.log("Content-Type:", req.headers["content-type"]);
-    console.log("Request Body:", req.body);
-
     next();
 });
 
-// API routes
+// ======================================
+// 4. API ROUTES
+// ======================================
+
+app.use("/api/daily-accounts", dailyAccountsRoutes);
 app.use("/api/sh-bills", shBillRoutes);
 app.use("/api/gi", giRoutes);
 
