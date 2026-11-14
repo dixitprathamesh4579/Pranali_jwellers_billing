@@ -1843,4 +1843,3 @@ export default function NewSHBill({ onNavigate }) {
     </div>
   );
 }
-gi

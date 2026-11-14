@@ -700,12 +700,7 @@
   min-width: 0;
 }
 
-.shbill-exchange-add-button {
-  flex: 0 0 auto;
-  min-width: 135px;
-  margin-left: auto;
-  white-space: nowrap;
-}
+
 
 .shbill-exchange-empty {
   display: grid;
