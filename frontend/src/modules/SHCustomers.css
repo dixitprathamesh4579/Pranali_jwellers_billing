@@ -566,24 +566,535 @@
 
 
 /* ===== Mobile usability improvements ===== */
-.shcustomers-page, .shcustomers-card { min-width: 0; }
-.shcustomers-table-wrapper, .shcustomer-history-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.shcustomers-table { min-width: 700px; }
-@media (max-width: 650px) {
-  .shcustomers-page { padding: 15px 11px; }
-  .shcustomers-header { flex-direction: column; align-items: stretch; }
-  .shcustomers-header h1 { font-size: 23px; }
-  .shcustomers-header button { width: 100%; min-height: 44px; }
-  .shcustomers-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
-  .shcustomer-stat-card { padding: 12px; gap: 9px; }
-  .shcustomer-stat-card h2 { font-size: 17px; overflow-wrap: anywhere; }
-  .shcustomers-card { padding: 14px; }
-  .shcustomers-list-heading { flex-direction: column; gap: 8px; }
-  .shcustomers-controls { flex-direction: column; align-items: stretch; }
-  .shcustomers-search { width: 100%; max-width: none; }
-  .shcustomer-modal-overlay { padding: 10px; align-items: flex-end; }
-  .shcustomer-modal, .shcustomer-payment-modal { width: 100%; max-width: 100%; max-height: 92dvh; overflow-y: auto; }
+.shcustomers-page,
+.shcustomers-card {
+    min-width: 0;
 }
+
+.shcustomers-table-wrapper,
+.shcustomer-history-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.shcustomers-table {
+    min-width: 700px;
+}
+
+@media (max-width: 650px) {
+    .shcustomers-page {
+        padding: 15px 11px;
+    }
+
+    .shcustomers-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .shcustomers-header h1 {
+        font-size: 23px;
+    }
+
+    .shcustomers-header button {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .shcustomers-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .shcustomer-stat-card {
+        padding: 12px;
+        gap: 9px;
+    }
+
+    .shcustomer-stat-card h2 {
+        font-size: 17px;
+        overflow-wrap: anywhere;
+    }
+
+    .shcustomers-card {
+        padding: 14px;
+    }
+
+    .shcustomers-list-heading {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .shcustomers-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .shcustomers-search {
+        width: 100%;
+        max-width: none;
+    }
+
+    .shcustomer-modal-overlay {
+        padding: 10px;
+        align-items: flex-end;
+    }
+
+    .shcustomer-modal,
+    .shcustomer-payment-modal {
+        width: 100%;
+        max-width: 100%;
+        max-height: 92dvh;
+        overflow-y: auto;
+    }
+}
+
 @media (max-width: 370px) {
-  .shcustomers-stats { grid-template-columns: 1fr; }
+    .shcustomers-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* =========================================================
+   MOBILE-FIRST RESPONSIVE POLISH
+   Keeps the existing desktop design and business logic.
+   ========================================================= */
+
+.shcustomers-page,
+.shcustomers-page * {
+    box-sizing: border-box;
+}
+
+.shcustomers-page {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.shcustomers-header,
+.shcustomers-list-heading,
+.shcustomers-controls,
+.shcustomers-card,
+.shcustomer-modal,
+.shcustomer-payment-modal {
+    min-width: 0;
+}
+
+.shcustomers-refresh,
+.shcustomer-view-button,
+.shcustomer-payment-button,
+.shcustomer-history-button,
+.shcustomer-cancel-button,
+.shcustomer-submit-payment,
+.shcustomers-filters button {
+    min-height: 40px;
+    touch-action: manipulation;
+}
+
+.shcustomers-search input {
+    min-width: 0;
+}
+
+.shcustomers-table-wrapper,
+.shcustomer-history-table-wrapper {
+    max-width: 100%;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+}
+
+.shcustomers-table th,
+.shcustomers-table td {
+    vertical-align: middle;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .shcustomers-page {
+        padding: 20px;
+    }
+
+    .shcustomers-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .shcustomers-card {
+        padding: 18px;
+    }
+
+    .shcustomers-controls {
+        align-items: stretch;
+    }
+
+    .shcustomers-search {
+        max-width: none;
+        flex-basis: 100%;
+    }
+
+    .shcustomers-filters {
+        width: 100%;
+    }
+}
+
+/* Phones */
+@media (max-width: 650px) {
+    .shcustomers-page {
+        padding: 14px 11px 24px;
+    }
+
+    .shcustomers-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 17px;
+    }
+
+    .shcustomers-header h1 {
+        font-size: 23px;
+        line-height: 1.2;
+    }
+
+    .shcustomers-header p {
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .shcustomers-refresh {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .shcustomers-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        margin-bottom: 16px;
+    }
+
+    .shcustomer-stat-card {
+        min-height: 88px;
+        padding: 11px;
+        gap: 9px;
+        border-radius: 11px;
+        align-items: flex-start;
+    }
+
+    .shcustomer-stat-icon {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        font-size: 17px;
+        border-radius: 9px;
+    }
+
+    .shcustomer-stat-card p {
+        font-size: 10px;
+        line-height: 1.3;
+        margin-bottom: 6px;
+    }
+
+    .shcustomer-stat-card h2 {
+        font-size: clamp(13px, 3.7vw, 17px);
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+    }
+
+    .shcustomers-card {
+        padding: 13px 11px;
+        border-radius: 12px;
+    }
+
+    .shcustomers-list-heading {
+        margin-bottom: 14px;
+    }
+
+    .shcustomers-list-heading h2 {
+        font-size: 17px;
+    }
+
+    .shcustomers-list-heading p {
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .shcustomers-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 11px;
+        margin-bottom: 14px;
+    }
+
+    .shcustomers-search {
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+        flex: none;
+        height: 46px;
+    }
+
+    .shcustomers-search input {
+        font-size: 14px;
+    }
+
+    .shcustomers-filters {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        width: 100%;
+        gap: 6px;
+    }
+
+    .shcustomers-filters button {
+        min-width: 0;
+        min-height: 42px;
+        padding: 8px 5px;
+        font-size: 10px;
+        line-height: 1.25;
+        white-space: normal;
+    }
+
+    /* Keep wide financial tables usable without breaking the page width. */
+    .shcustomers-table-wrapper,
+    .shcustomer-history-table-wrapper {
+        width: 100%;
+        margin-right: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid #edf0f4;
+        border-radius: 9px;
+    }
+
+    .shcustomers-table {
+        min-width: 760px;
+        font-size: 11px;
+    }
+
+    .shcustomers-table th {
+        padding: 12px 10px;
+        font-size: 10px;
+    }
+
+    .shcustomers-table td {
+        padding: 12px 10px;
+        font-size: 11px;
+    }
+
+    .shcustomer-name {
+        gap: 7px;
+    }
+
+    .shcustomer-avatar {
+        width: 29px;
+        height: 29px;
+        flex: 0 0 29px;
+        font-size: 11px;
+    }
+
+    .shcustomer-name strong {
+        font-size: 11px;
+    }
+
+    .shcustomer-view-button,
+    .shcustomer-payment-button,
+    .shcustomer-history-button {
+        min-height: 38px;
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    .shcustomers-table-footer {
+        font-size: 11px;
+        margin-top: 11px;
+    }
+
+    /* Bottom-sheet style customer and payment dialogs. */
+    .shcustomer-modal-overlay {
+        align-items: flex-end;
+        justify-content: center;
+        padding: 0;
+    }
+
+    .shcustomer-modal,
+    .shcustomer-payment-modal {
+        width: 100%;
+        max-width: 100%;
+        max-height: 92dvh;
+        margin: 0;
+        padding: 17px 13px calc(17px + env(safe-area-inset-bottom));
+        border-radius: 18px 18px 0 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .shcustomer-modal-header {
+        position: sticky;
+        top: -17px;
+        z-index: 2;
+        background: #fff;
+        padding: 3px 0 12px;
+        margin-bottom: 14px;
+    }
+
+    .shcustomer-modal-header h2 {
+        font-size: 18px;
+    }
+
+    .shcustomer-modal-header p {
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .shcustomer-modal-header button {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        border-radius: 9px;
+        background: #f4f6f8;
+        font-size: 25px;
+    }
+
+    .shcustomer-profile {
+        padding: 13px;
+        gap: 11px;
+        align-items: flex-start;
+    }
+
+    .shcustomer-profile-avatar {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        font-size: 18px;
+    }
+
+    .shcustomer-profile h3 {
+        font-size: 15px;
+        overflow-wrap: anywhere;
+    }
+
+    .shcustomer-profile p {
+        font-size: 11px;
+        overflow-wrap: anywhere;
+    }
+
+    .shcustomer-history-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+        margin-bottom: 18px;
+    }
+
+    .shcustomer-history-stats div {
+        min-width: 0;
+        padding: 10px 8px;
+        gap: 6px;
+    }
+
+    .shcustomer-history-stats span {
+        font-size: 9px;
+        line-height: 1.25;
+    }
+
+    .shcustomer-history-stats strong {
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .shcustomer-history-title {
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+
+    .shcustomer-payment-summary {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+        margin-bottom: 15px;
+    }
+
+    .shcustomer-payment-summary div {
+        min-width: 0;
+        padding: 9px 7px;
+        gap: 5px;
+    }
+
+    .shcustomer-payment-summary span {
+        font-size: 9px;
+        line-height: 1.25;
+    }
+
+    .shcustomer-payment-summary strong {
+        font-size: 11px;
+        overflow-wrap: anywhere;
+    }
+
+    .shcustomer-payment-modal form {
+        gap: 8px;
+    }
+
+    .shcustomer-payment-modal label {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .shcustomer-payment-modal input,
+    .shcustomer-payment-modal select,
+    .shcustomer-payment-modal textarea {
+        min-height: 44px;
+        padding: 11px;
+        font-size: 16px;
+        /* Prevents iOS Safari input zoom. */
+    }
+
+    .shcustomer-payment-modal textarea {
+        min-height: 90px;
+    }
+
+    .shcustomer-payment-actions {
+        display: grid;
+        grid-template-columns: 1fr 1.4fr;
+        gap: 8px;
+        position: sticky;
+        bottom: calc(-17px - env(safe-area-inset-bottom));
+        background: #fff;
+        padding: 12px 0 calc(4px + env(safe-area-inset-bottom));
+        margin-top: 12px;
+    }
+
+    .shcustomer-cancel-button,
+    .shcustomer-submit-payment {
+        min-height: 46px;
+        padding: 10px;
+        font-size: 12px;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 370px) {
+    .shcustomers-page {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .shcustomers-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+    }
+
+    .shcustomer-stat-card {
+        padding: 9px;
+    }
+
+    .shcustomer-stat-icon {
+        width: 30px;
+        height: 30px;
+        flex-basis: 30px;
+    }
+
+    .shcustomers-filters button {
+        font-size: 9px;
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+
+    .shcustomer-history-stats,
+    .shcustomer-payment-summary {
+        grid-template-columns: 1fr;
+    }
 }
