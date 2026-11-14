@@ -439,7 +439,16 @@ const getAllGICustomers = async (req, res) => {
                 account.item_names = account.items
                     .map(item => item.item_name || item.item_type)
                     .join(", ");
-
+                // Calculate total gross weight of all jewellery items
+                account.gross_weight = Number(
+                    account.items
+                        .reduce(
+                            (total, item) =>
+                                total + Number(item.gross_weight || 0),
+                            0
+                        )
+                        .toFixed(3)
+                );  
                 const balance = await calculateGIBalance(
                     pool,
                     {
