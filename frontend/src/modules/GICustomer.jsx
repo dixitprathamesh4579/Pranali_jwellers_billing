@@ -15,6 +15,7 @@ function GICustomer() {
     const [paymentLoading, setPaymentLoading] = useState(false);
     const [paymentError, setPaymentError] = useState("");
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [viewCustomer, setViewCustomer] = useState(null);
 
     // Delete confirmation + numeric CAPTCHA
     const [deleteGI, setDeleteGI] = useState(null);
@@ -526,9 +527,7 @@ function GICustomer() {
                                                 <button
                                                     type="button"
                                                     className="gi-view-button"
-                                                    onClick={() =>
-                                                        alert(`Details for ${customer.gi_number}`)
-                                                    }
+                                                    onClick={() => setViewCustomer(customer)}
                                                 >
                                                     View
                                                 </button>
@@ -574,6 +573,146 @@ function GICustomer() {
                 </div>
 
             </section>
+            {/* GI ACCOUNT VIEW DETAILS MODAL */}
+            {viewCustomer && (
+                <div
+                    className="gi-modal-overlay gi-view-overlay"
+                    onClick={() => setViewCustomer(null)}
+                >
+                    <section
+                        className="gi-payment-modal gi-view-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="gi-view-title"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="gi-modal-header">
+                            <div>
+                                <h2 id="gi-view-title">GI Account Details</h2>
+                                <p>{viewCustomer.gi_number || "GI Account"}</p>
+                            </div>
+                            <button
+                                type="button"
+                                className="gi-modal-close"
+                                onClick={() => setViewCustomer(null)}
+                                aria-label="Close account details"
+                            >
+                                &times;
+                            </button>
+                        </div>
+
+                        <div className="gi-view-status-row">
+                            <span className="gi-view-section-label">Account status</span>
+                            <span className={`gi-customer-status ${viewCustomer.account_status === "ACTIVE"
+                                    ? "status-active"
+                                    : "status-completed"
+                                }`}>
+                                {viewCustomer.account_status || "UNKNOWN"}
+                            </span>
+                        </div>
+
+                        <div className="gi-view-section">
+                            <h3>Customer Information</h3>
+                            <div className="gi-view-grid">
+                                <div className="gi-view-field">
+                                    <span>Customer Name</span>
+                                    <strong>{viewCustomer.customer_name || "-"}</strong>
+                                </div>
+                                <div className="gi-view-field">
+                                    <span>Mobile Number</span>
+                                    <strong>{viewCustomer.customer_phone || "-"}</strong>
+                                </div>
+                                <div className="gi-view-field">
+                                    <span>GI Number</span>
+                                    <strong>{viewCustomer.gi_number || "-"}</strong>
+                                </div>
+                                <div className="gi-view-field">
+                                    <span>GI Date</span>
+                                    <strong>
+                                        {viewCustomer.gi_date
+                                            ? new Date(viewCustomer.gi_date).toLocaleDateString("en-IN")
+                                            : "-"}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="gi-view-section">
+                            <h3>Pledged Jewellery</h3>
+                            <div className="gi-view-grid">
+                                <div className="gi-view-field gi-view-full-field">
+                                    <span>Item Name(s)</span>
+                                    <strong>{viewCustomer.item_names || "No item information available"}</strong>
+                                </div>
+                                <div className="gi-view-field">
+                                    <span>Gross Weight</span>
+                                    <strong>
+                                        {viewCustomer.gross_weight != null
+                                            ? `${viewCustomer.gross_weight} g`
+                                            : viewCustomer.total_gross_weight != null
+                                                ? `${viewCustomer.total_gross_weight} g`
+                                                : "-"}
+                                    </strong>
+                                </div>
+                            </div>
+                            <p className="gi-view-note">
+                                This list shows the item information returned by the GI Customers API.
+                            </p>
+                        </div>
+
+                        <div className="gi-view-section">
+                            <h3>Account Financial Summary</h3>
+                            <div className="gi-view-grid">
+                                <div className="gi-view-field">
+                                    <span>Principal Amount</span>
+                                    <strong>{currency(viewCustomer.principal)}</strong>
+                                </div>
+                                <div className="gi-view-field">
+                                    <span>Outstanding Interest</span>
+                                    <strong>{currency(viewCustomer.interest_amount)}</strong>
+                                </div>
+                                <div className="gi-view-field gi-view-highlight">
+                                    <span>Total Amount Due</span>
+                                    <strong>{currency(viewCustomer.total_due)}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="gi-view-section">
+                            <h3>Last Payment</h3>
+                            <div className="gi-view-grid">
+                                <div className="gi-view-field">
+                                    <span>Last Payment Amount</span>
+                                    <strong>
+                                        {viewCustomer.last_payment_amount != null
+                                            ? currency(viewCustomer.last_payment_amount)
+                                            : "-"}
+                                    </strong>
+                                </div>
+                                <div className="gi-view-field">
+                                    <span>Last Payment Date</span>
+                                    <strong>
+                                        {viewCustomer.last_payment_date
+                                            ? new Date(viewCustomer.last_payment_date).toLocaleDateString("en-IN")
+                                            : "-"}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="gi-view-actions">
+                            <button
+                                type="button"
+                                className="gi-cancel-button"
+                                onClick={() => setViewCustomer(null)}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            )}
+
             {/* DELETE GI ACCOUNT CAPTCHA MODAL */}
             {deleteGI && (
                 <div

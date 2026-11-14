@@ -891,3 +891,104 @@
         min-height: 46px;
     }
 }
+
+
+/* GI Customer - View account details modal */
+.gi-view-overlay {
+    z-index: 1200;
+}
+
+.gi-view-modal {
+    width: min(760px, calc(100vw - 32px));
+    max-width: 760px;
+    max-height: min(88vh, 900px);
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.gi-view-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.gi-view-section {
+    padding: 17px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.gi-view-section h3 {
+    margin: 0 0 13px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.gi-view-section-label {
+    font-size: 13px;
+    opacity: 0.75;
+}
+
+.gi-view-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.gi-view-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.gi-view-field span {
+    font-size: 12px;
+    opacity: 0.72;
+}
+
+.gi-view-field strong {
+    overflow-wrap: anywhere;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.gi-view-full-field {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.gi-view-highlight {
+    border-color: rgba(190, 150, 65, 0.45);
+    background: rgba(190, 150, 65, 0.10);
+}
+
+.gi-view-note {
+    margin: 9px 0 0;
+    font-size: 11px;
+    opacity: 0.65;
+}
+
+.gi-view-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 18px;
+}
+
+@media (max-width: 560px) {
+    .gi-view-modal {
+        width: calc(100vw - 20px);
+        max-height: 92vh;
+        padding: 16px;
+    }
+
+    .gi-view-grid {
+        grid-template-columns: 1fr;
+    }
+}
