@@ -2,6 +2,7 @@ const modules = [
   { name: "GI Customers", icon: "♧", desc: "Manage active Girvi accounts", tone: "mint" },
   { name: "GI History", icon: "◷", desc: "View completed Girvi records", tone: "gold" },
   { name: "GI Statistics", icon: "▥", desc: "Review monthly investments", tone: "lavender" },
+  { name: "DailyAccounts", icon: "✎", desc: "Manage daily transactions", tone: "sky" },
 ];
 export default function MorePage({ onNavigate, onLogout, user }) {
   return <section className="more-page">
