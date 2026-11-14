@@ -6,6 +6,7 @@ import NewGIBill from "./NewGi.jsx";
 import GICustomer from "./GICustomer.jsx";
 import GIHistory from "./GIHistory";
 import GIStatistics from "./GIStatistics";
+import NewSHBill from "./components/SHBill/NewSHBill";
 
 
 

@@ -2,6 +2,10 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import "./NewSHBill.css";
+import BillHeader from "./components/BillHeader";
+import BillPageHeading from "./components/BillPageHeading";
+import BillFooter from "./components/BillFooter";
+import BillSummary from "./components/BillSummary";
 
 const makeItem = () => ({
   id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
@@ -1226,33 +1230,8 @@ export default function NewSHBill({ onNavigate }) {
 
   return (
     <div className="shbill-page">
-      <header className="shbill-topbar">
-        <div className="shbill-brand-lockup">
-          <span className="shbill-brand-emblem" aria-hidden="true">✦</span>
-          <span className="shbill-brand-copy">
-            <strong>PRANALI JEWELLERS</strong>
-            <small>GOLD · SILVER · CUSTOM JEWELLERY</small>
-          </span>
-        </div>
-        <span className="shbill-header-status">
-          <span className="shbill-live-dot" /> New invoice
-        </span>
-      </header>
-
-      <section className="shbill-hero-heading">
-        <div className="shbill-hero-copy">
-          <p className="shbill-hero-kicker">PRANALI JEWELLERS / WORKSPACE</p>
-          <h1>Create sales bill</h1>
-          <p className="shbill-hero-description">
-            Manage your shop operations in one place.
-          </p>
-        </div>
-        <div className="shbill-hero-billno" aria-label={`Bill number ${billNumber}`}>
-          <span>Bill number</span>
-          <strong>{billNumber}</strong>
-          <small>Generated automatically</small>
-        </div>
-      </section>
+      <BillHeader />
+      <BillPageHeading billNumber={billNumber} />
 
       <form
         className="shbill-layout"
@@ -1691,113 +1670,28 @@ export default function NewSHBill({ onNavigate }) {
         </div>
 
         {/* SUMMARY IS FIRST ON MOBILE, SECOND ON DESKTOP */}
-        <aside className="shbill-summary-column">
-          <section className="shbill-summary-card">
-            <div className="shbill-summary-heading">
-              <span className="shbill-summary-icon" aria-hidden="true">✦</span>
-              <div>
-                <p>Your invoice</p>
-                <h2>Bill summary</h2>
-              </div>
-            </div>
-
-            <div className="shbill-total-panel">
-              <span>Amount to collect</span>
-              <strong>{money(netPayable)}</strong>
-              <small>{items.length} {items.length === 1 ? "item" : "items"} on this bill</small>
-            </div>
-
-            <div className="shbill-summary-rows">
-              <div><span>Subtotal</span><strong>{money(totals.subtotal)}</strong></div>
-              <label className="shbill-discount-row">
-                <span>Discount</span>
-                <span className="shbill-discount-input">
-                  <span>₹</span>
-                  <input
-                    aria-label="Discount in rupees"
-                    type="text"
-                    inputMode="decimal"
-                    value={discount}
-                    onChange={(event) => {
-                      setDiscount(event.target.value.replace(/[^0-9.]/g, ""));
-                      clearNotice();
-                    }}
-                    placeholder="0.00"
-                  />
-                </span>
-              </label>
-              <div><span>After discount</span><strong>{money(totals.taxableAmount)}</strong></div>
-              {billingType === "GST" && (
-                <div><span>GST <small>(3% demo)</small></span><strong>{money(totals.gstAmount)}</strong></div>
-              )}
-            </div>
-
-            <div className="shbill-grand-total">
-              <span>Grand total</span>
-              <strong>{money(totals.grandTotal)}</strong>
-            </div>
-
-            {exchangeTotal > 0 && (
-              <>
-                <div className="shbill-summary-row">
-                  <span>Less: exchange value</span>
-                  <strong className="shbill-exchange-deduction">− {money(exchangeTotal)}</strong>
-                </div>
-                <div className="shbill-grand-total shbill-net-payable">
-                  <span>Net payable</span>
-                  <strong>{money(netPayable)}</strong>
-                </div>
-              </>
-            )}
-
-            <label className="shbill-field shbill-paid-field">
-              <span>Paid amount (₹)</span>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                max={netPayable}
-                value={paidAmount}
-                onChange={(event) => {
-                  setPaidAmount(event.target.value);
-                  clearNotice();
-                }}
-                placeholder="Enter amount received"
-              />
-            </label>
-
-            <div className="shbill-summary-row shbill-due-row">
-              <span>Due amount</span>
-              <strong>{money(dueAmount)}</strong>
-            </div>
-
-            {billingType === "GST" && (
-              <p className="shbill-tax-note">GST is currently set to a demonstration rate of 3%.</p>
-            )}
-
-            {notice && (
-              <div className={`shbill-notice ${noticeType}`} role="status" aria-live="polite">
-                {notice}
-              </div>
-            )}
-
-            <div className="shbill-summary-actions">
-              <button className="shbill-secondary-button" type="button" onClick={previewPDF}>
-                Preview PDF
-              </button>
-              <button className="shbill-primary-button" type="button" onClick={downloadPDF} disabled={isSaving}>
-                {isSaving ? "Saving bill..." : "Save bill & download PDF"}
-              </button>
-            </div>
-            <p className="shbill-help-text">Review customer details, item weight and rates before saving.</p>
-          </section>
-        </aside>
+        <BillSummary
+          money={money}
+          netPayable={netPayable}
+          items={items}
+          totals={totals}
+          discount={discount}
+          setDiscount={setDiscount}
+          clearNotice={clearNotice}
+          billingType={billingType}
+          exchangeTotal={exchangeTotal}
+          paidAmount={paidAmount}
+          setPaidAmount={setPaidAmount}
+          dueAmount={dueAmount}
+          notice={notice}
+          noticeType={noticeType}
+          previewPDF={previewPDF}
+          downloadPDF={downloadPDF}
+          isSaving={isSaving}
+        />
       </form>
 
-      <footer className="shbill-footer">
-        <span>✦ PRANALI JEWELLERS</span>
-        <span>{SHOP.footer}</span>
-      </footer>
+      <BillFooter tagline={SHOP.footer} />
 
       {previewOpen && (
         <div
