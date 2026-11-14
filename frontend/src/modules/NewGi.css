@@ -51,6 +51,7 @@
 .gi-number-card strong {
     font-size: 19px;
     color: #a97822;
+    overflow-wrap: anywhere;
 }
 
 .gi-layout {
@@ -74,6 +75,7 @@
     border-radius: 14px;
     padding: 23px;
     box-shadow: 0 3px 12px rgba(25, 45, 77, 0.035);
+    min-width: 0;
 }
 
 .gi-section-heading {
@@ -81,10 +83,11 @@
     align-items: center;
     gap: 13px;
     margin-bottom: 23px;
+    min-width: 0;
 }
 
-.gi-section-heading>span,
-.gi-heading-left>span {
+.gi-section-heading > span,
+.gi-heading-left > span {
     width: 36px;
     height: 36px;
     background: #f8eed9;
@@ -106,6 +109,7 @@
     font-size: 12px;
     color: #8290a5;
     margin: 0;
+    line-height: 1.5;
 }
 
 .gi-fields {
@@ -132,6 +136,7 @@
 .gi-fields select,
 .gi-fields textarea {
     width: 100%;
+    min-width: 0;
     box-sizing: border-box;
     border: 1px solid #e4e8ef;
     border-radius: 8px;
@@ -166,6 +171,7 @@
     display: flex;
     align-items: center;
     gap: 13px;
+    min-width: 0;
 }
 
 .gi-add-button {
@@ -185,12 +191,18 @@
     padding: 18px;
     margin-bottom: 16px;
     background: #fffdfa;
+    min-width: 0;
+}
+
+.gi-item-card:last-child {
+    margin-bottom: 0;
 }
 
 .gi-item-heading {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     margin-bottom: 18px;
 }
 
@@ -261,6 +273,7 @@
 .gi-summary-principal strong {
     color: #a97822;
     font-size: 23px;
+    overflow-wrap: anywhere;
 }
 
 .gi-summary-details {
@@ -283,6 +296,7 @@
 .gi-summary-details strong {
     color: #192d4d;
     text-align: right;
+    overflow-wrap: anywhere;
 }
 
 .gi-summary-total {
@@ -304,6 +318,7 @@
 .gi-summary-total strong {
     font-size: 23px;
     color: #f1d49a;
+    overflow-wrap: anywhere;
 }
 
 .gi-interest-note {
@@ -341,6 +356,11 @@
     background: #8d651d;
 }
 
+.gi-save-button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
 .gi-summary-footer {
     color: #8290a5;
     font-size: 10px;
@@ -349,9 +369,20 @@
     margin: 12px 0 0;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
     .gi-layout {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr) 290px;
+        gap: 16px;
+    }
+
+    .gi-page {
+        padding: 22px;
+    }
+}
+
+@media (max-width: 900px) {
+    .gi-layout {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .gi-summary {
@@ -361,47 +392,166 @@
 
 @media (max-width: 600px) {
     .gi-page {
-        padding: 15px;
+        padding: 14px 11px;
     }
 
     .gi-page-header {
         align-items: flex-start;
         flex-direction: column;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .gi-page-header h1 {
+        font-size: 23px;
+    }
+
+    .gi-page-header p {
+        font-size: 12px;
     }
 
     .gi-number-card {
         width: 100%;
+        min-width: 0;
         box-sizing: border-box;
+        padding: 12px 14px;
     }
 
     .gi-card,
     .gi-summary {
-        padding: 16px;
+        padding: 14px;
+        border-radius: 12px;
+    }
+
+    .gi-main {
+        gap: 14px;
     }
 
     .gi-fields {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 13px;
     }
 
     .gi-full {
         grid-column: auto;
     }
 
+    .gi-fields input,
+    .gi-fields select,
+    .gi-fields textarea {
+        min-height: 44px;
+        padding: 11px 12px;
+        font-size: 16px;
+    }
+
+    .gi-fields textarea {
+        min-height: 90px;
+    }
+
+    .gi-section-heading {
+        gap: 10px;
+        margin-bottom: 17px;
+    }
+
+    .gi-section-heading h2 {
+        font-size: 15px;
+    }
+
+    .gi-section-heading p {
+        font-size: 11px;
+    }
+
+    .gi-section-heading > span,
+    .gi-heading-left > span {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+    }
+
     .gi-heading-between {
         align-items: flex-start;
         flex-wrap: wrap;
     }
+
+    .gi-heading-left {
+        gap: 10px;
+    }
+
+    .gi-add-button {
+        width: 100%;
+        min-height: 44px;
+        margin-top: 2px;
+    }
+
+    .gi-item-card {
+        padding: 13px;
+        margin-bottom: 12px;
+    }
+
+    .gi-item-heading {
+        margin-bottom: 14px;
+    }
+
+    .gi-remove-button {
+        min-height: 38px;
+        padding: 8px 12px;
+    }
+
+    .gi-summary-principal strong,
+    .gi-summary-total strong {
+        font-size: 21px;
+    }
+
+    .gi-save-button {
+        min-height: 48px;
+        font-size: 14px;
+    }
+
+    .gi-summary-details {
+        gap: 13px;
+    }
+
+    .gi-summary-details div {
+        font-size: 12px;
+    }
 }
 
+@media (max-width: 370px) {
+    .gi-page {
+        padding: 11px 8px;
+    }
 
-/* ===== Mobile usability improvements ===== */
-.gi-page, .gi-layout, .gi-main { min-width: 0; }
-@media (max-width: 600px) {
-  .gi-page { padding: 14px 11px; }
-  .gi-page-header { gap: 12px; }
-  .gi-page-header h1 { font-size: 23px; }
-  .gi-card, .gi-summary { padding: 14px; }
-  .gi-fields { grid-template-columns: minmax(0, 1fr); gap: 13px; }
-  .gi-fields input, .gi-fields select, .gi-fields textarea { min-height: 44px; font-size: 16px; }
-  .gi-save-button { min-height: 46px; }
+    .gi-card,
+    .gi-summary {
+        padding: 12px;
+    }
+
+    .gi-item-card {
+        padding: 11px;
+    }
+
+    .gi-page-header h1 {
+        font-size: 21px;
+    }
+
+    .gi-summary-principal,
+    .gi-summary-total {
+        padding: 14px;
+    }
+}
+
+/* Prevent horizontal overflow and improve touch interaction */
+.gi-page,
+.gi-layout,
+.gi-main,
+.gi-card,
+.gi-summary,
+.gi-item-card {
+    min-width: 0;
+}
+
+.gi-add-button,
+.gi-remove-button,
+.gi-save-button {
+    touch-action: manipulation;
 }
