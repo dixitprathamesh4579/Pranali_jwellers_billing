@@ -1098,3 +1098,184 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ==============================
+   DELETE BILL + CAPTCHA MODAL
+   ============================== */
+
+.shcustomer-delete-button {
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid #f0caca;
+    border-radius: 7px;
+    background: #fff1f1;
+    color: #c03939;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    touch-action: manipulation;
+}
+
+.shcustomer-delete-button:hover {
+    background: #ffe4e4;
+    border-color: #e7aaaa;
+}
+
+.shcustomer-delete-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.shcustomer-delete-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10020;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(15, 29, 48, 0.62);
+}
+
+.shcustomer-delete-modal {
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 25px;
+    border: 1px solid #f0d1d1;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.2);
+}
+
+.shcustomer-delete-modal h2 {
+    margin: 0 0 10px;
+    color: #192d4d;
+    font-size: 20px;
+}
+
+.shcustomer-delete-warning {
+    margin: 0 0 18px;
+    padding: 12px 13px;
+    border: 1px solid #f2cccc;
+    border-radius: 9px;
+    background: #fff3f3;
+    color: #a83232;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.shcustomer-delete-modal label {
+    display: block;
+    margin: 14px 0 7px;
+    color: #52647d;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.shcustomer-delete-question {
+    margin: 0 0 10px;
+    color: #192d4d;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.shcustomer-delete-modal input {
+    width: 100%;
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid #dce3ed;
+    border-radius: 8px;
+    outline: none;
+    color: #192d4d;
+    font: inherit;
+    font-size: 16px;
+}
+
+.shcustomer-delete-modal input:focus {
+    border-color: #c49a4a;
+    box-shadow: 0 0 0 3px rgba(196, 154, 74, 0.12);
+}
+
+.shcustomer-delete-error {
+    margin: 10px 0 0;
+    color: #c03939;
+    font-size: 12px;
+}
+
+.shcustomer-delete-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 20px;
+}
+
+.shcustomer-delete-cancel,
+.shcustomer-delete-confirm {
+    min-height: 42px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.shcustomer-delete-cancel {
+    border: 1px solid #dce3ed;
+    background: #fff;
+    color: #52647d;
+}
+
+.shcustomer-delete-confirm {
+    border: 1px solid #c03939;
+    background: #c03939;
+    color: #fff;
+}
+
+.shcustomer-delete-confirm:hover {
+    background: #a93232;
+}
+
+.shcustomer-delete-cancel:disabled,
+.shcustomer-delete-confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 650px) {
+    .shcustomer-actions {
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .shcustomer-delete-button {
+        min-height: 40px;
+    }
+
+    .shcustomer-delete-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .shcustomer-delete-modal {
+        width: 100%;
+        max-width: 100%;
+        max-height: 88dvh;
+        padding: 20px 15px calc(20px + env(safe-area-inset-bottom));
+        border-radius: 18px 18px 0 0;
+    }
+
+    .shcustomer-delete-actions {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+    }
+
+    .shcustomer-delete-cancel,
+    .shcustomer-delete-confirm {
+        min-height: 46px;
+    }
+}

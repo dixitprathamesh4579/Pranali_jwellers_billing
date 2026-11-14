@@ -48,6 +48,14 @@ export default function SHCustomers() {
     const [paymentHistory, setPaymentHistory] = useState([]);
     const [paymentHistoryLoading, setPaymentHistoryLoading] = useState(false);
 
+    // Delete confirmation + numeric CAPTCHA
+    const [deleteBill, setDeleteBill] = useState(null);
+    const [deleteCaptcha, setDeleteCaptcha] = useState(null);
+    const [captchaAnswer, setCaptchaAnswer] = useState("");
+    const [captchaLoading, setCaptchaLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
+
     // ---------------- FETCH CUSTOMERS ----------------
 
     const fetchCustomers = async () => {
@@ -251,6 +259,111 @@ export default function SHCustomers() {
         }
     };
 
+
+    // OPEN DELETE CONFIRMATION AND LOAD A SERVER-SIGNED CAPTCHA
+    const openDeleteBill = async (bill) => {
+        try {
+            setDeleteBill(bill);
+            setDeleteCaptcha(null);
+            setCaptchaAnswer("");
+            setDeleteError("");
+            setCaptchaLoading(true);
+
+            const response = await fetch(`${API_URL}/delete-captcha`);
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to load CAPTCHA.");
+            }
+
+            setDeleteCaptcha(result);
+        } catch (err) {
+            setDeleteError(err.message || "Unable to load CAPTCHA.");
+        } finally {
+            setCaptchaLoading(false);
+        }
+    };
+
+    // DELETE ONLY THE SELECTED SH BILL
+    const handleDeleteBill = async (e) => {
+        e.preventDefault();
+        if (!deleteBill || !deleteCaptcha) return;
+
+        if (!captchaAnswer.trim()) {
+            setDeleteError("Enter the CAPTCHA answer to continue.");
+            return;
+        }
+
+        const confirmed = window.confirm(
+            `Permanently delete bill ${deleteBill.bill_number} and its payment history? This cannot be undone.`
+        );
+        if (!confirmed) return;
+
+        try {
+            setDeleteLoading(true);
+            setDeleteError("");
+
+            const response = await fetch(`${API_URL}/${deleteBill.id}`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    captchaToken: deleteCaptcha.token,
+                    captchaAnswer
+                })
+            });
+
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to delete bill.");
+            }
+
+            setDeleteBill(null);
+            setDeleteCaptcha(null);
+            setCaptchaAnswer("");
+
+            // Refresh the customer directory and this customer's remaining bills.
+            await fetchCustomers();
+
+            if (selectedCustomer) {
+                const historyResponse = await fetch(
+                    `${API_URL}/customers/${encodeURIComponent(
+                        selectedCustomer.customer_phone
+                    )}/bills`
+                );
+                const historyResult = await historyResponse.json();
+
+                if (historyResponse.status === 404) {
+                    setCustomerBills([]);
+                    setSelectedCustomer(null);
+                } else if (!historyResponse.ok) {
+                    throw new Error(historyResult.message || "Bill deleted, but history refresh failed.");
+                } else {
+                    const remainingBills = historyResult.bills || [];
+                    setCustomerBills(remainingBills);
+
+                    setSelectedCustomer((previous) => previous ? ({
+                        ...previous,
+                        total_bills: remainingBills.length,
+                        total_purchase: remainingBills.reduce(
+                            (sum, bill) => sum + Number(bill.grand_total || 0), 0
+                        ),
+                        total_paid: remainingBills.reduce(
+                            (sum, bill) => sum + Number(bill.paid_amount || 0), 0
+                        ),
+                        total_due: remainingBills.reduce(
+                            (sum, bill) => sum + Number(bill.due_amount || 0), 0
+                        )
+                    }) : previous);
+                }
+            }
+
+            window.alert("Selected SH Bill deleted successfully.");
+        } catch (err) {
+            setDeleteError(err.message || "Bill deletion failed.");
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
 
     // VIEW PAYMENT HISTORY
     const viewPaymentHistory = async (bill) => {
@@ -666,6 +779,14 @@ export default function SHCustomers() {
                                                         >
                                                             History
                                                         </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="shcustomer-delete-button"
+                                                            onClick={() => openDeleteBill(bill)}
+                                                        >
+                                                            Delete
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -737,6 +858,103 @@ export default function SHCustomers() {
                 </div>
 
             )}
+            {/* DELETE SH BILL CAPTCHA MODAL */}
+            {deleteBill && (
+                <div
+                    className="shcustomer-modal-overlay"
+                    onClick={() => {
+                        if (!deleteLoading) {
+                            setDeleteBill(null);
+                            setDeleteCaptcha(null);
+                        }
+                    }}
+                >
+                    <section
+                        className="shcustomer-payment-modal shcustomer-delete-modal"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="shcustomer-modal-header">
+                            <div>
+                                <h2>Delete SH Bill</h2>
+                                <p>Bill: {deleteBill.bill_number}</p>
+                            </div>
+                            <button
+                                type="button"
+                                disabled={deleteLoading}
+                                onClick={() => {
+                                    setDeleteBill(null);
+                                    setDeleteCaptcha(null);
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <p className="shcustomer-delete-warning">
+                            This permanently deletes only this bill and its payment history.
+                            Other bills belonging to this customer will remain.
+                        </p>
+
+                        {captchaLoading ? (
+                            <p>Loading numeric CAPTCHA...</p>
+                        ) : deleteCaptcha ? (
+                            <form onSubmit={handleDeleteBill}>
+                                <label htmlFor="sh-delete-captcha">
+                                    Solve: <strong>{deleteCaptcha.question}</strong>
+                                </label>
+                                <input
+                                    id="sh-delete-captcha"
+                                    type="number"
+                                    inputMode="numeric"
+                                    value={captchaAnswer}
+                                    onChange={(e) => setCaptchaAnswer(e.target.value)}
+                                    placeholder="Enter answer"
+                                    required
+                                    autoComplete="off"
+                                />
+
+                                {deleteError && (
+                                    <div className="shcustomers-error">{deleteError}</div>
+                                )}
+
+                                <div className="shcustomer-payment-actions">
+                                    <button
+                                        type="button"
+                                        className="shcustomer-cancel-button"
+                                        disabled={deleteLoading}
+                                        onClick={() => {
+                                            setDeleteBill(null);
+                                            setDeleteCaptcha(null);
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="shcustomer-delete-button"
+                                        disabled={deleteLoading}
+                                    >
+                                        {deleteLoading ? "Deleting..." : "Confirm Delete"}
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            <>
+                                {deleteError && (
+                                    <div className="shcustomers-error">{deleteError}</div>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => openDeleteBill(deleteBill)}
+                                >
+                                    Retry CAPTCHA
+                                </button>
+                            </>
+                        )}
+                    </section>
+                </div>
+            )}
+
             {/* RECORD PAYMENT MODAL */}
 
             {selectedPaymentBill && (

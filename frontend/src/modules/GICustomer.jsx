@@ -16,6 +16,14 @@ function GICustomer() {
     const [paymentError, setPaymentError] = useState("");
     const [selectedCustomer, setSelectedCustomer] = useState(null);
 
+    // Delete confirmation + numeric CAPTCHA
+    const [deleteGI, setDeleteGI] = useState(null);
+    const [deleteCaptcha, setDeleteCaptcha] = useState(null);
+    const [captchaAnswer, setCaptchaAnswer] = useState("");
+    const [captchaLoading, setCaptchaLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
+
     const [paymentType, setPaymentType] = useState("INTEREST");
     const [paymentAmount, setPaymentAmount] = useState("");
     const [paymentDate, setPaymentDate] = useState(
@@ -109,6 +117,81 @@ function GICustomer() {
             total + Number(customer.principal || 0),
         0
     );
+    // OPEN DELETE CONFIRMATION AND LOAD A SERVER-SIGNED CAPTCHA
+    const openDeleteGI = async (customer) => {
+        try {
+            setDeleteGI(customer);
+            setDeleteCaptcha(null);
+            setCaptchaAnswer("");
+            setDeleteError("");
+            setCaptchaLoading(true);
+
+            const response = await fetch(
+                "https://pranali-jwellers-billing.onrender.com/api/gi/delete-captcha"
+            );
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to load CAPTCHA.");
+            }
+
+            setDeleteCaptcha(result);
+        } catch (err) {
+            setDeleteError(err.message || "Unable to load CAPTCHA.");
+        } finally {
+            setCaptchaLoading(false);
+        }
+    };
+
+    // DELETE ONLY THE SELECTED GI ACCOUNT
+    const handleDeleteGI = async (e) => {
+        e.preventDefault();
+        if (!deleteGI || !deleteCaptcha) return;
+
+        if (!captchaAnswer.trim()) {
+            setDeleteError("Enter the CAPTCHA answer to continue.");
+            return;
+        }
+
+        const confirmed = window.confirm(
+            `Permanently delete GI account ${deleteGI.gi_number} and its jewellery/transaction records? This cannot be undone.`
+        );
+        if (!confirmed) return;
+
+        try {
+            setDeleteLoading(true);
+            setDeleteError("");
+
+            const response = await fetch(
+                `https://pranali-jwellers-billing.onrender.com/api/gi/${deleteGI.gi_id}`,
+                {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        captchaToken: deleteCaptcha.token,
+                        captchaAnswer
+                    })
+                }
+            );
+
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to delete GI account.");
+            }
+
+            setDeleteGI(null);
+            setDeleteCaptcha(null);
+            setCaptchaAnswer("");
+            await fetchCustomers();
+
+            window.alert("Selected GI account deleted successfully.");
+        } catch (err) {
+            setDeleteError(err.message || "GI account deletion failed.");
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
+
     // OPEN PAYMENT MODAL
     const openPaymentModal = (customer) => {
         setSelectedCustomer(customer);
@@ -460,6 +543,14 @@ function GICustomer() {
                                                     </button>
                                                 )}
 
+                                                <button
+                                                    type="button"
+                                                    className="gi-delete-button"
+                                                    onClick={() => openDeleteGI(customer)}
+                                                >
+                                                    Delete
+                                                </button>
+
                                             </div>
                                         </td>
 
@@ -483,6 +574,104 @@ function GICustomer() {
                 </div>
 
             </section>
+            {/* DELETE GI ACCOUNT CAPTCHA MODAL */}
+            {deleteGI && (
+                <div
+                    className="gi-modal-overlay"
+                    onClick={() => {
+                        if (!deleteLoading) {
+                            setDeleteGI(null);
+                            setDeleteCaptcha(null);
+                        }
+                    }}
+                >
+                    <div
+                        className="gi-payment-modal gi-delete-modal"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="gi-modal-header">
+                            <div>
+                                <h2>Delete GI Account</h2>
+                                <p>{deleteGI.gi_number}</p>
+                            </div>
+                            <button
+                                type="button"
+                                className="gi-modal-close"
+                                disabled={deleteLoading}
+                                onClick={() => {
+                                    setDeleteGI(null);
+                                    setDeleteCaptcha(null);
+                                }}
+                            >
+                                &times;
+                            </button>
+                        </div>
+
+                        <p className="gi-delete-warning">
+                            This permanently deletes only this GI account, its jewellery items,
+                            and its transaction history. The customer and their other GI accounts remain.
+                        </p>
+
+                        {captchaLoading ? (
+                            <p>Loading numeric CAPTCHA...</p>
+                        ) : deleteCaptcha ? (
+                            <form onSubmit={handleDeleteGI}>
+                                <label htmlFor="gi-delete-captcha">
+                                    Solve: <strong>{deleteCaptcha.question}</strong>
+                                </label>
+                                <input
+                                    id="gi-delete-captcha"
+                                    type="number"
+                                    inputMode="numeric"
+                                    value={captchaAnswer}
+                                    onChange={(e) => setCaptchaAnswer(e.target.value)}
+                                    placeholder="Enter answer"
+                                    required
+                                    autoComplete="off"
+                                />
+
+                                {deleteError && (
+                                    <p className="gi-payment-error">{deleteError}</p>
+                                )}
+
+                                <div className="gi-modal-actions">
+                                    <button
+                                        type="button"
+                                        className="gi-cancel-button"
+                                        disabled={deleteLoading}
+                                        onClick={() => {
+                                            setDeleteGI(null);
+                                            setDeleteCaptcha(null);
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="gi-delete-button"
+                                        disabled={deleteLoading}
+                                    >
+                                        {deleteLoading ? "Deleting..." : "Confirm Delete"}
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            <>
+                                {deleteError && (
+                                    <p className="gi-payment-error">{deleteError}</p>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => openDeleteGI(deleteGI)}
+                                >
+                                    Retry CAPTCHA
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {showPaymentModal && selectedAccount && (
                 <div className="gi-modal-overlay">
                     <div className="gi-payment-modal">
