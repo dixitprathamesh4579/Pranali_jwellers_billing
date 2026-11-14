@@ -2,10 +2,10 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import "./NewSHBill.css";
-import BillHeader from "./components/BillHeader";
-import BillPageHeading from "./components/BillPageHeading";
-import BillFooter from "./components/BillFooter";
-import BillSummary from "./components/BillSummary";
+import BillHeader from "../components/BillHeader.jsx";
+import BillPageHeading from "../components/BillPageHeading.jsx";
+import BillFooter from "../components/BillFooter.jsx";
+import BillSummary from "../components/BillSummary.jsx";
 
 const makeItem = () => ({
   id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
