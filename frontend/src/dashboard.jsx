@@ -7,6 +7,7 @@ import NewGIBill from "./NewGi.jsx";
 import GICustomer from "./GICustomer.jsx";
 import GIHistory from "./GIHistory";
 import GIStatistics from "./GIStatistics";
+import DailyAccounts from "./modules/DailyAccounts.jsx";
 
 
 const modules = [
@@ -17,6 +18,7 @@ const modules = [
   { label: "GI Customer", icon: "♧" },
   { label: "GI History", icon: "◷" },
   { label: "GI Statistics", icon: "▥" },
+  { label: "Daily Accounts", icon: "₹" },
 
 ];
 
@@ -469,6 +471,8 @@ function Dashboard({ user, onNavigate, onLogout }) {
           <GIHistory />
         ) : activeModule === "GI Statistics" ? (
           <GIStatistics />
+        ) : activeModule === "Daily Accounts" ? (
+          <DailyAccounts />
         ) : (
           /* Other Modules */
           <section className="sh-module-placeholder">
