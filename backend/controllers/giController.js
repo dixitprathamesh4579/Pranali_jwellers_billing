@@ -269,7 +269,12 @@ const createGI = async (req, res) => {
             ]
         );
 
-        // 9. COMMIT TRANSACTION
+        await connection.query(
+            `UPDATE gi_number_sequence
+     SET last_number = ?
+     WHERE id = 1`,
+            [Number(giNumber.split("-")[1])]
+        );
 
         await connection.commit();
 

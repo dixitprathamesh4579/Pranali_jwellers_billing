@@ -2,10 +2,18 @@
 // GENERATE GI NUMBER
 // ==========================================
 
+// ==========================================
+// GENERATE GI NUMBER
+// ==========================================
+
+// ==========================================
+// GENERATE GI NUMBER
+// ==========================================
+
 const generateGINumber = async (connection) => {
 
     const [rows] = await connection.query(
-        `SELECT next_number
+        `SELECT last_number
          FROM gi_number_sequence
          WHERE id = 1
          FOR UPDATE`
@@ -15,19 +23,12 @@ const generateGINumber = async (connection) => {
         throw new Error("GI number sequence not initialized.");
     }
 
-    const nextNumber = Number(rows[0].next_number);
+    const lastNumber = Number(rows[0].last_number);
 
-    await connection.query(
-        `UPDATE gi_number_sequence
-         SET next_number = next_number + 1
-         WHERE id = 1`
-    );
+    const nextNumber = lastNumber + 1;
 
-    return `GI-${String(nextNumber).padStart(4, "0")}`;
-};
-
-
-// ==========================================
+    return `G-${nextNumber}`;
+};// ==========================================
 // NORMALIZE DATE
 // ==========================================
 
