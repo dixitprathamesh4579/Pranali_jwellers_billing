@@ -9,6 +9,7 @@ import NewGIBill from "../../modules/NewGi.jsx";
 import GICustomer from "../../modules/GICustomer.jsx";
 import GIHistory from "../../modules/GIHistory.jsx";
 import GIStatistics from "../../modules/GIStatistics.jsx";
+import DailyAccounts from "../../modules/DailyAccounts.jsx";
 
 const pageTitles = {
   Overview: "Dashboard",
@@ -36,6 +37,7 @@ export default function AppShell({ user, onLogout }) {
     "GI Customers": <GICustomer />,
     "GI History": <GIHistory />,
     "GI Statistics": <GIStatistics />,
+    "DailyAccounts": <DailyAccounts />,  
     More: <MorePage onNavigate={navigate} onLogout={onLogout} user={user} />,
   }[active];
 
@@ -47,7 +49,7 @@ export default function AppShell({ user, onLogout }) {
           {[
             ["Overview", "⌂"], ["New SH Bill", "＋"], ["SH Customers", "♙"],
             ["New GI", "◇"], ["GI Customers", "♧"], ["GI History", "◷"],
-            ["GI Statistics", "▥"],
+            ["GI Statistics", "▥"],["DailyAccounts", "✎"], 
           ].map(([name, icon]) => (
             <button key={name} className={active === name ? "desktop-nav-item active" : "desktop-nav-item"} onClick={() => navigate(name)}>
               <span>{icon}</span>{name}

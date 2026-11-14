@@ -10,6 +10,7 @@ import GIStatistics from "./GIStatistics";
 import DailyAccounts from "./modules/DailyAccounts.jsx";
 
 
+
 const modules = [
   { label: "Dashboard", icon: "▦" },
   { label: "NEW SH Bill", icon: "▤" },
@@ -19,6 +20,7 @@ const modules = [
   { label: "GI History", icon: "◷" },
   { label: "GI Statistics", icon: "▥" },
   { label: "Daily Accounts", icon: "₹" },
+  
 
 ];
 
