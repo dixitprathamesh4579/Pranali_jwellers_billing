@@ -1509,9 +1509,7 @@ export default function NewSHBill({ onNavigate }) {
               </div>
             
             </div>
-              <button className="shbill-add-button shbill-exchange-add-button" type="button" onClick={addExchangeItem}>
-                + Add exchange
-              </button>
+              
 
             {calculatedExchangeItems.length === 0 ? (
               <div className="shbill-exchange-empty">
