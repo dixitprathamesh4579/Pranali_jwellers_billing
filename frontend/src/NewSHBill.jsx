@@ -137,27 +137,7 @@ const pdfDate = (v) =>
     })
     : "";
 
-const getNextBillNumber = () => {
-  const storageKey = "pranali_jewellers_next_sh_bill_number";
-  let nextNumber = 1;
 
-  try {
-    nextNumber = Number(window.localStorage.getItem(storageKey)) || 1;
-
-    window.localStorage.setItem(
-      storageKey,
-      String(nextNumber + 1)
-    );
-  } catch (error) {
-    nextNumber = Date.now() % 100000;
-  }
-
-  const groupIndex = Math.floor((nextNumber - 1) / 100);
-  const sequence = ((nextNumber - 1) % 100) + 1;
-  const groupLetter = String.fromCharCode(65 + (groupIndex % 26));
-
-  return `${groupLetter}-${sequence}`;
-};
 
 export default function NewSHBill({ onNavigate }) {
   // ---------------- STATES ----------------

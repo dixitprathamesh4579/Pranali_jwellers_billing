@@ -1,5 +1,55 @@
 const pool = require("../config/db");
 
+// Convert 0 -> A, 25 -> Z, 26 -> AA, 27 -> AB, etc.
+const numberToLetters = (number) => {
+    let result = "";
+    let n = number + 1;
+
+    while (n > 0) {
+        n--;
+
+        result =
+            String.fromCharCode(65 + (n % 26)) + result;
+
+        n = Math.floor(n / 26);
+    }
+
+    return result;
+};
+
+// Convert A -> 0, Z -> 25, AA -> 26, AB -> 27, etc.
+const lettersToNumber = (letters) => {
+    let result = 0;
+
+    for (const letter of letters) {
+        result = result * 26 + (letter.charCodeAt(0) - 64);
+    }
+
+    return result - 1;
+};
+
+// Convert a global bill count into A-1, A-2 ... AA-1, etc.
+const formatBillNumber = (number) => {
+    const groupIndex = Math.floor((number - 1) / 100);
+    const sequence = ((number - 1) % 100) + 1;
+
+    return `${numberToLetters(groupIndex)}-${sequence}`;
+};
+
+// Convert an existing bill number into its global sequence number.
+const parseBillNumber = (billNumber) => {
+    const match = /^([A-Z]+)-(\d+)$/.exec(billNumber || "");
+
+    if (!match) return 0;
+
+    const groupIndex = lettersToNumber(match[1]);
+    const sequence = Number(match[2]);
+
+    if (sequence < 1 || sequence > 100) return 0;
+
+    return groupIndex * 100 + sequence;
+};
+
 // CREATE NEW SH BILL
 // CREATE NEW SH BILL
 const createSHBill = async (req, res) => {
@@ -7,7 +57,6 @@ const createSHBill = async (req, res) => {
 
     try {
         const {
-            bill_number,
             billing_type,
             bill_date,
             customer_name,
@@ -18,15 +67,15 @@ const createSHBill = async (req, res) => {
             discount_amount,
             gst_amount,
             grand_total,
-            exchange_items = [],
-            exchange_total = 0,
-            net_payable,
-            paid_amount
+            paid_amount,
+            due_amount,
+            exchange_items,
+            exchange_total,
+            net_payable
         } = req.body;
 
-        // BASIC VALIDATION
+        // Basic validation
         if (
-            !bill_number ||
             !billing_type ||
             !bill_date ||
             !customer_name ||
@@ -54,68 +103,48 @@ const createSHBill = async (req, res) => {
             });
         }
 
-        // EXCHANGE VALIDATION
-        if (!Array.isArray(exchange_items)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid exchange items."
-            });
-        }
-
-        const grandTotal = Number(grand_total);
-        const exchangeTotal = Number(exchange_total);
-        const paidAmount = Number(paid_amount);
-
-        if (
-            !Number.isFinite(grandTotal) ||
-            !Number.isFinite(exchangeTotal) ||
-            !Number.isFinite(paidAmount) ||
-            grandTotal <= 0 ||
-            exchangeTotal < 0 ||
-            paidAmount < 0
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid bill amounts."
-            });
-        }
-
-        const calculatedNetPayable = Number(
-            (grandTotal - exchangeTotal).toFixed(2)
-        );
-
-        if (calculatedNetPayable < 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Exchange value cannot exceed the grand total."
-            });
-        }
-
-        if (
-            net_payable !== undefined &&
-            Math.abs(Number(net_payable) - calculatedNetPayable) > 0.01
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Net payable amount calculation is incorrect."
-            });
-        }
-
-        if (paidAmount > calculatedNetPayable + 0.001) {
-            return res.status(400).json({
-                success: false,
-                message: "Paid amount cannot exceed net payable amount."
-            });
-        }
-
-        const finalDue = Number(
-            (calculatedNetPayable - paidAmount).toFixed(2)
-        );
-
         await connection.beginTransaction();
 
-        const sql = `
-            INSERT INTO sh_bills (
+        // Lock the sequence row.
+        // This ensures that simultaneous users cannot get the same number.
+        const [sequenceRows] = await connection.query(
+            `SELECT last_number
+             FROM sh_bill_number_sequence
+             WHERE id = 1
+             FOR UPDATE`
+        );
+
+        if (sequenceRows.length === 0) {
+            throw new Error("SH bill sequence row is missing.");
+        }
+
+        let lastNumber = Number(sequenceRows[0].last_number);
+
+        /*
+         * First-time migration:
+         * If old bills already exist but the sequence table is new,
+         * find the highest existing bill number.
+         */
+        if (lastNumber === 0) {
+            const [existingBills] = await connection.query(
+                "SELECT bill_number FROM sh_bills"
+            );
+
+            for (const bill of existingBills) {
+                lastNumber = Math.max(
+                    lastNumber,
+                    parseBillNumber(bill.bill_number)
+                );
+            }
+        }
+
+        // Generate the next bill number.
+        const nextNumber = lastNumber + 1;
+        const bill_number = formatBillNumber(nextNumber);
+
+        // Save bill.
+        const [result] = await connection.query(
+            `INSERT INTO sh_bills (
                 bill_number,
                 billing_type,
                 bill_date,
@@ -127,50 +156,40 @@ const createSHBill = async (req, res) => {
                 discount_amount,
                 gst_amount,
                 grand_total,
+                paid_amount,
+                due_amount,
                 exchange_items,
                 exchange_total,
-                net_payable,
-                paid_amount,
-                due_amount
+                net_payable
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                bill_number,
+                billing_type,
+                bill_date,
+                customer_name,
+                customer_phone,
+                customer_address || null,
+                JSON.stringify(items),
+                subtotal,
+                discount_amount,
+                gst_amount,
+                grand_total,
+                paid_amount,
+                due_amount,
+                JSON.stringify(exchange_items || []),
+                exchange_total || 0,
+                net_payable ?? grand_total
+            ]
+        );
 
-        const values = [
-            bill_number,
-            billing_type,
-            bill_date,
-            customer_name,
-            customer_phone,
-            customer_address || null,
-            JSON.stringify(items),
-            subtotal,
-            discount_amount,
-            gst_amount,
-            grandTotal,
-            JSON.stringify(exchange_items),
-            exchangeTotal,
-            calculatedNetPayable,
-            paidAmount,
-            finalDue
-        ];
-
-        const [result] = await connection.execute(sql, values);
-
-        // Save initial payment in payment history.
-        if (paidAmount > 0) {
-            await connection.execute(
-                `INSERT INTO sh_bill_payments
-                 (bill_id, payment_amount, payment_date, payment_mode, remarks)
-                 VALUES (?, ?, ?, 'CASH', ?)`,
-                [
-                    result.insertId,
-                    paidAmount,
-                    bill_date,
-                    "Initial payment recorded with bill"
-                ]
-            );
-        }
+        // Update sequence only after successful bill insertion.
+        await connection.query(
+            `UPDATE sh_bill_number_sequence
+             SET last_number = ?
+             WHERE id = 1`,
+            [nextNumber]
+        );
 
         await connection.commit();
 
@@ -178,12 +197,7 @@ const createSHBill = async (req, res) => {
             success: true,
             message: "SH Bill saved successfully!",
             bill_id: result.insertId,
-            bill_number,
-            grand_total: grandTotal,
-            exchange_total: exchangeTotal,
-            net_payable: calculatedNetPayable,
-            paid_amount: paidAmount,
-            due_amount: finalDue
+            bill_number
         });
 
     } catch (error) {
