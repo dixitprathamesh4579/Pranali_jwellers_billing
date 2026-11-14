@@ -25,12 +25,6 @@ app.use(cors({
 // Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// API routes
-app.use("/api/sh-bills", shBillRoutes);
-app.use("/api/gi", giRoutes);
-
-// Temporary debugging middleware
 app.use((req, res, next) => {
     console.log("Method:", req.method);
     console.log("URL:", req.url);
@@ -39,6 +33,13 @@ app.use((req, res, next) => {
 
     next();
 });
+
+// API routes
+app.use("/api/sh-bills", shBillRoutes);
+app.use("/api/gi", giRoutes);
+
+// Temporary debugging middleware
+
 
 // Temporary OTP storage for local development only.
 const otpStore = new Map();
