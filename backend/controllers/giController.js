@@ -327,16 +327,16 @@ const createGI = async (req, res) => {
 // ACTIVE / COMPLETED / ALL
 // ==========================================
 
+
+
 const getAllGICustomers = async (req, res) => {
-
     try {
-
         const {
             search = "",
             filter = "all"
         } = req.query;
 
-        // Validate filter
+        // VALIDATE FILTER
         if (!["all", "active", "completed"].includes(filter)) {
             return res.status(400).json({
                 success: false,
@@ -344,8 +344,10 @@ const getAllGICustomers = async (req, res) => {
             });
         }
 
-        const searchValue = `%${search.trim()}%`;
+        const searchText = search.trim();
+        const searchValue = `%${searchText}%`;
 
+        // FETCH GI ACCOUNTS AND CUSTOMER DETAILS
         let sql = `
             SELECT
                 ga.id AS gi_id,
@@ -380,13 +382,13 @@ const getAllGICustomers = async (req, res) => {
         `;
 
         const queryParams = [
-            search.trim(),
+            searchText,
             searchValue,
             searchValue,
             searchValue
         ];
 
-        // Apply account status filter
+        // APPLY ACCOUNT STATUS FILTER
         if (filter === "active") {
             sql += ` AND ga.account_status = 'ACTIVE'`;
         }
@@ -397,9 +399,12 @@ const getAllGICustomers = async (req, res) => {
 
         sql += ` ORDER BY ga.created_at DESC`;
 
-        const [accounts] = await pool.execute(sql, queryParams);
+        const [accounts] = await pool.execute(
+            sql,
+            queryParams
+        );
 
-        // Fetch jewellery items
+        // FETCH ADDITIONAL INFORMATION
         if (accounts.length > 0) {
 
             const accountIds = accounts.map(
@@ -409,6 +414,10 @@ const getAllGICustomers = async (req, res) => {
             const placeholders = accountIds
                 .map(() => "?")
                 .join(",");
+
+            // =====================================
+            // 1. FETCH JEWELLERY ITEMS
+            // =====================================
 
             const [items] = await pool.query(
                 `
@@ -420,7 +429,46 @@ const getAllGICustomers = async (req, res) => {
                 accountIds
             );
 
-            // Group jewellery items by GI account
+            // =====================================
+            // 2. FETCH LATEST PAYMENT
+            // =====================================
+
+            const [payments] = await pool.query(
+                `
+                SELECT
+                    gt.gi_account_id,
+                    gt.amount AS last_payment_amount,
+                    gt.transaction_date AS last_payment_date
+
+                FROM gi_transactions gt
+
+                INNER JOIN (
+                    SELECT
+                        gi_account_id,
+                        MAX(id) AS latest_payment_id
+
+                    FROM gi_transactions
+
+                    WHERE gi_account_id IN (${placeholders})
+
+                    AND transaction_type IN (
+                        'PAYMENT',
+                        'INTEREST_PAYMENT'
+                    )
+
+                    GROUP BY gi_account_id
+
+                ) latest
+
+                    ON gt.id = latest.latest_payment_id
+                `,
+                accountIds
+            );
+
+            // =====================================
+            // 3. GROUP JEWELLERY ITEMS
+            // =====================================
+
             const itemMap = {};
 
             items.forEach(item => {
@@ -430,25 +478,63 @@ const getAllGICustomers = async (req, res) => {
                 }
 
                 itemMap[item.gi_account_id].push(item);
+
             });
 
-            // Calculate actual outstanding balance
+            // =====================================
+            // 4. MAP LATEST PAYMENTS
+            // =====================================
+
+            const paymentMap = {};
+
+            payments.forEach(payment => {
+
+                paymentMap[payment.gi_account_id] = payment;
+
+            });
+
+            // =====================================
+            // 5. CALCULATE ACCOUNT BALANCES
+            // =====================================
+
             for (const account of accounts) {
 
+                // JEWELLERY INFORMATION
                 account.items = itemMap[account.gi_id] || [];
+
                 account.item_names = account.items
-                    .map(item => item.item_name || item.item_type)
+                    .map(item =>
+                        item.item_name || item.item_type
+                    )
                     .join(", ");
-                // Calculate total gross weight of all jewellery items
+
+                // TOTAL GROSS WEIGHT
                 account.gross_weight = Number(
-                    account.items
-                        .reduce(
-                            (total, item) =>
-                                total + Number(item.gross_weight || 0),
-                            0
-                        )
-                        .toFixed(3)
-                );  
+                    account.items.reduce(
+                        (total, item) =>
+                            total + Number(item.gross_weight || 0),
+                        0
+                    ).toFixed(3)
+                );
+
+                // =================================
+                // LATEST PAYMENT INFORMATION
+                // =================================
+
+                const lastPayment = paymentMap[account.gi_id];
+
+                account.last_payment_amount = lastPayment
+                    ? Number(lastPayment.last_payment_amount)
+                    : null;
+
+                account.last_payment_date = lastPayment
+                    ? lastPayment.last_payment_date
+                    : null;
+
+                // =================================
+                // EXISTING BALANCE CALCULATION
+                // =================================
+
                 const balance = await calculateGIBalance(
                     pool,
                     {
@@ -457,18 +543,25 @@ const getAllGICustomers = async (req, res) => {
                         interest_rate: account.interest_rate,
                         gi_date: account.gi_date
                     },
-                    new Date() // Today's date
+                    new Date()
                 );
 
                 account.principal = Number(balance.principal);
+
                 account.interest_amount = Number(balance.interest);
+
                 account.total_due = Number(balance.totalDue);
 
                 account.interest_rate = Number(
                     account.interest_rate
                 );
+
             }
         }
+
+        // =====================================
+        // FINAL RESPONSE
+        // =====================================
 
         return res.status(200).json({
 
@@ -493,6 +586,7 @@ const getAllGICustomers = async (req, res) => {
         });
     }
 };
+
 
 
 

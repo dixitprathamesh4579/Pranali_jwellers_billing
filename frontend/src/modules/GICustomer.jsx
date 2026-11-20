@@ -203,6 +203,7 @@ function GICustomer() {
         setPaymentDescription("");
         setShowPaymentModal(true);
     };
+//last paymeny date and amount
 
 
     // SUBMIT PAYMENT
