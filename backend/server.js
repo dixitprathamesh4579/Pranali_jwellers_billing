@@ -4,6 +4,10 @@ const crypto = require("crypto");
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
+if (!process.env.JWT_SECRET) {
+    console.error("FATAL ERROR: JWT_SECRET is not configured.");
+    process.exit(1);
+}
 
 const pool = require("./config/db");
 const { sendOtpEmail } = require("./services/emailService");

@@ -14,6 +14,8 @@ import BillFooter from "../components/BillFooter.jsx";
 
 import BillSummary from "../components/BillSummary.jsx";
 
+import { apiFetch } from "../utils/api.js";
+
 const makeItem = () => ({
 
   id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
@@ -694,34 +696,10 @@ export default function NewSHBill({ onNavigate }) {
 
     try {
 
-      const apiBaseUrl = (
-
-        import.meta.env.VITE_API_BASE_URL ||
-
-        "https://pranali-jwellers-billing.onrender.com"
-
-      ).replace(/\/$/, "");
-
-      const response = await fetch(
-
-        `${apiBaseUrl}/api/sh-bills`,
-
-        {
-
-          method: "POST",
-
-          headers: {
-
-            "Content-Type": "application/json",
-
-          },
-
-          body: billDataSnapshot,
-
-        }
-
-      );
-
+      const response = await apiFetch("/sh-bills", {
+        method: "POST",
+        body: billDataSnapshot,
+      });
       let result = {};
 
       try {
@@ -1206,20 +1184,20 @@ export default function NewSHBill({ onNavigate }) {
 
     );
     // Display GST number only for GST invoices
-if (billingType === "GST") {
-  doc.setFont("times", "bold");
-  doc.setFontSize(7.3);
-  doc.setTextColor(125, 83, 20);
+    if (billingType === "GST") {
+      doc.setFont("times", "bold");
+      doc.setFontSize(7.3);
+      doc.setTextColor(125, 83, 20);
 
-  doc.text(
-    "GST No: 27APEPD6553J2ZR",
-    rightX + 3,
-    panelY + 25
-  );
+      doc.text(
+        "GST No: 27APEPD6553J2ZR",
+        rightX + 3,
+        panelY + 25
+      );
 
-  doc.setFont("times", "normal");
-  doc.setTextColor(60, 52, 40);
-}
+      doc.setFont("times", "normal");
+      doc.setTextColor(60, 52, 40);
+    }
 
     // ---------------- NEW GOLD / SILVER / OTHER DETAILS HEADING ----------------
 

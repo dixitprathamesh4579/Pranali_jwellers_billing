@@ -1,19 +1,19 @@
 const express = require("express");
-
 const router = express.Router();
 
+const authenticateToken = require("../middleware/authmiddleware");
+
 const {
-  createTransaction,
-  getTransactions,
-  updateTransaction,
-  deleteTransaction,
-  getMonthlySummary,
+    createTransaction,
+    getTransactions,
+    updateTransaction,
+    deleteTransaction,
+    getMonthlySummary,
 } = require("../controllers/dailyAccountsController");
 
-// Monthly summary
-router.get("/summary/monthly", getMonthlySummary);
+router.use(authenticateToken);
 
-// Transaction CRUD
+router.get("/summary/monthly", getMonthlySummary);
 router.post("/", createTransaction);
 router.get("/", getTransactions);
 router.put("/:id", updateTransaction);

@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import "./GICustomer.css";
 
+import { apiFetch } from "../utils/api.js";
+import "./GICustomer.css";
+
 function GICustomer() {
     const [search, setSearch] = useState("");
     const [activeFilter, setActiveFilter] = useState("ALL");
@@ -63,8 +66,8 @@ function GICustomer() {
             setLoading(true);
             setError("");
 
-            const response = await fetch(
-                `https://pranali-jwellers-billing.onrender.com/api/gi/customers?search=${encodeURIComponent(search)}`
+            const response = await apiFetch(
+                `/gi/customers?search=${encodeURIComponent(search)}`
             );
 
             const data = await response.json();
@@ -127,9 +130,7 @@ function GICustomer() {
             setDeleteError("");
             setCaptchaLoading(true);
 
-            const response = await fetch(
-                "https://pranali-jwellers-billing.onrender.com/api/gi/delete-captcha"
-            );
+            const response = await apiFetch("/gi/delete-captcha");
             const result = await response.json();
 
             if (!response.ok || !result.success) {
@@ -153,10 +154,13 @@ function GICustomer() {
             setDeleteError("Enter the CAPTCHA answer to continue.");
             return;
         }
-
-        const confirmed = window.confirm(
-            `Permanently delete GI account ${deleteGI.gi_number} and its jewellery/transaction records? This cannot be undone.`
-        );
+        const response = await apiFetch(`/gi/${deleteGI.gi_id}`, {
+            method: "DELETE",
+            body: JSON.stringify({
+                captchaToken: deleteCaptcha.token,
+                captchaAnswer
+            })
+        });
         if (!confirmed) return;
 
         try {
@@ -203,7 +207,7 @@ function GICustomer() {
         setPaymentDescription("");
         setShowPaymentModal(true);
     };
-//last paymeny date and amount
+    //last paymeny date and amount
 
 
     // SUBMIT PAYMENT
@@ -219,22 +223,16 @@ function GICustomer() {
             setPaymentLoading(true);
             setPaymentError("");
 
-            const response = await fetch(
-                "https://pranali-jwellers-billing.onrender.com/api/gi/payment",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        giAccountId: selectedAccount.gi_id,
-                        amount: Number(paymentForm.amount),
-                        paymentDate: paymentForm.paymentDate,
-                        paymentMethod: paymentForm.paymentMethod,
-                        description: paymentForm.description
-                    })
-                }
-            );
+            const response = await apiFetch("/gi/payment", {
+                method: "POST",
+                body: JSON.stringify({
+                    giAccountId: selectedAccount.gi_id,
+                    amount: Number(paymentForm.amount),
+                    paymentDate: paymentForm.paymentDate,
+                    paymentMethod: paymentForm.paymentMethod,
+                    description: paymentForm.description
+                })
+            });
 
             const data = await response.json();
 
@@ -297,17 +295,10 @@ function GICustomer() {
         };
 
         try {
-            const response = await fetch(
-                "https://pranali-jwellers-billing.onrender.com/api/gi/payment",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(paymentData)
-                }
-            );
-
+            const response = await apiFetch("/gi/payment", {
+                method: "POST",
+                body: JSON.stringify(paymentData)
+            });
             const data = await response.json();
 
             if (!response.ok || !data.success) {
@@ -605,8 +596,8 @@ function GICustomer() {
                         <div className="gi-view-status-row">
                             <span className="gi-view-section-label">Account status</span>
                             <span className={`gi-customer-status ${viewCustomer.account_status === "ACTIVE"
-                                    ? "status-active"
-                                    : "status-completed"
+                                ? "status-active"
+                                : "status-completed"
                                 }`}>
                                 {viewCustomer.account_status || "UNKNOWN"}
                             </span>

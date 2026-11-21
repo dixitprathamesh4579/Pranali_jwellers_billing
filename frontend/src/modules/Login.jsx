@@ -13,7 +13,8 @@ export default function Login({ onLogin }) {
 
   async function sendOtp(event) {
     event.preventDefault();
-
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setLoading(true);
     setMessage("");
     setError(false);

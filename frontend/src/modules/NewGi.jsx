@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import "./NewGi.css";
+import { apiFetch } from "../utils/api.js";
 
 const makeGIItem = () => ({
     id: Date.now() + Math.random(),
@@ -214,17 +215,10 @@ export default function NewGIBill() {
         try {
             setIsSaving(true);
 
-            const response = await fetch(
-                "https://pranali-jwellers-billing.onrender.com/api/gi",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(requestData)
-                }
-            );
-
+            const response = await apiFetch("/gi", {
+                method: "POST",
+                body: JSON.stringify(requestData),
+            });
             const data = await response.json();
 
             if (!response.ok || !data.success) {

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import "./GIStatistics.css";
+import { apiFetch } from "../utils/api.js";
 
-const API_URL = "https://pranali-jwellers-billing.onrender.com/api/gi/statistics";
+
 
 function GIStatistics() {
     const [statistics, setStatistics] = useState(null);
@@ -13,7 +14,7 @@ function GIStatistics() {
             setLoading(true);
             setError("");
 
-            const response = await fetch(API_URL);
+            const response = await apiFetch("/gi/statistics");
             const data = await response.json();
 
             if (!response.ok || !data.success) {

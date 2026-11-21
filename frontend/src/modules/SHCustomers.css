@@ -563,16 +563,214 @@
         align-items: flex-start;
     }
 }
+
+/* =========================================
+   DELETE BILL BUTTON
+========================================= */
+
+.shcustomer-delete-button {
+    background: #fff0f0;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.shcustomer-delete-button:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+
+/* =========================================
+   DELETE MODAL
+========================================= */
+
+.shcustomer-delete-modal {
+    max-width: 480px;
+    width: 95%;
+}
+
+.shcustomer-delete-warning {
+    background: #fff5f5;
+    border: 1px solid #fecaca;
+    border-radius: 9px;
+    padding: 14px;
+    margin: 15px 0;
+    color: #991b1b;
+}
+
+.shcustomer-delete-warning strong {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 15px;
+}
+
+.shcustomer-delete-warning p {
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 5px 0;
+}
+
+.shcustomer-delete-bill-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 9px;
+    margin-bottom: 18px;
+}
+
+.shcustomer-delete-bill-info div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.shcustomer-delete-bill-info span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.shcustomer-delete-bill-info strong {
+    color: #1e293b;
+    font-size: 14px;
+}
+
+
+/* =========================================
+   CAPTCHA
+========================================= */
+
+.shcustomer-captcha-box {
+    margin-top: 10px;
+}
+
+.shcustomer-captcha-question {
+    background: #f1f5f9;
+    border: 1px dashed #94a3b8;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 21px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 12px;
+}
+
+.shcustomer-captcha-box input {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    font-size: 15px;
+    outline: none;
+}
+
+.shcustomer-captcha-box input:focus {
+    border-color: #64748b;
+}
+
+
+/* =========================================
+   CONFIRM DELETE BUTTON
+========================================= */
+
+.shcustomer-confirm-delete {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 11px 17px;
+    border-radius: 7px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.shcustomer-confirm-delete:hover {
+    background: #b91c1c;
+}
+
+.shcustomer-confirm-delete:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* COMPLETE BILL DETAILS */
-.shcustomer-bill-detail-modal { max-width: 900px; }
-.shcustomer-bill-detail-content { overflow: auto; }
-.shcustomer-bill-detail-content h3 { margin: 20px 0 12px; color: #192d4d; }
-.shcustomer-bill-detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
-.shcustomer-bill-detail-grid > div { background:#f7f8fa; border:1px solid #edf0f4; border-radius:9px; padding:13px; display:flex; flex-direction:column; gap:6px; min-width:0; }
-.shcustomer-bill-detail-grid span { color:#8290a5; font-size:12px; }
-.shcustomer-bill-detail-grid strong { color:#192d4d; overflow-wrap:anywhere; }
-.shcustomer-bill-detail-grid .wide { grid-column:1/-1; }
-.shcustomer-bill-detail-grid.financial { grid-template-columns:repeat(2,minmax(0,1fr)); }
-.shcustomer-payment-success-text { padding:12px 0; line-height:1.6; }
-.shcustomer-actions { flex-wrap:wrap; }
-@media(max-width:650px){ .shcustomer-bill-detail-modal{max-width:100%;} .shcustomer-bill-detail-grid,.shcustomer-bill-detail-grid.financial{grid-template-columns:1fr;} .shcustomer-bill-detail-grid .wide{grid-column:auto;} }
+.shcustomer-bill-detail-modal {
+    max-width: 900px;
+}
+
+.shcustomer-bill-detail-content {
+    overflow: auto;
+}
+
+.shcustomer-bill-detail-content h3 {
+    margin: 20px 0 12px;
+    color: #192d4d;
+}
+
+.shcustomer-bill-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.shcustomer-bill-detail-grid>div {
+    background: #f7f8fa;
+    border: 1px solid #edf0f4;
+    border-radius: 9px;
+    padding: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.shcustomer-bill-detail-grid span {
+    color: #8290a5;
+    font-size: 12px;
+}
+
+.shcustomer-bill-detail-grid strong {
+    color: #192d4d;
+    overflow-wrap: anywhere;
+}
+
+.shcustomer-bill-detail-grid .wide {
+    grid-column: 1/-1;
+}
+
+.shcustomer-bill-detail-grid.financial {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.shcustomer-payment-success-text {
+    padding: 12px 0;
+    line-height: 1.6;
+}
+
+.shcustomer-actions {
+    flex-wrap: wrap;
+}
+
+@media(max-width:650px) {
+    .shcustomer-bill-detail-modal {
+        max-width: 100%;
+    }
+
+    .shcustomer-bill-detail-grid,
+    .shcustomer-bill-detail-grid.financial {
+        grid-template-columns: 1fr;
+    }
+
+    .shcustomer-bill-detail-grid .wide {
+        grid-column: auto;
+    }
+}

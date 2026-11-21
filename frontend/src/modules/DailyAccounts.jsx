@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import "./DailyAccounts.css";
-
-const API_URL = "https://pranali-jwellers-billing.onrender.com/api/daily-accounts";
+import { apiFetch } from "../utils/api.js";
 
 const emptyForm = () => ({
     transaction_date: new Date().toLocaleDateString("en-CA"),
@@ -55,8 +54,8 @@ export default function DailyAccounts() {
         setError("");
         try {
             const [transactionsResponse, summaryResponse] = await Promise.all([
-                fetch(API_URL),
-                fetch(`${API_URL}/summary/monthly?month=${month}&year=${year}`),
+                apiFetch("/daily-accounts"),
+                apiFetch(`/daily-accounts/summary/monthly?month=${month}&year=${year}`),
             ]);
 
             const transactionsData = await transactionsResponse.json();
@@ -133,11 +132,12 @@ export default function DailyAccounts() {
                 reason: form.reason.trim() || null,
             };
 
-            const response = await fetch(
-                editingId ? `${API_URL}/${editingId}` : API_URL,
+            const response = await apiFetch(
+                editingId
+                    ? `/daily-accounts/${editingId}`
+                    : "/daily-accounts",
                 {
                     method: editingId ? "PUT" : "POST",
-                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),
                 }
             );
@@ -163,7 +163,9 @@ export default function DailyAccounts() {
 
         setError("");
         try {
-            const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+            const response = await apiFetch(`/daily-accounts/${id}`, {
+                method: "DELETE",
+            });
             const data = await response.json();
             if (!response.ok || !data.success) {
                 throw new Error(data.message || "Unable to delete transaction.");

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./GIHistory.css";
+import { apiFetch } from "../utils/api.js";
 
-const API_URL = "https://pranali-jwellers-billing.onrender.com/api/gi";
 
 const currency = (amount) => {
     return new Intl.NumberFormat("en-IN", {
@@ -40,8 +40,8 @@ function GIHistory() {
             setLoading(true);
             setError("");
 
-            const response = await fetch(
-                `${API_URL}/history?search=${encodeURIComponent(search)}`
+            const response = await apiFetch(
+                `/gi/history?search=${encodeURIComponent(search)}`
             );
 
             const data = await response.json();
