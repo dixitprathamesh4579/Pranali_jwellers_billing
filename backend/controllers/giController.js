@@ -332,7 +332,7 @@ const createGI = async (req, res) => {
 
 const getAllGICustomers = async (req, res) => {
     try {
-        console.time("GI_CUSTOMERS_TOTAL");
+        
         const {
             search = "",
             filter = "all"
@@ -403,8 +403,7 @@ const getAllGICustomers = async (req, res) => {
             sql,
             queryParams
         );
-        console.time("GI_ACCOUNTS_QUERY");
-        console.timeEnd("GI_ACCOUNTS_QUERY");
+     
 
         // 3. RETURN EMPTY RESPONSE
         if (accounts.length === 0) {
@@ -423,7 +422,7 @@ const getAllGICustomers = async (req, res) => {
         const placeholders = accountIds
             .map(() => "?")
             .join(",");
-console.time("GI_ITEMS_QUERY");
+
         // 5. FETCH JEWELLERY ITEMS IN ONE QUERY
         const [items] = await pool.query(
             `
@@ -434,7 +433,7 @@ console.time("GI_ITEMS_QUERY");
             `,
             accountIds
         );
-console.timeEnd("GI_ITEMS_QUERY");  
+ 
         // 6. FETCH ALL TRANSACTIONS IN ONE QUERY
         const [transactions] = await pool.query(
             `
@@ -470,7 +469,7 @@ console.timeEnd("GI_ITEMS_QUERY");
 
             itemMap[item.gi_account_id].push(item);
         }
-console.time("GI_TRANSACTIONS_QUERY");
+
         // 8. GROUP TRANSACTIONS BY ACCOUNT
         const transactionMap = {};
 
@@ -500,8 +499,7 @@ console.time("GI_TRANSACTIONS_QUERY");
                 }
             }
         }
-console.timeEnd("GI_TRANSACTIONS_QUERY");
-console.time("GI_BALANCE_CALCULATION");
+
         // 9. CALCULATE ACCOUNT BALANCES
         const asOfDate = new Date();
 
@@ -560,8 +558,7 @@ console.time("GI_BALANCE_CALCULATION");
                 account.interest_rate
             );
         }
-console.timeEnd("GI_BALANCE_CALCULATION");
-console.timeEnd("GI_CUSTOMERS_TOTAL");
+
         // 10. FINAL RESPONSE
         return res.status(200).json({
             success: true,
