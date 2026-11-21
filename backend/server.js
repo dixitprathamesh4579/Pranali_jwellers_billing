@@ -22,7 +22,6 @@ const allowedOrigins = [
     "http://localhost:5173",
     "https://pranali-jwellers-billing.dixitprathamesh4579.workers.dev"
 ];
-
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.includes(origin)) {
@@ -46,13 +45,12 @@ app.use(express.urlencoded({ extended: true }));
 // 3. REQUEST LOGGING
 // ======================================
 
-app.use((req, res, next) => {
-    console.log("Method:", req.method);
-    console.log("URL:", req.url);
-    console.log("Origin:", req.headers.origin);
-    console.log("Content-Type:", req.headers["content-type"]);
-    next();
-});
+if (process.env.NODE_ENV !== "production") {
+    app.use((req, res, next) => {
+        console.log(`${req.method} ${req.url}`);
+        next();
+    });
+}
 
 // ======================================
 // 4. API ROUTES

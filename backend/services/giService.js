@@ -2,14 +2,6 @@
 // GENERATE GI NUMBER
 // ==========================================
 
-// ==========================================
-// GENERATE GI NUMBER
-// ==========================================
-
-// ==========================================
-// GENERATE GI NUMBER
-// ==========================================
-
 const generateGINumber = async (connection) => {
 
     const [rows] = await connection.query(
@@ -28,7 +20,10 @@ const generateGINumber = async (connection) => {
     const nextNumber = lastNumber + 1;
 
     return `G-${nextNumber}`;
-};// ==========================================
+};
+
+
+// ==========================================
 // NORMALIZE DATE
 // ==========================================
 
@@ -150,31 +145,22 @@ const calculateGIInterest = (
 
 
 // ==========================================
-// CALCULATE GI OUTSTANDING BALANCE
+// CALCULATE BALANCE FROM PROVIDED TRANSACTIONS
+// NO DATABASE QUERY REQUIRED
 // ==========================================
 
-const calculateGIBalance = async (
-    connection,
+const calculateGIBalanceFromTransactions = (
     account,
+    transactions,
     asOfDate = new Date()
 ) => {
-
-    const [transactions] = await connection.query(
-        `SELECT *
-         FROM gi_transactions
-         WHERE gi_account_id = ?
-         ORDER BY transaction_date ASC, id ASC`,
-        [account.id]
-    );
 
     let principal = Number(account.principal);
 
     let outstandingInterest = 0;
 
-    // Date from which principal interest calculation starts.
     let principalStartDate = toDateOnly(account.gi_date);
 
-    // Interest already accrued during the current principal period.
     let accruedInterestSoFar = 0;
 
     for (const transaction of transactions) {
@@ -187,7 +173,6 @@ const calculateGIBalance = async (
             transaction.transaction_date
         );
 
-        // Calculate cumulative interest on current principal.
         const cumulativeInterest = calculateGIInterest(
             principal,
             account.interest_rate,
@@ -195,7 +180,6 @@ const calculateGIBalance = async (
             transactionDate
         ).interest;
 
-        // Add only newly accrued interest.
         const newInterest = Math.max(
             0,
             cumulativeInterest - accruedInterestSoFar
@@ -205,7 +189,6 @@ const calculateGIBalance = async (
 
         accruedInterestSoFar = cumulativeInterest;
 
-        // Deduct interest payment.
         const interestPaid = Number(
             transaction.interest_paid || 0
         );
@@ -215,7 +198,6 @@ const calculateGIBalance = async (
             outstandingInterest - interestPaid
         );
 
-        // Deduct principal payment.
         const principalPaid = Number(
             transaction.principal_paid || 0
         );
@@ -225,7 +207,6 @@ const calculateGIBalance = async (
             Number((principal - principalPaid).toFixed(2))
         );
 
-        // If principal changes, start a new interest calculation period.
         if (principalPaid > 0) {
 
             principalStartDate = transactionDate;
@@ -235,6 +216,7 @@ const calculateGIBalance = async (
     }
 
     // Calculate interest up to requested date.
+
     const finalDate = toDateOnly(asOfDate);
 
     const finalCumulativeInterest = calculateGIInterest(
@@ -268,11 +250,56 @@ const calculateGIBalance = async (
 
 
 // ==========================================
+// CALCULATE GI OUTSTANDING BALANCE
+// ==========================================
+
+const calculateGIBalance = async (
+    connection,
+    account,
+    asOfDate = new Date(),
+    preloadedTransactions = null
+) => {
+
+    let transactions = preloadedTransactions;
+
+    // Fetch transactions only when they haven't
+    // already been provided by the caller.
+
+    if (!Array.isArray(transactions)) {
+
+        const [rows] = await connection.execute(
+            `SELECT
+                transaction_type,
+                transaction_date,
+                principal_paid,
+                interest_paid
+
+             FROM gi_transactions
+
+             WHERE gi_account_id = ?
+
+             ORDER BY transaction_date ASC, id ASC`,
+            [account.id]
+        );
+
+        transactions = rows;
+    }
+
+    return calculateGIBalanceFromTransactions(
+        account,
+        transactions,
+        asOfDate
+    );
+};
+
+
+// ==========================================
 // EXPORT FUNCTIONS
 // ==========================================
 
 module.exports = {
     generateGINumber,
     calculateGIInterest,
-    calculateGIBalance
+    calculateGIBalance,
+    calculateGIBalanceFromTransactions
 };
