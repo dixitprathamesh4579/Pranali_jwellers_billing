@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const crypto = require("crypto");
 require("dotenv").config();
-
+const whatsappRoutes = require("./routes/whatsappRoutes");
 const jwt = require("jsonwebtoken");
 if (!process.env.JWT_SECRET) {
     console.error("FATAL ERROR: JWT_SECRET is not configured.");
@@ -65,7 +65,7 @@ if (process.env.NODE_ENV !== "production") {
 // ======================================
 // 4. API ROUTES
 // ======================================
-
+app.use("/api/whatsapp", whatsappRoutes);
 app.use("/api/daily-accounts", dailyAccountsRoutes);
 app.use("/api/sh-bills", shBillRoutes);
 app.use("/api/gi", giRoutes);
@@ -285,11 +285,7 @@ app.get("/api/auth/me", async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Backend running at http://localhost:${PORT}`);
-});
 // ======================================
 // WHATSAPP WEBHOOK
 // ======================================
@@ -387,4 +383,16 @@ app.post("/api/whatsapp/webhook", (req, res) => {
         console.error("WhatsApp webhook error:", error.message);
         return res.sendStatus(500);
     }
+});
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(`Backend running at http://localhost:${PORT}`);
+});
+app.get("/api/health", (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "Backend server is running",
+        timestamp: new Date().toISOString()
+    });
 });

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import QRCode from "qrcode";
 import "./SHCustomers.css";
 import { apiFetch } from "../utils/api.js";
 
@@ -47,16 +46,35 @@ export default function SHCustomers() {
     const [historyBillId, setHistoryBillId] = useState(null);
     const [paymentHistory, setPaymentHistory] = useState([]);
     const [paymentHistoryLoading, setPaymentHistoryLoading] = useState(false);
+
     const [detailBill, setDetailBill] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
+
     const [paymentSuccessBill, setPaymentSuccessBill] = useState(null);
+
     // ---------------- DELETE BILL CAPTCHA ----------------
-    // DELETE BILL CAPTCHA
+
     const [deleteBill, setDeleteBill] = useState(null);
     const [deleteCaptcha, setDeleteCaptcha] = useState(null);
     const [deleteCaptchaAnswer, setDeleteCaptchaAnswer] = useState("");
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [deleteMessage, setDeleteMessage] = useState("");
+
+    // ---------------- WHATSAPP REMINDER STATES ----------------
+
+    const [reminderCustomer, setReminderCustomer] = useState(null);
+    const [reminderPhone, setReminderPhone] = useState("");
+    const [reminderDueData, setReminderDueData] = useState(null);
+
+    const [reminderLoading, setReminderLoading] = useState(false);
+    const [reminderError, setReminderError] = useState("");
+
+    const [reminderMobileConfirmed, setReminderMobileConfirmed] =
+        useState(false);
+
+    const [reminderSending, setReminderSending] = useState(false);
+
+
     // ---------------- FETCH CUSTOMERS ----------------
 
     const fetchCustomers = async () => {
@@ -91,7 +109,9 @@ export default function SHCustomers() {
         }
     };
 
+
     // Fetch when search or filter changes
+
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchCustomers();
@@ -99,6 +119,7 @@ export default function SHCustomers() {
 
         return () => clearTimeout(timer);
     }, [search, filter]);
+
 
     // ---------------- CUSTOMER SUMMARY ----------------
 
@@ -119,6 +140,7 @@ export default function SHCustomers() {
             sum + Number(customer.total_due || 0),
         0
     );
+
 
     // ---------------- CUSTOMER BILL HISTORY ----------------
 
@@ -151,7 +173,10 @@ export default function SHCustomers() {
             setHistoryLoading(false);
         }
     };
-    // REFRESH CUSTOMER DETAILS
+
+
+    // ---------------- REFRESH CUSTOMER DETAILS ----------------
+
     const refreshCustomerDetails = async () => {
         if (!selectedCustomer) return;
 
@@ -166,23 +191,36 @@ export default function SHCustomers() {
         const result = await response.json();
 
         if (!response.ok) {
-            throw new Error(result.message || "Unable to refresh bill history.");
+            throw new Error(
+                result.message || "Unable to refresh bill history."
+            );
         }
 
         const updatedBills = result.bills || [];
+
         setCustomerBills(updatedBills);
 
         // Recalculate customer totals from updated bills.
+
         const updatedCustomer = {
             ...selectedCustomer,
+
             total_purchase: updatedBills.reduce(
-                (sum, bill) => sum + Number(bill.grand_total || 0), 0
+                (sum, bill) =>
+                    sum + Number(bill.grand_total || 0),
+                0
             ),
+
             total_paid: updatedBills.reduce(
-                (sum, bill) => sum + Number(bill.paid_amount || 0), 0
+                (sum, bill) =>
+                    sum + Number(bill.paid_amount || 0),
+                0
             ),
+
             total_due: updatedBills.reduce(
-                (sum, bill) => sum + Number(bill.due_amount || 0), 0
+                (sum, bill) =>
+                    sum + Number(bill.due_amount || 0),
+                0
             )
         };
 
@@ -190,7 +228,8 @@ export default function SHCustomers() {
     };
 
 
-    // OPEN PAYMENT FORM
+    // ---------------- OPEN PAYMENT FORM ----------------
+
     const openPaymentForm = (bill) => {
         setSelectedPaymentBill(bill);
 
@@ -205,7 +244,8 @@ export default function SHCustomers() {
     };
 
 
-    // RECORD PAYMENT
+    // ---------------- RECORD PAYMENT ----------------
+
     const handleRecordPayment = async (e) => {
         e.preventDefault();
 
@@ -237,13 +277,25 @@ export default function SHCustomers() {
                     body: JSON.stringify(paymentForm)
                 }
             );
+
             const result = await response.json();
 
             if (!response.ok) {
-                throw new Error(result.message || "Unable to record payment.");
+                throw new Error(
+                    result.message || "Unable to record payment."
+                );
             }
 
-            setPaymentSuccessBill({ ...selectedPaymentBill, paid_amount: Number(selectedPaymentBill.paid_amount || 0) + amount, due_amount: Math.max(0, due - amount) });
+            setPaymentSuccessBill({
+                ...selectedPaymentBill,
+
+                paid_amount:
+                    Number(selectedPaymentBill.paid_amount || 0) + amount,
+
+                due_amount:
+                    Math.max(0, due - amount)
+            });
+
             setPaymentMessage("Payment recorded successfully!");
 
             setSelectedPaymentBill(null);
@@ -251,36 +303,70 @@ export default function SHCustomers() {
             await refreshCustomerDetails();
 
         } catch (err) {
-            setPaymentMessage(err.message || "Payment failed.");
+            setPaymentMessage(
+                err.message || "Payment failed."
+            );
         } finally {
             setPaymentLoading(false);
         }
     };
 
 
-    // VIEW COMPLETE BILL DETAILS
+    // ---------------- VIEW COMPLETE BILL DETAILS ----------------
+
     const viewBillDetails = async (bill) => {
         try {
             setDetailLoading(true);
             setDetailBill(null);
-            const response = await apiFetch(`/sh-bills/${bill.id}`);
+
+            const response = await apiFetch(
+                `/sh-bills/${bill.id}`
+            );
+
             const result = await response.json();
-            if (!response.ok) throw new Error(result.message || "Unable to fetch bill details.");
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message || "Unable to fetch bill details."
+                );
+            }
+
             const parsed = (value, fallback = []) => {
                 if (Array.isArray(value)) return value;
-                if (typeof value === "string") { try { return JSON.parse(value); } catch { return fallback; } }
+
+                if (typeof value === "string") {
+                    try {
+                        return JSON.parse(value);
+                    } catch {
+                        return fallback;
+                    }
+                }
+
                 return fallback;
             };
-            setDetailBill({ ...result.bill, items: parsed(result.bill.items), exchange_items: parsed(result.bill.exchange_items) });
+
+            setDetailBill({
+                ...result.bill,
+                items: parsed(result.bill.items),
+                exchange_items: parsed(result.bill.exchange_items)
+            });
+
         } catch (err) {
-            setError(err.message || "Unable to fetch bill details.");
-        } finally { setDetailLoading(false); }
+            setError(
+                err.message || "Unable to fetch bill details."
+            );
+        } finally {
+            setDetailLoading(false);
+        }
     };
 
-    // PRINT BILL AS PDF (A4 Pranali Jewellers sales-bill layout)
+
+    // ---------------- PRINT BILL AS PDF ----------------
+
     const printBill = async (bill) => {
         try {
             // Always load the latest bill and payment records before printing.
+
             const [billResponse, paymentsResponse] = await Promise.all([
                 apiFetch(`/sh-bills/${bill.id}`),
                 apiFetch(`/sh-bills/${bill.id}/payments`)
@@ -290,121 +376,372 @@ export default function SHCustomers() {
             const paymentsResult = await paymentsResponse.json();
 
             if (!billResponse.ok) {
-                throw new Error(billResult.message || "Unable to fetch bill for printing.");
+                throw new Error(
+                    billResult.message ||
+                    "Unable to fetch bill for printing."
+                );
             }
+
             if (!paymentsResponse.ok) {
-                throw new Error(paymentsResult.message || "Unable to fetch updated payment details.");
+                throw new Error(
+                    paymentsResult.message ||
+                    "Unable to fetch updated payment details."
+                );
             }
 
             const b = billResult.bill || bill;
-            const payments = Array.isArray(paymentsResult.payments) ? paymentsResult.payments : [];
+
+            const payments = Array.isArray(paymentsResult.payments)
+                ? paymentsResult.payments
+                : [];
+
             const parseItems = (value) => {
                 if (Array.isArray(value)) return value;
+
                 if (typeof value === "string") {
                     try {
                         const parsed = JSON.parse(value);
+
                         return Array.isArray(parsed) ? parsed : [];
-                    } catch { return []; }
+                    } catch {
+                        return [];
+                    }
                 }
+
                 return [];
             };
+
             const items = parseItems(b.items);
             const exchanges = parseItems(b.exchange_items);
-            const safe = (value) => String(value ?? "-").replace(/[&<>"']/g, (ch) => ({
-                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-            }[ch]));
+
+            const safe = (value) =>
+                String(value ?? "-").replace(/[&<>"']/g, (ch) => ({
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;"
+                }[ch]));
+
             const pick = (obj, keys, fallback = "-") => {
                 for (const key of keys) {
-                    if (obj?.[key] !== undefined && obj?.[key] !== null && obj[key] !== "") return obj[key];
+                    if (
+                        obj?.[key] !== undefined &&
+                        obj?.[key] !== null &&
+                        obj[key] !== ""
+                    ) {
+                        return obj[key];
+                    }
                 }
+
                 return fallback;
             };
-            const num = (value) => Number(value) || 0;
-            const rupees = (value) => `Rs. ${num(value).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            const dateText = (value) => value ? formatDate(value) : "-";
 
-            // Payment endpoint is the source for the individual transactions;
-            // the saved bill totals remain authoritative for the current balance.
-            const paidAmount = b.paid_amount ?? payments.reduce((sum, p) => sum + num(p.payment_amount), 0);
-            const dueAmount = b.due_amount ?? Math.max(0, num(b.net_payable ?? b.grand_total) - num(paidAmount));
-            const paymentStatus = num(dueAmount) <= 0 ? "FULLY PAID" : num(paidAmount) > 0 ? "PARTIALLY PAID" : "PAYMENT PENDING";
+            const num = (value) => Number(value) || 0;
+
+            const rupees = (value) =>
+                `Rs. ${num(value).toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })}`;
+
+            const dateText = (value) =>
+                value ? formatDate(value) : "-";
+
+
+            // Payment endpoint is the source for individual transactions.
+
+            const paidAmount =
+                b.paid_amount ??
+                payments.reduce(
+                    (sum, p) =>
+                        sum + num(p.payment_amount),
+                    0
+                );
+
+            const dueAmount =
+                b.due_amount ??
+                Math.max(
+                    0,
+                    num(b.net_payable ?? b.grand_total) -
+                    num(paidAmount)
+                );
+
+            const paymentStatus =
+                num(dueAmount) <= 0
+                    ? "FULLY PAID"
+                    : num(paidAmount) > 0
+                        ? "PARTIALLY PAID"
+                        : "PAYMENT PENDING";
+
+
+            // ---------------- AMOUNT IN WORDS ----------------
 
             const amountInWords = (amount) => {
-                const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
-                const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+                const ones = [
+                    "",
+                    "One",
+                    "Two",
+                    "Three",
+                    "Four",
+                    "Five",
+                    "Six",
+                    "Seven",
+                    "Eight",
+                    "Nine",
+                    "Ten",
+                    "Eleven",
+                    "Twelve",
+                    "Thirteen",
+                    "Fourteen",
+                    "Fifteen",
+                    "Sixteen",
+                    "Seventeen",
+                    "Eighteen",
+                    "Nineteen"
+                ];
+
+                const tens = [
+                    "",
+                    "",
+                    "Twenty",
+                    "Thirty",
+                    "Forty",
+                    "Fifty",
+                    "Sixty",
+                    "Seventy",
+                    "Eighty",
+                    "Ninety"
+                ];
+
                 const underThousand = (n) => {
                     let out = "";
-                    if (n >= 100) { out += `${ones[Math.floor(n / 100)]} Hundred `; n %= 100; }
-                    if (n >= 20) { out += `${tens[Math.floor(n / 10)]} `; n %= 10; }
-                    if (n > 0) out += `${ones[n]} `;
+
+                    if (n >= 100) {
+                        out += `${ones[Math.floor(n / 100)]} Hundred `;
+                        n %= 100;
+                    }
+
+                    if (n >= 20) {
+                        out += `${tens[Math.floor(n / 10)]} `;
+                        n %= 10;
+                    }
+
+                    if (n > 0) {
+                        out += `${ones[n]} `;
+                    }
+
                     return out.trim();
                 };
+
                 let n = Math.max(0, Math.round(num(amount)));
-                if (!n) return "Zero Rupees Only";
+
+                if (!n) {
+                    return "Zero Rupees Only";
+                }
+
                 const parts = [];
-                const crore = Math.floor(n / 10000000); n %= 10000000;
-                const lakh = Math.floor(n / 100000); n %= 100000;
-                const thousand = Math.floor(n / 1000); n %= 1000;
-                if (crore) parts.push(`${underThousand(crore)} Crore`);
-                if (lakh) parts.push(`${underThousand(lakh)} Lakh`);
-                if (thousand) parts.push(`${underThousand(thousand)} Thousand`);
-                if (n) parts.push(underThousand(n));
+
+                const crore = Math.floor(n / 10000000);
+                n %= 10000000;
+
+                const lakh = Math.floor(n / 100000);
+                n %= 100000;
+
+                const thousand = Math.floor(n / 1000);
+                n %= 1000;
+
+                if (crore) {
+                    parts.push(`${underThousand(crore)} Crore`);
+                }
+
+                if (lakh) {
+                    parts.push(`${underThousand(lakh)} Lakh`);
+                }
+
+                if (thousand) {
+                    parts.push(`${underThousand(thousand)} Thousand`);
+                }
+
+                if (n) {
+                    parts.push(underThousand(n));
+                }
+
                 return `${parts.join(" ")} Rupees Only`;
             };
 
-            const itemRows = (list, exchange = false) => list.length
-                ? list.map((item, index) => {
-                    const metal = pick(item, ["metal", "metal_type", "material"], "-");
-                    const purity = pick(item, ["purity", "metal_purity"], "");
-                    const metalPurity = purity ? `${metal} / ${purity}` : metal;
-                    const weight = pick(item, ["weight", "net_weight", "gross_weight"], "-");
-                    const rate = pick(item, ["rate", "rate_per_gram", "price"], 0);
-                    const metalAmount = pick(
-                        item,
-                        ["metalValue", "metal_amount", "gold_amount", "metal_value"],
-                        (num(item.weight) * num(item.rate))
-                    );
 
-                    const making = pick(
-                        item,
-                        ["makingCharges", "making_charges", "making_amount", "making"],
-                        0
-                    );
+            // ---------------- ITEM ROWS ----------------
 
-                    const total = pick(
-                        item,
-                        ["itemTotal", "item_total", "total", "total_amount"],
-                        num(metalAmount) + num(making)
-                    );
-                    return `<tr>
-                        <td class="center">${index + 1}</td>
-                        <td>${safe(pick(item, ["name", "item_name", "description", "product"], exchange ? "Exchange Jewellery" : "Jewellery Item"))}</td>
-                        <td>${safe(metalPurity)}</td>
-                        <td class="right">${safe(weight)}</td>
-                        <td class="right">${safe(num(rate).toFixed(2))}</td>
-                        <td class="right">${safe(rupees(metalAmount))}</td>
-                        <td class="right">${safe(rupees(making))}</td>
-                        <td class="right">${safe(rupees(total))}</td>
-                    </tr>`;
-                }).join("")
-                : `<tr><td colspan="8" class="empty">No ${exchange ? "exchange " : ""}jewellery items recorded.</td></tr>`;
+            const itemRows = (list, exchange = false) =>
+                list.length
+                    ? list.map((item, index) => {
+                        const metal = pick(
+                            item,
+                            ["metal", "metal_type", "material"],
+                            "-"
+                        );
+
+                        const purity = pick(
+                            item,
+                            ["purity", "metal_purity"],
+                            ""
+                        );
+
+                        const metalPurity = purity
+                            ? `${metal} / ${purity}`
+                            : metal;
+
+                        const weight = pick(
+                            item,
+                            ["weight", "net_weight", "gross_weight"],
+                            "-"
+                        );
+
+                        const rate = pick(
+                            item,
+                            ["rate", "rate_per_gram", "price"],
+                            0
+                        );
+
+                        const metalAmount = pick(
+                            item,
+                            [
+                                "metalValue",
+                                "metal_amount",
+                                "gold_amount",
+                                "metal_value"
+                            ],
+                            num(item.weight) * num(item.rate)
+                        );
+
+                        const making = pick(
+                            item,
+                            [
+                                "makingCharges",
+                                "making_charges",
+                                "making_amount",
+                                "making"
+                            ],
+                            0
+                        );
+
+                        const total = pick(
+                            item,
+                            [
+                                "itemTotal",
+                                "item_total",
+                                "total",
+                                "total_amount"
+                            ],
+                            num(metalAmount) + num(making)
+                        );
+
+                        return `
+                            <tr>
+                                <td class="center">${index + 1}</td>
+
+                                <td>
+                                    ${safe(
+                                        pick(
+                                            item,
+                                            [
+                                                "name",
+                                                "item_name",
+                                                "description",
+                                                "product"
+                                            ],
+                                            exchange
+                                                ? "Exchange Jewellery"
+                                                : "Jewellery Item"
+                                        )
+                                    )}
+                                </td>
+
+                                <td>${safe(metalPurity)}</td>
+
+                                <td class="right">${safe(weight)}</td>
+
+                                <td class="right">
+                                    ${safe(num(rate).toFixed(2))}
+                                </td>
+
+                                <td class="right">
+                                    ${safe(rupees(metalAmount))}
+                                </td>
+
+                                <td class="right">
+                                    ${safe(rupees(making))}
+                                </td>
+
+                                <td class="right">
+                                    ${safe(rupees(total))}
+                                </td>
+                            </tr>
+                        `;
+                    }).join("")
+                    : `
+                        <tr>
+                            <td colspan="8" class="empty">
+                                No ${exchange ? "exchange " : ""}jewellery items recorded.
+                            </td>
+                        </tr>
+                    `;
+
+
+            // ---------------- PAYMENT ROWS ----------------
 
             const paymentRows = payments.length
-                ? payments.map((payment, index) => `<tr>
-                    <td class="center">${index + 1}</td>
-                    <td>${safe(dateText(payment.payment_date))}</td>
-                    <td>${safe(String(payment.payment_mode || "-").replaceAll("_", " "))}</td>
-                    <td>${safe(payment.remarks || "-")}</td>
-                    <td class="right">${safe(rupees(payment.payment_amount))}</td>
-                </tr>`).join("")
-                : `<tr><td colspan="5" class="empty">No payment transactions recorded.</td></tr>`;
+                ? payments.map((payment, index) => `
+                    <tr>
+                        <td class="center">${index + 1}</td>
+
+                        <td>
+                            ${safe(dateText(payment.payment_date))}
+                        </td>
+
+                        <td>
+                            ${safe(
+                                String(payment.payment_mode || "-")
+                                    .replaceAll("_", " ")
+                            )}
+                        </td>
+
+                        <td>
+                            ${safe(payment.remarks || "-")}
+                        </td>
+
+                        <td class="right">
+                            ${safe(rupees(payment.payment_amount))}
+                        </td>
+                    </tr>
+                `).join("")
+                : `
+                    <tr>
+                        <td colspan="5" class="empty">
+                            No payment transactions recorded.
+                        </td>
+                    </tr>
+                `;
+
 
             const subtotal = b.subtotal ?? b.grand_total ?? 0;
             const discount = b.discount_amount ?? b.discount ?? 0;
             const grandTotal = b.grand_total ?? b.net_payable ?? 0;
-            const billDate = dateText(b.bill_date || b.created_at);
+
+            const billDate = dateText(
+                b.bill_date || b.created_at
+            );
+
+
+            // ---------------- BILL HTML ----------------
+
             const html = `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Pranali Jewellers - ${safe(b.bill_number)}</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pranali Jewellers - ${safe(b.bill_number)}</title>
+
 <style>
 @page{size:A4 portrait;margin:9mm}
 *{box-sizing:border-box}
@@ -445,7 +782,13 @@ td{padding:6px 4px;border:1px solid #cfc3aa;font-size:8px;overflow-wrap:anywhere
 .sign-brand{font-weight:bold;margin-top:5px}
 .footer{background:#80551b;color:#f8edcf;text-align:center;padding:5px;margin-top:12px;font-style:italic;font-size:9px}
 @media print{.invoice{break-inside:avoid}tr{break-inside:avoid}}
-</style></head><body><div class="invoice"><div class="inner">
+</style>
+</head>
+
+<body>
+<div class="invoice">
+<div class="inner">
+
 <header class="header">
 <div class="brand">PRANALI JEWELLERS</div>
 <p class="tagline">GOLD | SILVER | ONE GRAM | CUSTOM JEWELLERY</p>
@@ -454,61 +797,209 @@ td{padding:6px 4px;border:1px solid #cfc3aa;font-size:8px;overflow-wrap:anywhere
 <p class="contact">Phone: +91 9421124579 | Email: pranalijewellers@gmail.com</p>
 <div class="title">SALES INVOICE</div>
 </header>
+
 <div class="info">
-<section class="info-box"><div class="box-title">CUSTOMER DETAILS</div><div class="info-body">
+
+<section class="info-box">
+<div class="box-title">CUSTOMER DETAILS</div>
+<div class="info-body">
 <div>Name: <strong>${safe(b.customer_name)}</strong></div>
 <div>Mobile: <strong>${safe(b.customer_phone)}</strong></div>
 <div>Address: <strong>${safe(b.customer_address || "-")}</strong></div>
-</div></section>
-<section class="info-box"><div class="box-title">INVOICE DETAILS</div><div class="info-body">
+</div>
+</section>
+
+<section class="info-box">
+<div class="box-title">INVOICE DETAILS</div>
+<div class="info-body">
 <div>Bill No: <strong>${safe(b.bill_number)}</strong></div>
 <div>Date: <strong>${safe(billDate)}</strong></div>
 <div>Status: <strong>${safe(paymentStatus)}</strong></div>
-</div></section>
 </div>
+</section>
+
+</div>
+
 <div class="section-title">NEW GOLD / SILVER / OTHER DETAILS</div>
-<table><thead><tr>
-<th style="width:4%">Sr.</th><th style="width:20%">Jewellery Description</th><th style="width:14%">Metal / Purity</th><th style="width:9%">Wt. (g)</th><th style="width:10%">Rate per g</th><th style="width:13%">Metal</th><th style="width:12%">Making</th><th style="width:18%">Total</th>
-</tr></thead><tbody>${itemRows(items)}</tbody></table>
-${exchanges.length ? `<div class="section-title">EXCHANGE JEWELLERY DETAILS</div><table><thead><tr><th style="width:4%">Sr.</th><th style="width:20%">Jewellery Description</th><th style="width:14%">Metal / Purity</th><th style="width:9%">Wt. (g)</th><th style="width:10%">Rate per g</th><th style="width:13%">Metal</th><th style="width:12%">Making</th><th style="width:18%">Total</th></tr></thead><tbody>${itemRows(exchanges, true)}</tbody></table>` : ""}
+
+<table>
+<thead>
+<tr>
+<th style="width:4%">Sr.</th>
+<th style="width:20%">Jewellery Description</th>
+<th style="width:14%">Metal / Purity</th>
+<th style="width:9%">Wt. (g)</th>
+<th style="width:10%">Rate per g</th>
+<th style="width:13%">Metal</th>
+<th style="width:12%">Making</th>
+<th style="width:18%">Total</th>
+</tr>
+</thead>
+<tbody>${itemRows(items)}</tbody>
+</table>
+
+${exchanges.length ? `
+<div class="section-title">EXCHANGE JEWELLERY DETAILS</div>
+
+<table>
+<thead>
+<tr>
+<th style="width:4%">Sr.</th>
+<th style="width:20%">Jewellery Description</th>
+<th style="width:14%">Metal / Purity</th>
+<th style="width:9%">Wt. (g)</th>
+<th style="width:10%">Rate per g</th>
+<th style="width:13%">Metal</th>
+<th style="width:12%">Making</th>
+<th style="width:18%">Total</th>
+</tr>
+</thead>
+<tbody>${itemRows(exchanges, true)}</tbody>
+</table>
+` : ""}
+
 <div class="summary">
-<div class="summary-row"><span>Subtotal</span><strong>${safe(rupees(subtotal))}</strong></div>
-<div class="summary-row"><span>Discount</span><strong>${safe(rupees(discount))}</strong></div>
-${num(b.gst_amount) ? `<div class="summary-row"><span>GST</span><strong>${safe(rupees(b.gst_amount))}</strong></div>` : ""}
-${num(b.exchange_total) ? `<div class="summary-row"><span>Exchange Value</span><strong>${safe(rupees(b.exchange_total))}</strong></div>` : ""}
-<div class="summary-row total"><span>GRAND TOTAL</span><strong>${safe(rupees(grandTotal))}</strong></div>
-<div class="summary-row"><span>PAID AMOUNT</span><strong>${safe(rupees(paidAmount))}</strong></div>
-<div class="summary-row"><span>DUE AMOUNT</span><strong>${safe(rupees(dueAmount))}</strong></div>
+
+<div class="summary-row">
+<span>Subtotal</span>
+<strong>${safe(rupees(subtotal))}</strong>
 </div>
-<div class="words"><div class="words-title">TOTAL AMOUNT IN WORDS</div><div class="words-text">${safe(amountInWords(b.net_payable ?? grandTotal))}</div></div>
-${payments.length ? `<section class="payments"><div class="section-title">PAYMENT DETAILS / UPDATED PAYMENT HISTORY</div><table><thead><tr><th style="width:8%">Sr.</th><th style="width:19%">Payment Date</th><th style="width:20%">Payment Mode</th><th>Remarks</th><th style="width:22%">Amount</th></tr></thead><tbody>${paymentRows}</tbody></table><div class="status">TOTAL PAYMENTS RECEIVED: ${safe(rupees(paidAmount))} &nbsp; | &nbsp; BALANCE DUE: ${safe(rupees(dueAmount))}</div></section>` : ""}
+
+<div class="summary-row">
+<span>Discount</span>
+<strong>${safe(rupees(discount))}</strong>
+</div>
+
+${num(b.gst_amount) ? `
+<div class="summary-row">
+<span>GST</span>
+<strong>${safe(rupees(b.gst_amount))}</strong>
+</div>
+` : ""}
+
+${num(b.exchange_total) ? `
+<div class="summary-row">
+<span>Exchange Value</span>
+<strong>${safe(rupees(b.exchange_total))}</strong>
+</div>
+` : ""}
+
+<div class="summary-row total">
+<span>GRAND TOTAL</span>
+<strong>${safe(rupees(grandTotal))}</strong>
+</div>
+
+<div class="summary-row">
+<span>PAID AMOUNT</span>
+<strong>${safe(rupees(paidAmount))}</strong>
+</div>
+
+<div class="summary-row">
+<span>DUE AMOUNT</span>
+<strong>${safe(rupees(dueAmount))}</strong>
+</div>
+
+</div>
+
+<div class="words">
+<div class="words-title">TOTAL AMOUNT IN WORDS</div>
+<div class="words-text">
+${safe(amountInWords(b.net_payable ?? grandTotal))}
+</div>
+</div>
+
+${payments.length ? `
+<section class="payments">
+
+<div class="section-title">
+PAYMENT DETAILS / UPDATED PAYMENT HISTORY
+</div>
+
+<table>
+<thead>
+<tr>
+<th style="width:8%">Sr.</th>
+<th style="width:19%">Payment Date</th>
+<th style="width:20%">Payment Mode</th>
+<th>Remarks</th>
+<th style="width:22%">Amount</th>
+</tr>
+</thead>
+<tbody>${paymentRows}</tbody>
+</table>
+
+<div class="status">
+TOTAL PAYMENTS RECEIVED: ${safe(rupees(paidAmount))}
+&nbsp; | &nbsp;
+BALANCE DUE: ${safe(rupees(dueAmount))}
+</div>
+
+</section>
+` : ""}
+
 <div class="bottom">
-<div class="terms"><div class="terms-title">TERMS &amp; CONDITIONS</div>
+
+<div class="terms">
+<div class="terms-title">TERMS &amp; CONDITIONS</div>
+
 <div>1. Goods once sold will not be taken back or exchanged.</div>
 <div>2. Purity as per applicable hallmark details.</div>
 <div>3. Thank you for shopping with us.</div>
-<div class="signatures"><div><div class="sign-line">Customer Signature</div></div><div><div class="sign-line">Authorised Signatory</div><div class="sign-brand">PRANALI JEWELLERS</div></div></div>
+
+<div class="signatures">
+
+<div>
+<div class="sign-line">Customer Signature</div>
 </div>
-<div class="footer">Your Trust &nbsp; • &nbsp; Our Heritage &nbsp; • &nbsp; Timeless Jewellery</div>
-</div></div></div>
-<script>window.addEventListener("load",()=>setTimeout(()=>window.print(),400));window.addEventListener("afterprint",()=>window.close());</script>
-</body></html>`;
+
+<div>
+<div class="sign-line">Authorised Signatory</div>
+<div class="sign-brand">PRANALI JEWELLERS</div>
+</div>
+
+</div>
+</div>
+
+<div class="footer">
+Your Trust &nbsp; • &nbsp; Our Heritage &nbsp; • &nbsp; Timeless Jewellery
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+window.addEventListener("load",()=>setTimeout(()=>window.print(),400));
+window.addEventListener("afterprint",()=>window.close());
+</script>
+
+</body>
+</html>`;
+
 
             const win = window.open("", "_blank");
+
             if (!win) {
                 setError("Please allow pop-ups to print this bill.");
                 return;
             }
+
             win.document.open();
             win.document.write(html);
             win.document.close();
+
         } catch (err) {
             console.error("Print Bill Error:", err);
-            setError(err.message || "Printing failed.");
+
+            setError(
+                err.message || "Printing failed."
+            );
         }
     };
 
-    // VIEW PAYMENT HISTORY
+
+    // ---------------- VIEW PAYMENT HISTORY ----------------
+
     const viewPaymentHistory = async (bill) => {
         try {
             setHistoryBillId(bill.id);
@@ -522,7 +1013,9 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
             const result = await response.json();
 
             if (!response.ok) {
-                throw new Error(result.message || "Unable to fetch payment history.");
+                throw new Error(
+                    result.message || "Unable to fetch payment history."
+                );
             }
 
             setPaymentHistory(result.payments || []);
@@ -533,6 +1026,8 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
             setPaymentHistoryLoading(false);
         }
     };
+
+
     // ---------------- OPEN DELETE BILL MODAL ----------------
 
     const openDeleteModal = async (bill) => {
@@ -542,7 +1037,9 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
             setDeleteCaptchaAnswer("");
             setDeleteMessage("");
 
-            const response = await apiFetch("/sh-bills/delete-captcha");
+            const response = await apiFetch(
+                "/sh-bills/delete-captcha"
+            );
 
             const result = await response.json();
 
@@ -596,12 +1093,14 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                 );
             }
 
-            // Close delete modal
+            // Close delete modal.
+
             setDeleteBill(null);
             setDeleteCaptcha(null);
             setDeleteCaptchaAnswer("");
 
-            // Refresh customer and bill information
+            // Refresh customer and bill information.
+
             await refreshCustomerDetails();
 
             alert(
@@ -620,35 +1119,49 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
             setDeleteLoading(false);
         }
     };
+
+
     // ---------------- CLOSE CUSTOMER DETAILS ----------------
 
     const closeCustomer = () => {
         setSelectedCustomer(null);
         setCustomerBills([]);
     };
-    // ---------------- WHATSAPP DUE REMINDER ----------------
 
-    const [reminderCustomer, setReminderCustomer] = useState(null);
-    const [reminderPhone, setReminderPhone] = useState("");
-    const [reminderDueData, setReminderDueData] = useState(null);
-    const [reminderQR, setReminderQR] = useState("");
-    const [reminderLoading, setReminderLoading] = useState(false);
-    const [reminderError, setReminderError] = useState("");
-    // ---------------- WHATSAPP REMINDER ----------------
 
-    // TESTING ONLY — replace with shop UPI ID before production.
-    const REMINDER_UPI_ID = "dixitprathamesh02@okicici";
+    // ========================================================
+    // WHATSAPP CLOUD API PAYMENT REMINDER
+    // ========================================================
 
-    const REMINDER_PAYEE_NAME = "PRANALI JEWELLERS";
+
+    // ---------------- CLOSE REMINDER MODAL ----------------
+
+    const closeReminderModal = () => {
+        if (reminderSending) return;
+
+        setReminderCustomer(null);
+        setReminderPhone("");
+        setReminderDueData(null);
+        setReminderError("");
+        setReminderMobileConfirmed(false);
+        setReminderLoading(false);
+    };
+
+
+    // ---------------- FETCH CUSTOMER DUE DETAILS ----------------
 
     const startWhatsAppReminder = async (customer) => {
         try {
             setReminderLoading(true);
             setReminderError("");
-            setReminderQR("");
+
+            setReminderCustomer(customer);
+            setReminderPhone(customer.customer_phone || "");
             setReminderDueData(null);
+            setReminderMobileConfirmed(false);
 
             // Fetch latest customer bills and payment information.
+
             const response = await apiFetch(
                 `/sh-bills/customers/${encodeURIComponent(
                     customer.customer_phone
@@ -659,38 +1172,40 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
             if (!response.ok) {
                 throw new Error(
-                    result.message || "ग्राहकाची बिल माहिती मिळवता आली नाही."
+                    result.message ||
+                    "ग्राहकाची बिल माहिती मिळवता आली नाही."
                 );
             }
 
             const bills = result.bills || [];
 
             const totalPurchase = bills.reduce(
-                (sum, bill) => sum + Number(bill.grand_total || 0),
+                (sum, bill) =>
+                    sum + Number(bill.grand_total || 0),
                 0
             );
 
             const totalPaid = bills.reduce(
-                (sum, bill) => sum + Number(bill.paid_amount || 0),
+                (sum, bill) =>
+                    sum + Number(bill.paid_amount || 0),
                 0
             );
 
             const totalDue = bills.reduce(
-                (sum, bill) => sum + Number(bill.due_amount || 0),
+                (sum, bill) =>
+                    sum + Number(bill.due_amount || 0),
                 0
             );
 
             if (totalDue <= 0) {
-                throw new Error("या ग्राहकाची कोणतीही बाकी रक्कम नाही.");
+                throw new Error(
+                    "या ग्राहकाची कोणतीही बाकी रक्कम नाही."
+                );
             }
 
             const pendingBills = bills.filter(
                 bill => Number(bill.due_amount) > 0
             );
-
-            setReminderCustomer(customer);
-
-            setReminderPhone(customer.customer_phone || "");
 
             setReminderDueData({
                 totalPurchase,
@@ -700,77 +1215,136 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
             });
 
         } catch (err) {
-            setReminderError(err.message || "Reminder तयार करता आला नाही.");
+            console.error("WhatsApp Reminder Preparation Error:", err);
+
+            setReminderError(
+                err.message || "Reminder तयार करता आला नाही."
+            );
+
         } finally {
             setReminderLoading(false);
         }
     };
 
 
-    // GENERATE QR AFTER MOBILE NUMBER CONFIRMATION
+    // ---------------- CONFIRM MOBILE NUMBER ----------------
 
-    const confirmReminderMobile = async () => {
+    const confirmReminderMobile = () => {
+        setReminderError("");
+
+        const digits = reminderPhone.replace(/\D/g, "");
+
+        // Accept either a 10-digit Indian mobile number
+        // or a 12-digit number starting with 91.
+
+        const mobile =
+            digits.length === 12 && digits.startsWith("91")
+                ? digits.slice(2)
+                : digits;
+
+        if (!/^[6-9]\d{9}$/.test(mobile)) {
+            setReminderError(
+                "कृपया योग्य 10 अंकी भारतीय मोबाईल नंबर टाका."
+            );
+
+            return;
+        }
+
+        if (!reminderDueData || reminderDueData.totalDue <= 0) {
+            setReminderError(
+                "बाकी रक्कम उपलब्ध नाही."
+            );
+
+            return;
+        }
+
+        setReminderPhone(mobile);
+        setReminderMobileConfirmed(true);
+    };
+
+
+    // ---------------- SEND WHATSAPP REMINDER ----------------
+
+    const sendWhatsAppDueReminder = async () => {
+        if (!reminderCustomer || !reminderMobileConfirmed) {
+            return;
+        }
+
+        if (reminderSending) {
+            return;
+        }
+
         try {
+            setReminderSending(true);
             setReminderError("");
 
-            // Accept 10-digit Indian number, or number with 91 prefix.
-            const digits = reminderPhone.replace(/\D/g, "");
+            const response = await apiFetch(
+                "/whatsapp/send-due-reminder",
+                {
+                    method: "POST",
 
-            const mobile =
-                digits.length === 12 && digits.startsWith("91")
-                    ? digits.slice(2)
-                    : digits;
+                    body: JSON.stringify({
+                        // Original customer number is used by backend
+                        // to identify the customer and fetch bills.
 
-            if (!/^[6-9]\d{9}$/.test(mobile)) {
-                setReminderError(
-                    "कृपया योग्य 10 अंकी भारतीय मोबाईल नंबर टाका."
+                        customerPhone:
+                            reminderCustomer.customer_phone,
+
+                        // Confirmed recipient number can be different
+                        // from the saved customer number.
+
+                        recipientPhone: reminderPhone
+                    })
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message ||
+                    "WhatsApp संदेश पाठवता आला नाही."
                 );
-                return;
             }
 
-            if (!reminderDueData || reminderDueData.totalDue <= 0) {
-                setReminderError("बाकी रक्कम उपलब्ध नाही.");
-                return;
-            }
+            alert(
+                "WhatsApp Reminder यशस्वीरित्या पाठवला!"
+            );
 
-            const amount = Number(reminderDueData.totalDue).toFixed(2);
-
-            // Dynamic UPI payment URI.
-            const upiParams = new URLSearchParams({
-                pa: REMINDER_UPI_ID,
-                pn: REMINDER_PAYEE_NAME,
-                am: amount,
-                cu: "INR",
-                tn: "SH Bill Pending Payment"
-            });
-
-            const upiURI = `upi://pay?${upiParams.toString()}`;
-
-            const qr = await QRCode.toDataURL(upiURI, {
-                width: 350,
-                margin: 2,
-                errorCorrectionLevel: "H"
-            });
-
-            setReminderQR(qr);
-
-            setReminderPhone(mobile);
+            setReminderCustomer(null);
+            setReminderPhone("");
+            setReminderDueData(null);
+            setReminderError("");
+            setReminderMobileConfirmed(false);
 
         } catch (err) {
-            console.error("QR Generation Error:", err);
-            setReminderError("QR कोड तयार करताना समस्या आली.");
+            console.error(
+                "WhatsApp Reminder Error:",
+                err
+            );
+
+            setReminderError(
+                err.message ||
+                "WhatsApp संदेश पाठवताना समस्या आली."
+            );
+
+        } finally {
+            setReminderSending(false);
         }
     };
 
 
-    // GENERATE MARATHI MESSAGE
+    // ---------------- MARATHI MESSAGE PREVIEW ----------------
 
     const getMarathiReminderMessage = () => {
-        if (!reminderCustomer || !reminderDueData) return "";
+        if (!reminderCustomer || !reminderDueData) {
+            return "";
+        }
 
-        const pendingBillNumbers = reminderDueData.pendingBills
-            .map(bill => bill.bill_number)
-            .join(", ");
+        const pendingBillNumbers =
+            reminderDueData.pendingBills
+                .map(bill => bill.bill_number)
+                .join(", ");
 
         return `🙏 ॥ श्री गणेशाय नमः ॥
 
@@ -804,47 +1378,9 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
     };
 
 
-    // DOWNLOAD QR CODE
-
-    const downloadReminderQR = () => {
-        if (!reminderQR) return;
-
-        const link = document.createElement("a");
-
-        link.href = reminderQR;
-        link.download = `Pranali-Jewellers-QR-${reminderPhone}.png`;
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-
-    // OPEN WHATSAPP
-
-    const openReminderWhatsApp = () => {
-        if (!reminderQR || !reminderPhone) return;
-
-        const message = getMarathiReminderMessage();
-
-        const whatsappURL =
-            `https://wa.me/91${reminderPhone}?text=${encodeURIComponent(message)}`;
-
-        window.open(whatsappURL, "_blank", "noopener,noreferrer");
-    };
-
-
-    // CLOSE REMINDER MODAL
-
-    const closeReminderModal = () => {
-        setReminderCustomer(null);
-        setReminderPhone("");
-        setReminderDueData(null);
-        setReminderQR("");
-        setReminderError("");
-    };
-
-    // ---------------- UI ----------------
+    // ========================================================
+    // UI
+    // ========================================================
 
     return (
         <main className="shcustomers-page">
@@ -854,6 +1390,7 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
             <div className="shcustomers-header">
                 <div>
                     <h1>SH Customers</h1>
+
                     <p>
                         Manage your jewellery customers and their
                         billing records.
@@ -869,12 +1406,14 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                 </button>
             </div>
 
+
             {/* SUMMARY CARDS */}
 
             <section className="shcustomers-stats">
 
                 <div className="shcustomer-stat-card">
                     <div className="shcustomer-stat-icon">♙</div>
+
                     <div>
                         <p>Total Customers</p>
                         <h2>{totalCustomers}</h2>
@@ -883,6 +1422,7 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                 <div className="shcustomer-stat-card">
                     <div className="shcustomer-stat-icon">₹</div>
+
                     <div>
                         <p>Total Purchase</p>
                         <h2>{money(totalPurchase)}</h2>
@@ -891,6 +1431,7 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                 <div className="shcustomer-stat-card">
                     <div className="shcustomer-stat-icon">!</div>
+
                     <div>
                         <p>Customers With Dues</p>
                         <h2>{pendingCustomers}</h2>
@@ -899,6 +1440,7 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                 <div className="shcustomer-stat-card">
                     <div className="shcustomer-stat-icon">◷</div>
+
                     <div>
                         <p>Total Pending Amount</p>
                         <h2>{money(totalDue)}</h2>
@@ -907,6 +1449,7 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
             </section>
 
+
             {/* CUSTOMER LIST */}
 
             <section className="shcustomers-card">
@@ -914,9 +1457,13 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                 <div className="shcustomers-list-heading">
                     <div>
                         <h2>Customer Directory</h2>
-                        <p>All customers created through SH Bills.</p>
+
+                        <p>
+                            All customers created through SH Bills.
+                        </p>
                     </div>
                 </div>
+
 
                 {/* SEARCH */}
 
@@ -941,6 +1488,7 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                             </button>
                         )}
                     </div>
+
 
                     <div className="shcustomers-filters">
 
@@ -972,6 +1520,7 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                 </div>
 
+
                 {/* ERROR */}
 
                 {error && (
@@ -979,6 +1528,7 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                         {error}
                     </div>
                 )}
+
 
                 {/* TABLE */}
 
@@ -1003,23 +1553,34 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                             {loading ? (
                                 <tr>
-                                    <td colSpan="8" className="shcustomers-empty">
+                                    <td
+                                        colSpan="8"
+                                        className="shcustomers-empty"
+                                    >
                                         Loading customers...
                                     </td>
                                 </tr>
                             ) : customers.length === 0 ? (
                                 <tr>
-                                    <td colSpan="8" className="shcustomers-empty">
+                                    <td
+                                        colSpan="8"
+                                        className="shcustomers-empty"
+                                    >
                                         No customers found.
                                     </td>
                                 </tr>
                             ) : (
                                 customers.map((customer, index) => (
 
-                                    <tr key={customer.customer_phone || index}>
+                                    <tr
+                                        key={
+                                            customer.customer_phone || index
+                                        }
+                                    >
 
                                         <td>
                                             <div className="shcustomer-name">
+
                                                 <div className="shcustomer-avatar">
                                                     {customer.customer_name
                                                         ?.charAt(0)
@@ -1029,10 +1590,13 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                                 <strong>
                                                     {customer.customer_name}
                                                 </strong>
+
                                             </div>
                                         </td>
 
-                                        <td>{customer.customer_phone}</td>
+                                        <td>
+                                            {customer.customer_phone}
+                                        </td>
 
                                         <td>
                                             {customer.total_bills}
@@ -1059,7 +1623,9 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                         </td>
 
                                         <td>
-                                            {formatDate(customer.last_bill_date)}
+                                            {formatDate(
+                                                customer.last_bill_date
+                                            )}
                                         </td>
 
                                         <td>
@@ -1068,7 +1634,9 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                                 <button
                                                     className="shcustomer-view-button"
                                                     type="button"
-                                                    onClick={() => viewCustomer(customer)}
+                                                    onClick={() =>
+                                                        viewCustomer(customer)
+                                                    }
                                                 >
                                                     View Details
                                                 </button>
@@ -1077,10 +1645,17 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                                     <button
                                                         className="shcustomer-whatsapp-button"
                                                         type="button"
-                                                        disabled={reminderLoading}
-                                                        onClick={() => startWhatsAppReminder(customer)}
+                                                        disabled={
+                                                            reminderLoading ||
+                                                            reminderSending
+                                                        }
+                                                        onClick={() =>
+                                                            startWhatsAppReminder(customer)
+                                                        }
                                                     >
-                                                        {reminderLoading ? "Loading..." : "WhatsApp Reminder"}
+                                                        {reminderLoading
+                                                            ? "Loading..."
+                                                            : "WhatsApp Reminder"}
                                                     </button>
                                                 )}
 
@@ -1098,13 +1673,17 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                 </div>
 
+
                 <div className="shcustomers-table-footer">
                     Showing {customers.length} customers
                 </div>
 
             </section>
 
+
+            {/* ================================================= */}
             {/* CUSTOMER DETAILS MODAL */}
+            {/* ================================================= */}
 
             {selectedCustomer && (
 
@@ -1122,7 +1701,10 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                             <div>
                                 <h2>Customer Details</h2>
-                                <p>Customer billing information and history.</p>
+
+                                <p>
+                                    Customer billing information and history.
+                                </p>
                             </div>
 
                             <button
@@ -1134,6 +1716,7 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                         </div>
 
+
                         <div className="shcustomer-profile">
 
                             <div className="shcustomer-profile-avatar">
@@ -1143,19 +1726,28 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                             </div>
 
                             <div>
-                                <h3>{selectedCustomer.customer_name}</h3>
-                                <p>{selectedCustomer.customer_phone}</p>
+                                <h3>
+                                    {selectedCustomer.customer_name}
+                                </h3>
+
                                 <p>
-                                    {selectedCustomer.customer_address || "No address available"}
+                                    {selectedCustomer.customer_phone}
+                                </p>
+
+                                <p>
+                                    {selectedCustomer.customer_address ||
+                                        "No address available"}
                                 </p>
                             </div>
 
                         </div>
 
+
                         <div className="shcustomer-history-stats">
 
                             <div>
                                 <span>Total Purchase</span>
+
                                 <strong>
                                     {money(selectedCustomer.total_purchase)}
                                 </strong>
@@ -1163,6 +1755,7 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                             <div>
                                 <span>Total Paid</span>
+
                                 <strong>
                                     {money(selectedCustomer.total_paid)}
                                 </strong>
@@ -1170,23 +1763,34 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                             <div>
                                 <span>Pending Due</span>
+
                                 <strong className="shcustomer-due">
                                     {money(selectedCustomer.total_due)}
                                 </strong>
                             </div>
 
                         </div>
+
+
                         <h3 className="shcustomer-history-title">
                             Bill History
                         </h3>
 
+
                         {historyLoading ? (
-                            <p className="shcustomers-empty">Loading bill history...</p>
+                            <p className="shcustomers-empty">
+                                Loading bill history...
+                            </p>
                         ) : customerBills.length === 0 ? (
-                            <p className="shcustomers-empty">No bill history found.</p>
+                            <p className="shcustomers-empty">
+                                No bill history found.
+                            </p>
                         ) : (
+
                             <div className="shcustomer-history-table-wrapper">
+
                                 <table className="shcustomers-table">
+
                                     <thead>
                                         <tr>
                                             <th>Bill Number</th>
@@ -1200,15 +1804,31 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                     </thead>
 
                                     <tbody>
+
                                         {customerBills.map((bill) => (
+
                                             <tr key={bill.id}>
-                                                <td>{bill.bill_number}</td>
-                                                <td>{formatDate(bill.bill_date)}</td>
-                                                <td>{bill.billing_type}</td>
-                                                <td>{money(bill.grand_total)}</td>
+
+                                                <td>
+                                                    {bill.bill_number}
+                                                </td>
+
+                                                <td>
+                                                    {formatDate(bill.bill_date)}
+                                                </td>
+
+                                                <td>
+                                                    {bill.billing_type}
+                                                </td>
+
+                                                <td>
+                                                    {money(bill.grand_total)}
+                                                </td>
+
                                                 <td className="shcustomer-paid">
                                                     {money(bill.paid_amount)}
                                                 </td>
+
                                                 <td>
                                                     <span
                                                         className={
@@ -1223,13 +1843,34 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                                                 <td>
                                                     <div className="shcustomer-actions">
-                                                        <button type="button" className="shcustomer-history-button" onClick={() => viewBillDetails(bill)}>View Bill</button>
-                                                        <button type="button" className="shcustomer-history-button" onClick={() => printBill(bill)}>Print / PDF</button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="shcustomer-history-button"
+                                                            onClick={() =>
+                                                                viewBillDetails(bill)
+                                                            }
+                                                        >
+                                                            View Bill
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="shcustomer-history-button"
+                                                            onClick={() =>
+                                                                printBill(bill)
+                                                            }
+                                                        >
+                                                            Print / PDF
+                                                        </button>
+
                                                         {Number(bill.due_amount) > 0 && (
                                                             <button
                                                                 type="button"
                                                                 className="shcustomer-payment-button"
-                                                                onClick={() => openPaymentForm(bill)}
+                                                                onClick={() =>
+                                                                    openPaymentForm(bill)
+                                                                }
                                                             >
                                                                 + Payment
                                                             </button>
@@ -1238,40 +1879,136 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                                         <button
                                                             type="button"
                                                             className="shcustomer-history-button"
-                                                            onClick={() => viewPaymentHistory(bill)}
+                                                            onClick={() =>
+                                                                viewPaymentHistory(bill)
+                                                            }
                                                         >
                                                             History
                                                         </button>
+
                                                         <button
                                                             type="button"
                                                             className="shcustomer-delete-button"
-                                                            onClick={() => openDeleteModal(bill)}
+                                                            onClick={() =>
+                                                                openDeleteModal(bill)
+                                                            }
                                                         >
                                                             Delete
                                                         </button>
+
                                                     </div>
                                                 </td>
+
                                             </tr>
+
                                         ))}
+
                                     </tbody>
+
                                 </table>
+
                             </div>
                         )}
+
+
                         {/* COMPLETE BILL DETAILS MODAL */}
-                        {detailLoading && <div className="shcustomer-modal-overlay"><section className="shcustomer-payment-modal"><p>Loading bill details...</p></section></div>}
+
+                        {detailLoading && (
+                            <div className="shcustomer-modal-overlay">
+                                <section className="shcustomer-payment-modal">
+                                    <p>Loading bill details...</p>
+                                </section>
+                            </div>
+                        )}
+
+
                         {detailBill && (
-                            <div className="shcustomer-modal-overlay" onClick={() => setDetailBill(null)}>
-                                <section className="shcustomer-payment-modal shcustomer-bill-detail-modal" onClick={e => e.stopPropagation()}>
-                                    <div className="shcustomer-modal-header"><div><h2>Bill Details · {detailBill.bill_number}</h2><p>Complete saved bill information</p></div><button type="button" onClick={() => setDetailBill(null)}>×</button></div>
-                                    <div className="shcustomer-bill-detail-content">
-                                        <h3>Customer & Bill</h3><div className="shcustomer-bill-detail-grid">
-                                            <div><span>Customer</span><strong>{detailBill.customer_name}</strong></div><div><span>Mobile</span><strong>{detailBill.customer_phone}</strong></div><div><span>Date</span><strong>{formatDate(detailBill.bill_date)}</strong></div><div><span>Billing Type</span><strong>{detailBill.billing_type}</strong></div><div className="wide"><span>Address</span><strong>{detailBill.customer_address || '-'}</strong></div>
+
+                            <div
+                                className="shcustomer-modal-overlay"
+                                onClick={() => setDetailBill(null)}
+                            >
+
+                                <section
+                                    className="shcustomer-payment-modal shcustomer-bill-detail-modal"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+
+                                    <div className="shcustomer-modal-header">
+
+                                        <div>
+                                            <h2>
+                                                Bill Details · {detailBill.bill_number}
+                                            </h2>
+
+                                            <p>
+                                                Complete saved bill information
+                                            </p>
                                         </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => setDetailBill(null)}
+                                        >
+                                            ×
+                                        </button>
+
+                                    </div>
+
+
+                                    <div className="shcustomer-bill-detail-content">
+
+                                        <h3>Customer & Bill</h3>
+
+                                        <div className="shcustomer-bill-detail-grid">
+
+                                            <div>
+                                                <span>Customer</span>
+                                                <strong>
+                                                    {detailBill.customer_name}
+                                                </strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Mobile</span>
+                                                <strong>
+                                                    {detailBill.customer_phone}
+                                                </strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Date</span>
+                                                <strong>
+                                                    {formatDate(detailBill.bill_date)}
+                                                </strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Billing Type</span>
+                                                <strong>
+                                                    {detailBill.billing_type}
+                                                </strong>
+                                            </div>
+
+                                            <div className="wide">
+                                                <span>Address</span>
+                                                <strong>
+                                                    {detailBill.customer_address || "-"}
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+
                                         <h3>Items</h3>
 
+
                                         {detailBill.items?.length ? (
+
                                             <div className="shcustomer-history-table-wrapper">
+
                                                 <table className="shcustomers-table">
+
                                                     <thead>
                                                         <tr>
                                                             <th>#</th>
@@ -1284,7 +2021,9 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                                     </thead>
 
                                                     <tbody>
+
                                                         {detailBill.items.map((it, i) => {
+
                                                             const itemAmount =
                                                                 it.total ??
                                                                 it.total_amount ??
@@ -1307,7 +2046,10 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                                                             return (
                                                                 <tr key={i}>
-                                                                    <td>{i + 1}</td>
+
+                                                                    <td>
+                                                                        {i + 1}
+                                                                    </td>
 
                                                                     <td>
                                                                         {it.name ||
@@ -1329,38 +2071,199 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                                                     </td>
 
                                                                     <td>
-                                                                        {money(it.rate ?? it.price ?? 0)}
+                                                                        {money(
+                                                                            it.rate ?? it.price ?? 0
+                                                                        )}
                                                                     </td>
 
-                                                                    <td>{money(it.itemTotal)}</td>
+                                                                    <td>
+                                                                        {money(
+                                                                            it.itemTotal ??
+                                                                            itemAmount
+                                                                        )}
+                                                                    </td>
+
                                                                 </tr>
                                                             );
                                                         })}
+
                                                     </tbody>
+
                                                 </table>
+
                                             </div>
+
                                         ) : (
                                             <p>No item details saved.</p>
                                         )}
-                                        {detailBill.exchange_items?.length > 0 && <><h3>Exchange Items</h3><div className="shcustomer-history-table-wrapper"><table className="shcustomers-table"><thead><tr><th>#</th><th>Details</th><th>Weight</th><th>Quantity</th><th>Value</th></tr></thead><tbody>{detailBill.exchange_items.map((it, i) => <tr key={i}><td>{i + 1}</td><td>{it.name || it.item_name || it.description || Object.entries(it).map(([k, v]) => `${k}: ${v}`).join(' · ')}</td><td>{it.weight ?? it.net_weight ?? it.gross_weight ?? '-'}</td><td>{it.quantity ?? it.qty ?? 1}</td><td>{money(it.amount ?? it.total ?? it.value ?? 0)}</td></tr>)}</tbody></table></div></>}
-                                        <h3>Bill Summary</h3><div className="shcustomer-bill-detail-grid financial"><div><span>Subtotal</span><strong>{money(detailBill.subtotal)}</strong></div><div><span>Discount</span><strong>{money(detailBill.discount_amount)}</strong></div><div><span>GST</span><strong>{money(detailBill.gst_amount)}</strong></div><div><span>Grand Total</span><strong>{money(detailBill.grand_total)}</strong></div><div><span>Exchange Value</span><strong>{money(detailBill.exchange_total)}</strong></div><div><span>Net Payable</span><strong>{money(detailBill.net_payable)}</strong></div><div><span>Paid</span><strong className="shcustomer-paid">{money(detailBill.paid_amount)}</strong></div><div><span>Due</span><strong className="shcustomer-due">{money(detailBill.due_amount)}</strong></div></div>
-                                    </div><div className="shcustomer-payment-actions"><button type="button" className="shcustomer-cancel-button" onClick={() => setDetailBill(null)}>Close</button><button type="button" className="shcustomer-submit-payment" onClick={() => printBill(detailBill)}>Print / Save PDF</button></div>
+
+
+                                        {detailBill.exchange_items?.length > 0 && (
+
+                                            <>
+                                                <h3>Exchange Items</h3>
+
+                                                <div className="shcustomer-history-table-wrapper">
+
+                                                    <table className="shcustomers-table">
+
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>Details</th>
+                                                                <th>Weight</th>
+                                                                <th>Quantity</th>
+                                                                <th>Value</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+
+                                                            {detailBill.exchange_items.map((it, i) => (
+
+                                                                <tr key={i}>
+                                                                    <td>{i + 1}</td>
+
+                                                                    <td>
+                                                                        {it.name ||
+                                                                            it.item_name ||
+                                                                            it.description ||
+                                                                            Object.entries(it)
+                                                                                .map(([k, v]) => `${k}: ${v}`)
+                                                                                .join(" · ")}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {it.weight ??
+                                                                            it.net_weight ??
+                                                                            it.gross_weight ??
+                                                                            "-"}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {it.quantity ?? it.qty ?? 1}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {money(
+                                                                            it.amount ??
+                                                                            it.total ??
+                                                                            it.value ??
+                                                                            0
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+
+                                                            ))}
+
+                                                        </tbody>
+
+                                                    </table>
+
+                                                </div>
+                                            </>
+
+                                        )}
+
+
+                                        <h3>Bill Summary</h3>
+
+                                        <div className="shcustomer-bill-detail-grid financial">
+
+                                            <div>
+                                                <span>Subtotal</span>
+                                                <strong>{money(detailBill.subtotal)}</strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Discount</span>
+                                                <strong>{money(detailBill.discount_amount)}</strong>
+                                            </div>
+
+                                            <div>
+                                                <span>GST</span>
+                                                <strong>{money(detailBill.gst_amount)}</strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Grand Total</span>
+                                                <strong>{money(detailBill.grand_total)}</strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Exchange Value</span>
+                                                <strong>{money(detailBill.exchange_total)}</strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Net Payable</span>
+                                                <strong>{money(detailBill.net_payable)}</strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Paid</span>
+                                                <strong className="shcustomer-paid">
+                                                    {money(detailBill.paid_amount)}
+                                                </strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Due</span>
+                                                <strong className="shcustomer-due">
+                                                    {money(detailBill.due_amount)}
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div className="shcustomer-payment-actions">
+
+                                        <button
+                                            type="button"
+                                            className="shcustomer-cancel-button"
+                                            onClick={() => setDetailBill(null)}
+                                        >
+                                            Close
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="shcustomer-submit-payment"
+                                            onClick={() => printBill(detailBill)}
+                                        >
+                                            Print / Save PDF
+                                        </button>
+
+                                    </div>
+
                                 </section>
+
                             </div>
                         )}
+
 
                         {/* RECORD PAYMENT MODAL */}
 
                         {selectedPaymentBill && (
+
                             <div className="shcustomer-modal-overlay">
+
                                 <section
                                     className="shcustomer-payment-modal"
                                     onClick={(e) => e.stopPropagation()}
                                 >
+
                                     <div className="shcustomer-modal-header">
+
                                         <div>
                                             <h2>Record Payment</h2>
-                                            <p>Bill: {selectedPaymentBill.bill_number}</p>
+
+                                            <p>
+                                                Bill: {selectedPaymentBill.bill_number}
+                                            </p>
                                         </div>
 
                                         <button
@@ -1369,29 +2272,43 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                         >
                                             ×
                                         </button>
+
                                     </div>
 
+
                                     <div className="shcustomer-payment-summary">
+
                                         <div>
                                             <span>Bill Amount</span>
-                                            <strong>{money(selectedPaymentBill.grand_total)}</strong>
+
+                                            <strong>
+                                                {money(selectedPaymentBill.grand_total)}
+                                            </strong>
                                         </div>
 
                                         <div>
                                             <span>Already Paid</span>
-                                            <strong>{money(selectedPaymentBill.paid_amount)}</strong>
+
+                                            <strong>
+                                                {money(selectedPaymentBill.paid_amount)}
+                                            </strong>
                                         </div>
 
                                         <div>
                                             <span>Pending Due</span>
+
                                             <strong className="shcustomer-due">
                                                 {money(selectedPaymentBill.due_amount)}
                                             </strong>
                                         </div>
+
                                     </div>
 
+
                                     <form onSubmit={handleRecordPayment}>
+
                                         <label>Payment Amount (₹)</label>
+
                                         <input
                                             type="number"
                                             min="0.01"
@@ -1408,7 +2325,9 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                             placeholder="Enter amount"
                                         />
 
+
                                         <label>Payment Date</label>
+
                                         <input
                                             type="date"
                                             required
@@ -1421,7 +2340,9 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                             }
                                         />
 
+
                                         <label>Payment Mode</label>
+
                                         <select
                                             value={paymentForm.payment_mode}
                                             onChange={(e) =>
@@ -1433,12 +2354,16 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                         >
                                             <option value="CASH">Cash</option>
                                             <option value="UPI">UPI</option>
-                                            <option value="BANK_TRANSFER">Bank Transfer</option>
+                                            <option value="BANK_TRANSFER">
+                                                Bank Transfer
+                                            </option>
                                             <option value="CARD">Card</option>
                                             <option value="OTHER">Other</option>
                                         </select>
 
+
                                         <label>Remarks (Optional)</label>
+
                                         <textarea
                                             value={paymentForm.remarks}
                                             onChange={(e) =>
@@ -1451,16 +2376,21 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                             rows="3"
                                         />
 
+
                                         {paymentMessage && (
                                             <div className="shcustomers-error">
                                                 {paymentMessage}
                                             </div>
                                         )}
 
+
                                         <div className="shcustomer-payment-actions">
+
                                             <button
                                                 type="button"
-                                                onClick={() => setSelectedPaymentBill(null)}
+                                                onClick={() =>
+                                                    setSelectedPaymentBill(null)
+                                                }
                                                 className="shcustomer-cancel-button"
                                             >
                                                 Cancel
@@ -1471,43 +2401,111 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                                 disabled={paymentLoading}
                                                 className="shcustomer-submit-payment"
                                             >
-                                                {paymentLoading ? "Saving..." : "Save Payment"}
+                                                {paymentLoading
+                                                    ? "Saving..."
+                                                    : "Save Payment"}
                                             </button>
+
                                         </div>
+
                                     </form>
+
                                 </section>
+
                             </div>
                         )}
+
 
                         {/* PAYMENT SAVED CONFIRMATION */}
+
                         {paymentSuccessBill && (
-                            <div className="shcustomer-modal-overlay" onClick={() => setPaymentSuccessBill(null)}>
-                                <section className="shcustomer-payment-modal" onClick={e => e.stopPropagation()}>
-                                    <div className="shcustomer-modal-header"><div><h2>✓ Payment Saved</h2><p>{paymentSuccessBill.bill_number}</p></div><button type="button" onClick={() => setPaymentSuccessBill(null)}>×</button></div>
-                                    <p className="shcustomer-payment-success-text">Payment recorded successfully. You can now print or save this bill as a PDF.</p>
-                                    <div className="shcustomer-payment-actions"><button type="button" className="shcustomer-cancel-button" onClick={() => setPaymentSuccessBill(null)}>Close</button><button type="button" className="shcustomer-submit-payment" onClick={() => printBill(paymentSuccessBill)}>Print / Save PDF</button></div>
-                                </section>
-                            </div>
-                        )}
 
-                        {/* PAYMENT HISTORY MODAL */}
-
-                        {historyBillId !== null && (
                             <div
                                 className="shcustomer-modal-overlay"
-                                onClick={() => setHistoryBillId(null)}
+                                onClick={() => setPaymentSuccessBill(null)}
                             >
+
                                 <section
                                     className="shcustomer-payment-modal"
                                     onClick={(e) => e.stopPropagation()}
                                 >
+
                                     <div className="shcustomer-modal-header">
+
+                                        <div>
+                                            <h2>✓ Payment Saved</h2>
+
+                                            <p>
+                                                {paymentSuccessBill.bill_number}
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => setPaymentSuccessBill(null)}
+                                        >
+                                            ×
+                                        </button>
+
+                                    </div>
+
+
+                                    <p className="shcustomer-payment-success-text">
+                                        Payment recorded successfully.
+                                        You can now print or save this bill as a PDF.
+                                    </p>
+
+
+                                    <div className="shcustomer-payment-actions">
+
+                                        <button
+                                            type="button"
+                                            className="shcustomer-cancel-button"
+                                            onClick={() => setPaymentSuccessBill(null)}
+                                        >
+                                            Close
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="shcustomer-submit-payment"
+                                            onClick={() => printBill(paymentSuccessBill)}
+                                        >
+                                            Print / Save PDF
+                                        </button>
+
+                                    </div>
+
+                                </section>
+
+                            </div>
+                        )}
+
+
+                        {/* PAYMENT HISTORY MODAL */}
+
+                        {historyBillId !== null && (
+
+                            <div
+                                className="shcustomer-modal-overlay"
+                                onClick={() => setHistoryBillId(null)}
+                            >
+
+                                <section
+                                    className="shcustomer-payment-modal"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+
+                                    <div className="shcustomer-modal-header">
+
                                         <div>
                                             <h2>Payment History</h2>
+
                                             <p>
                                                 Bill: {
                                                     customerBills.find(
-                                                        (bill) => bill.id === historyBillId
+                                                        (bill) =>
+                                                            bill.id === historyBillId
                                                     )?.bill_number
                                                 }
                                             </p>
@@ -1519,7 +2517,9 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                         >
                                             ×
                                         </button>
+
                                     </div>
+
 
                                     {paymentHistoryLoading ? (
                                         <p>Loading payment history...</p>
@@ -1528,8 +2528,11 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                             No payment records found.
                                         </p>
                                     ) : (
+
                                         <div className="shcustomer-history-table-wrapper">
+
                                             <table className="shcustomers-table">
+
                                                 <thead>
                                                     <tr>
                                                         <th>Date</th>
@@ -1540,26 +2543,48 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                                 </thead>
 
                                                 <tbody>
+
                                                     {paymentHistory.map((payment) => (
+
                                                         <tr key={payment.id}>
-                                                            <td>{formatDate(payment.payment_date)}</td>
+
+                                                            <td>
+                                                                {formatDate(payment.payment_date)}
+                                                            </td>
+
                                                             <td className="shcustomer-paid">
                                                                 {money(payment.payment_amount)}
                                                             </td>
-                                                            <td>{payment.payment_mode}</td>
-                                                            <td>{payment.remarks || "-"}</td>
+
+                                                            <td>
+                                                                {payment.payment_mode}
+                                                            </td>
+
+                                                            <td>
+                                                                {payment.remarks || "-"}
+                                                            </td>
+
                                                         </tr>
+
                                                     ))}
+
                                                 </tbody>
+
                                             </table>
+
                                         </div>
                                     )}
+
                                 </section>
+
                             </div>
                         )}
+
+
                         {/* DELETE BILL CAPTCHA MODAL */}
 
                         {deleteBill && (
+
                             <div
                                 className="shcustomer-modal-overlay"
                                 onClick={() => {
@@ -1569,15 +2594,20 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                     }
                                 }}
                             >
+
                                 <section
                                     className="shcustomer-payment-modal shcustomer-delete-modal"
                                     onClick={(e) => e.stopPropagation()}
                                 >
 
                                     <div className="shcustomer-modal-header">
+
                                         <div>
                                             <h2>Delete Bill</h2>
-                                            <p>Permanent bill deletion confirmation</p>
+
+                                            <p>
+                                                Permanent bill deletion confirmation
+                                            </p>
                                         </div>
 
                                         <button
@@ -1590,9 +2620,12 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                         >
                                             ×
                                         </button>
+
                                     </div>
 
+
                                     <div className="shcustomer-delete-warning">
+
                                         <strong>⚠ Warning!</strong>
 
                                         <p>
@@ -1604,7 +2637,9 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                             The customer record and other bills will remain
                                             unchanged.
                                         </p>
+
                                     </div>
+
 
                                     <div className="shcustomer-delete-bill-info">
 
@@ -1630,11 +2665,14 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
 
                                     </div>
 
+
                                     <form onSubmit={handleDeleteBill}>
 
                                         <label>Security Verification</label>
 
+
                                         {deleteCaptcha ? (
+
                                             <div className="shcustomer-captcha-box">
 
                                                 <div className="shcustomer-captcha-question">
@@ -1652,15 +2690,20 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                                 />
 
                                             </div>
+
                                         ) : (
-                                            <p>Generating security verification...</p>
+                                            <p>
+                                                Generating security verification...
+                                            </p>
                                         )}
+
 
                                         {deleteMessage && (
                                             <div className="shcustomers-error">
                                                 {deleteMessage}
                                             </div>
                                         )}
+
 
                                         <div className="shcustomer-payment-actions">
 
@@ -1679,7 +2722,10 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                             <button
                                                 type="submit"
                                                 className="shcustomer-confirm-delete"
-                                                disabled={deleteLoading || !deleteCaptcha}
+                                                disabled={
+                                                    deleteLoading ||
+                                                    !deleteCaptcha
+                                                }
                                             >
                                                 {deleteLoading
                                                     ? "Deleting..."
@@ -1691,64 +2737,117 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                     </form>
 
                                 </section>
+
                             </div>
                         )}
 
                     </section>
+
                 </div>
             )}
-            {/* WHATSAPP REMINDER MODAL */}
+
+
+            {/* ================================================= */}
+            {/* WHATSAPP CLOUD API REMINDER MODAL */}
+            {/* ================================================= */}
 
             {reminderCustomer && (
+
                 <div
                     className="shcustomer-modal-overlay"
                     onClick={closeReminderModal}
                 >
+
                     <section
                         className="shcustomer-payment-modal shcustomer-reminder-modal"
                         onClick={(e) => e.stopPropagation()}
                     >
 
+                        {/* MODAL HEADER */}
+
                         <div className="shcustomer-modal-header">
+
                             <div>
                                 <h2>WhatsApp Payment Reminder</h2>
-                                <p>मराठी पेमेंट रिमाइंडर</p>
+
+                                <p>
+                                    मराठी पेमेंट रिमाइंडर
+                                </p>
                             </div>
 
                             <button
                                 type="button"
                                 onClick={closeReminderModal}
+                                disabled={reminderSending}
                             >
                                 ×
                             </button>
+
                         </div>
+
+
+                        {/* CUSTOMER DETAILS */}
 
                         <div className="shcustomer-reminder-customer">
-                            <strong>{reminderCustomer.customer_name}</strong>
-                            <span>
-                                बाकी रक्कम:{" "}
-                                {money(reminderDueData?.totalDue)}
-                            </span>
+
+                            <strong>
+                                {reminderCustomer.customer_name}
+                            </strong>
+
+                            {reminderDueData && (
+                                <span>
+                                    बाकी रक्कम:{" "}
+                                    {money(reminderDueData.totalDue)}
+                                </span>
+                            )}
+
                         </div>
 
-                        <label>ग्राहकाचा मोबाईल नंबर तपासा</label>
 
-                        <input
-                            type="tel"
-                            value={reminderPhone}
-                            maxLength={13}
-                            placeholder="10 अंकी मोबाईल नंबर"
-                            onChange={(e) => {
-                                setReminderPhone(e.target.value);
-                                setReminderQR("");
-                                setReminderError("");
-                            }}
-                        />
+                        {/* LOADING */}
 
-                        <p className="shcustomer-reminder-hint">
-                            मोबाईल नंबर चुकीचा असल्यास येथे बदल करू शकता.
-                            हा बदल ग्राहकाच्या सेव्ह केलेल्या नंबरमध्ये होणार नाही.
-                        </p>
+                        {reminderLoading && (
+                            <p>
+                                ग्राहकाची बिल माहिती मिळवत आहे...
+                            </p>
+                        )}
+
+
+                        {/* MOBILE NUMBER */}
+
+                        {!reminderLoading && (
+
+                            <>
+                                <label>
+                                    ग्राहकाचा मोबाईल नंबर तपासा
+                                </label>
+
+                                <input
+                                    type="tel"
+                                    value={reminderPhone}
+                                    maxLength={13}
+                                    placeholder="10 अंकी मोबाईल नंबर"
+                                    disabled={
+                                        reminderMobileConfirmed ||
+                                        reminderSending
+                                    }
+                                    onChange={(e) => {
+                                        setReminderPhone(e.target.value);
+                                        setReminderError("");
+                                    }}
+                                />
+
+                                <p className="shcustomer-reminder-hint">
+                                    मोबाईल नंबर चुकीचा असल्यास येथे बदल करू शकता.
+                                    हा बदल ग्राहकाच्या सेव्ह केलेल्या नंबरमध्ये
+                                    होणार नाही.
+                                </p>
+                            </>
+
+                        )}
+
+
+                        {/* ERROR */}
 
                         {reminderError && (
                             <div className="shcustomers-error">
@@ -1756,83 +2855,105 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                             </div>
                         )}
 
-                        {!reminderQR ? (
-                            <div className="shcustomer-payment-actions">
-                                <button
-                                    type="button"
-                                    className="shcustomer-cancel-button"
-                                    onClick={closeReminderModal}
-                                >
-                                    Cancel
-                                </button>
 
-                                <button
-                                    type="button"
-                                    className="shcustomer-submit-payment"
-                                    onClick={confirmReminderMobile}
-                                >
-                                    Confirm Number & Generate QR
-                                </button>
+                        {/* MESSAGE PREVIEW */}
+
+                        {reminderMobileConfirmed && reminderDueData && (
+
+                            <div className="shcustomer-reminder-message">
+
+                                <h3>
+                                    WhatsApp Message Preview
+                                </h3>
+
+                                <pre>
+                                    {getMarathiReminderMessage()}
+                                </pre>
+
                             </div>
-                        ) : (
-                            <>
-                                <div className="shcustomer-reminder-qr">
-                                    <h3>UPI Payment QR Code</h3>
 
-                                    <img
-                                        src={reminderQR}
-                                        alt="UPI Payment QR Code"
-                                    />
+                        )}
 
-                                    <strong>
-                                        {money(reminderDueData?.totalDue)}
-                                    </strong>
 
-                                    <span>UPI ID: {REMINDER_UPI_ID}</span>
-                                </div>
+                        {/* ACTION BUTTONS */}
 
-                                <div className="shcustomer-reminder-message">
-                                    <h3>WhatsApp Message Preview</h3>
+                        <div className="shcustomer-payment-actions">
 
-                                    <pre>
-                                        {getMarathiReminderMessage()}
-                                    </pre>
-                                </div>
+                            {!reminderMobileConfirmed ? (
 
-                                <div className="shcustomer-payment-actions">
+                                <>
+
                                     <button
                                         type="button"
                                         className="shcustomer-cancel-button"
-                                        onClick={() => setReminderQR("")}
+                                        onClick={closeReminderModal}
+                                        disabled={
+                                            reminderSending ||
+                                            reminderLoading
+                                        }
+                                    >
+                                        Cancel
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        className="shcustomer-submit-payment"
+                                        onClick={confirmReminderMobile}
+                                        disabled={
+                                            reminderLoading ||
+                                            !reminderDueData
+                                        }
+                                    >
+                                        Confirm Mobile Number
+                                    </button>
+
+                                </>
+
+                            ) : (
+
+                                <>
+
+                                    <button
+                                        type="button"
+                                        className="shcustomer-cancel-button"
+                                        onClick={() => {
+                                            setReminderMobileConfirmed(false);
+                                            setReminderError("");
+                                        }}
+                                        disabled={reminderSending}
                                     >
                                         Edit Number
                                     </button>
 
-                                    <button
-                                        type="button"
-                                        className="shcustomer-cancel-button"
-                                        onClick={downloadReminderQR}
-                                    >
-                                        Download QR
-                                    </button>
 
                                     <button
                                         type="button"
                                         className="shcustomer-whatsapp-button"
-                                        onClick={openReminderWhatsApp}
+                                        onClick={sendWhatsAppDueReminder}
+                                        disabled={reminderSending}
                                     >
-                                        Open WhatsApp
+                                        {reminderSending
+                                            ? "Sending..."
+                                            : "Send WhatsApp Reminder"}
                                     </button>
-                                </div>
 
-                                <p className="shcustomer-reminder-hint">
-                                    कृपया डाउनलोड केलेला QR कोड WhatsApp मध्ये
-                                    फोटो म्हणून जोडा आणि मेसेज तपासून पाठवा.
-                                </p>
-                            </>
+                                </>
+
+                            )}
+
+                        </div>
+
+
+                        {reminderMobileConfirmed && (
+                            <p className="shcustomer-reminder-hint">
+                                कृपया संदेशातील माहिती तपासून WhatsApp
+                                Reminder पाठवा.
+                            </p>
                         )}
 
                     </section>
+
                 </div>
             )}
 
