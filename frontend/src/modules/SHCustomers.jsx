@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
+import QRCode from "qrcode";
 import "./SHCustomers.css";
-
 import { apiFetch } from "../utils/api.js";
-
 
 
 const money = (value) =>
@@ -627,6 +626,223 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
         setSelectedCustomer(null);
         setCustomerBills([]);
     };
+    // ---------------- WHATSAPP DUE REMINDER ----------------
+
+    const [reminderCustomer, setReminderCustomer] = useState(null);
+    const [reminderPhone, setReminderPhone] = useState("");
+    const [reminderDueData, setReminderDueData] = useState(null);
+    const [reminderQR, setReminderQR] = useState("");
+    const [reminderLoading, setReminderLoading] = useState(false);
+    const [reminderError, setReminderError] = useState("");
+    // ---------------- WHATSAPP REMINDER ----------------
+
+    // TESTING ONLY — replace with shop UPI ID before production.
+    const REMINDER_UPI_ID = "dixitprathamesh02@okicici";
+
+    const REMINDER_PAYEE_NAME = "PRANALI JEWELLERS";
+
+    const startWhatsAppReminder = async (customer) => {
+        try {
+            setReminderLoading(true);
+            setReminderError("");
+            setReminderQR("");
+            setReminderDueData(null);
+
+            // Fetch latest customer bills and payment information.
+            const response = await apiFetch(
+                `/sh-bills/customers/${encodeURIComponent(
+                    customer.customer_phone
+                )}/bills`
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message || "ग्राहकाची बिल माहिती मिळवता आली नाही."
+                );
+            }
+
+            const bills = result.bills || [];
+
+            const totalPurchase = bills.reduce(
+                (sum, bill) => sum + Number(bill.grand_total || 0),
+                0
+            );
+
+            const totalPaid = bills.reduce(
+                (sum, bill) => sum + Number(bill.paid_amount || 0),
+                0
+            );
+
+            const totalDue = bills.reduce(
+                (sum, bill) => sum + Number(bill.due_amount || 0),
+                0
+            );
+
+            if (totalDue <= 0) {
+                throw new Error("या ग्राहकाची कोणतीही बाकी रक्कम नाही.");
+            }
+
+            const pendingBills = bills.filter(
+                bill => Number(bill.due_amount) > 0
+            );
+
+            setReminderCustomer(customer);
+
+            setReminderPhone(customer.customer_phone || "");
+
+            setReminderDueData({
+                totalPurchase,
+                totalPaid,
+                totalDue,
+                pendingBills
+            });
+
+        } catch (err) {
+            setReminderError(err.message || "Reminder तयार करता आला नाही.");
+        } finally {
+            setReminderLoading(false);
+        }
+    };
+
+
+    // GENERATE QR AFTER MOBILE NUMBER CONFIRMATION
+
+    const confirmReminderMobile = async () => {
+        try {
+            setReminderError("");
+
+            // Accept 10-digit Indian number, or number with 91 prefix.
+            const digits = reminderPhone.replace(/\D/g, "");
+
+            const mobile =
+                digits.length === 12 && digits.startsWith("91")
+                    ? digits.slice(2)
+                    : digits;
+
+            if (!/^[6-9]\d{9}$/.test(mobile)) {
+                setReminderError(
+                    "कृपया योग्य 10 अंकी भारतीय मोबाईल नंबर टाका."
+                );
+                return;
+            }
+
+            if (!reminderDueData || reminderDueData.totalDue <= 0) {
+                setReminderError("बाकी रक्कम उपलब्ध नाही.");
+                return;
+            }
+
+            const amount = Number(reminderDueData.totalDue).toFixed(2);
+
+            // Dynamic UPI payment URI.
+            const upiParams = new URLSearchParams({
+                pa: REMINDER_UPI_ID,
+                pn: REMINDER_PAYEE_NAME,
+                am: amount,
+                cu: "INR",
+                tn: "SH Bill Pending Payment"
+            });
+
+            const upiURI = `upi://pay?${upiParams.toString()}`;
+
+            const qr = await QRCode.toDataURL(upiURI, {
+                width: 350,
+                margin: 2,
+                errorCorrectionLevel: "H"
+            });
+
+            setReminderQR(qr);
+
+            setReminderPhone(mobile);
+
+        } catch (err) {
+            console.error("QR Generation Error:", err);
+            setReminderError("QR कोड तयार करताना समस्या आली.");
+        }
+    };
+
+
+    // GENERATE MARATHI MESSAGE
+
+    const getMarathiReminderMessage = () => {
+        if (!reminderCustomer || !reminderDueData) return "";
+
+        const pendingBillNumbers = reminderDueData.pendingBills
+            .map(bill => bill.bill_number)
+            .join(", ");
+
+        return `🙏 ॥ श्री गणेशाय नमः ॥
+
+🌸 *प्रणाली ज्वेलर्स, दिघंची* 🌸
+
+नमस्कार ${reminderCustomer.customer_name || "ग्राहक"} जी,
+
+आपण आमच्या दुकानातून केलेल्या खरेदीबद्दल मनःपूर्वक धन्यवाद! 🙏
+
+आपल्या बिलांची काही रक्कम अद्याप बाकी आहे. त्याची माहिती खालीलप्रमाणे:
+
+🧾 *बिलाचा तपशील*
+
+▪️ बिल क्रमांक: ${pendingBillNumbers || "-"}
+▪️ एकूण बिल रक्कम: ${money(reminderDueData.totalPurchase)}
+▪️ जमा रक्कम: ${money(reminderDueData.totalPaid)}
+▪️ *बाकी रक्कम: ${money(reminderDueData.totalDue)}*
+
+आपणास नम्र विनंती आहे की, कृपया आपल्या सोयीनुसार बाकी रक्कम जमा करावी.
+
+💳 पैसे भरण्यासाठी सोबत दिलेला UPI QR कोड स्कॅन करा.
+
+आपल्या सहकार्याची अपेक्षा आहे.
+
+धन्यवाद! 🙏
+
+*आपले विश्वासू,*
+💎 *प्रणाली ज्वेलर्स*
+📍 दिघंची, महाराष्ट्र
+📞 9421124579`;
+    };
+
+
+    // DOWNLOAD QR CODE
+
+    const downloadReminderQR = () => {
+        if (!reminderQR) return;
+
+        const link = document.createElement("a");
+
+        link.href = reminderQR;
+        link.download = `Pranali-Jewellers-QR-${reminderPhone}.png`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+
+    // OPEN WHATSAPP
+
+    const openReminderWhatsApp = () => {
+        if (!reminderQR || !reminderPhone) return;
+
+        const message = getMarathiReminderMessage();
+
+        const whatsappURL =
+            `https://wa.me/91${reminderPhone}?text=${encodeURIComponent(message)}`;
+
+        window.open(whatsappURL, "_blank", "noopener,noreferrer");
+    };
+
+
+    // CLOSE REMINDER MODAL
+
+    const closeReminderModal = () => {
+        setReminderCustomer(null);
+        setReminderPhone("");
+        setReminderDueData(null);
+        setReminderQR("");
+        setReminderError("");
+    };
 
     // ---------------- UI ----------------
 
@@ -847,13 +1063,28 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                                         </td>
 
                                         <td>
-                                            <button
-                                                className="shcustomer-view-button"
-                                                type="button"
-                                                onClick={() => viewCustomer(customer)}
-                                            >
-                                                View Details
-                                            </button>
+                                            <div className="shcustomer-list-actions">
+
+                                                <button
+                                                    className="shcustomer-view-button"
+                                                    type="button"
+                                                    onClick={() => viewCustomer(customer)}
+                                                >
+                                                    View Details
+                                                </button>
+
+                                                {Number(customer.total_due) > 0 && (
+                                                    <button
+                                                        className="shcustomer-whatsapp-button"
+                                                        type="button"
+                                                        disabled={reminderLoading}
+                                                        onClick={() => startWhatsAppReminder(customer)}
+                                                    >
+                                                        {reminderLoading ? "Loading..." : "WhatsApp Reminder"}
+                                                    </button>
+                                                )}
+
+                                            </div>
                                         </td>
 
                                     </tr>
@@ -1466,7 +1697,146 @@ ${payments.length ? `<section class="payments"><div class="section-title">PAYMEN
                     </section>
                 </div>
             )}
+            {/* WHATSAPP REMINDER MODAL */}
+
+            {reminderCustomer && (
+                <div
+                    className="shcustomer-modal-overlay"
+                    onClick={closeReminderModal}
+                >
+                    <section
+                        className="shcustomer-payment-modal shcustomer-reminder-modal"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+
+                        <div className="shcustomer-modal-header">
+                            <div>
+                                <h2>WhatsApp Payment Reminder</h2>
+                                <p>मराठी पेमेंट रिमाइंडर</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={closeReminderModal}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div className="shcustomer-reminder-customer">
+                            <strong>{reminderCustomer.customer_name}</strong>
+                            <span>
+                                बाकी रक्कम:{" "}
+                                {money(reminderDueData?.totalDue)}
+                            </span>
+                        </div>
+
+                        <label>ग्राहकाचा मोबाईल नंबर तपासा</label>
+
+                        <input
+                            type="tel"
+                            value={reminderPhone}
+                            maxLength={13}
+                            placeholder="10 अंकी मोबाईल नंबर"
+                            onChange={(e) => {
+                                setReminderPhone(e.target.value);
+                                setReminderQR("");
+                                setReminderError("");
+                            }}
+                        />
+
+                        <p className="shcustomer-reminder-hint">
+                            मोबाईल नंबर चुकीचा असल्यास येथे बदल करू शकता.
+                            हा बदल ग्राहकाच्या सेव्ह केलेल्या नंबरमध्ये होणार नाही.
+                        </p>
+
+                        {reminderError && (
+                            <div className="shcustomers-error">
+                                {reminderError}
+                            </div>
+                        )}
+
+                        {!reminderQR ? (
+                            <div className="shcustomer-payment-actions">
+                                <button
+                                    type="button"
+                                    className="shcustomer-cancel-button"
+                                    onClick={closeReminderModal}
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="shcustomer-submit-payment"
+                                    onClick={confirmReminderMobile}
+                                >
+                                    Confirm Number & Generate QR
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="shcustomer-reminder-qr">
+                                    <h3>UPI Payment QR Code</h3>
+
+                                    <img
+                                        src={reminderQR}
+                                        alt="UPI Payment QR Code"
+                                    />
+
+                                    <strong>
+                                        {money(reminderDueData?.totalDue)}
+                                    </strong>
+
+                                    <span>UPI ID: {REMINDER_UPI_ID}</span>
+                                </div>
+
+                                <div className="shcustomer-reminder-message">
+                                    <h3>WhatsApp Message Preview</h3>
+
+                                    <pre>
+                                        {getMarathiReminderMessage()}
+                                    </pre>
+                                </div>
+
+                                <div className="shcustomer-payment-actions">
+                                    <button
+                                        type="button"
+                                        className="shcustomer-cancel-button"
+                                        onClick={() => setReminderQR("")}
+                                    >
+                                        Edit Number
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="shcustomer-cancel-button"
+                                        onClick={downloadReminderQR}
+                                    >
+                                        Download QR
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="shcustomer-whatsapp-button"
+                                        onClick={openReminderWhatsApp}
+                                    >
+                                        Open WhatsApp
+                                    </button>
+                                </div>
+
+                                <p className="shcustomer-reminder-hint">
+                                    कृपया डाउनलोड केलेला QR कोड WhatsApp मध्ये
+                                    फोटो म्हणून जोडा आणि मेसेज तपासून पाठवा.
+                                </p>
+                            </>
+                        )}
+
+                    </section>
+                </div>
+            )}
 
         </main>
     );
+
 }
