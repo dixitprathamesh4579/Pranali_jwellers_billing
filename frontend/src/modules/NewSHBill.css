@@ -1590,3 +1590,40 @@
     opacity: 1;
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
 }
+/*=================================additional==============================*/
+/* WHATSAPP CONFIRMATION MODAL */
+
+.shbill-whatsapp-modal {
+    max-width: 480px;
+    height: auto;
+}
+
+.shbill-whatsapp-content {
+    padding: 22px;
+}
+
+.shbill-whatsapp-content p {
+    margin: 0 0 20px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.shbill-whatsapp-content > small {
+    display: block;
+    margin-top: 12px;
+    color: #777;
+    line-height: 1.5;
+}
+
+.shbill-whatsapp-content .shbill-field {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.shbill-whatsapp-content .shbill-input-unit {
+    margin-top: 8px;
+}
+
+.shbill-whatsapp-content .shbill-input-unit input {
+    width: 100%;
+}

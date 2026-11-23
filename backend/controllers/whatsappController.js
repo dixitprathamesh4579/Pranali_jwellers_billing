@@ -1,11 +1,10 @@
 const pool = require("../config/db");
-
 const {
-    sendDueReminder
+    sendDueReminder,
+    sendBillPdf
 } = require("../services/whatsappService");
 
 
-// Normalize and validate Indian mobile numbers.
 const normalizeIndianMobile = (value) => {
     const digits = String(value || "").replace(/\D/g, "");
 
@@ -22,18 +21,18 @@ const normalizeIndianMobile = (value) => {
 };
 
 
-// SEND WHATSAPP PAYMENT REMINDER
 const sendWhatsAppDueReminder = async (req, res) => {
     try {
-
         const {
             customerPhone,
             recipientPhone
         } = req.body;
 
-        // Validate original customer number.
         const normalizedCustomerPhone =
             normalizeIndianMobile(customerPhone);
+
+        const normalizedRecipientPhone =
+            normalizeIndianMobile(recipientPhone);
 
         if (!normalizedCustomerPhone) {
             return res.status(400).json({
@@ -42,10 +41,6 @@ const sendWhatsAppDueReminder = async (req, res) => {
             });
         }
 
-        // Validate confirmed recipient number.
-        const normalizedRecipientPhone =
-            normalizeIndianMobile(recipientPhone);
-
         if (!normalizedRecipientPhone) {
             return res.status(400).json({
                 success: false,
@@ -53,111 +48,86 @@ const sendWhatsAppDueReminder = async (req, res) => {
             });
         }
 
-
-        // Fetch customer's pending bills.
+        // Fetch ALL customer bills.
         const [bills] = await pool.execute(
-            `
-            SELECT
+            `SELECT
                 id,
                 bill_number,
                 customer_name,
-                customer_phone,
                 grand_total,
                 paid_amount,
                 due_amount
-
-            FROM sh_bills
-
-            WHERE customer_phone = ?
-            AND due_amount > 0
-
-            ORDER BY bill_date ASC, id ASC
-            `,
-            [
-                normalizedCustomerPhone.slice(2)
-            ]
+             FROM sh_bills
+             WHERE customer_phone = ?
+             ORDER BY bill_date ASC, id ASC`,
+            [normalizedCustomerPhone.slice(2)]
         );
-
 
         if (bills.length === 0) {
             return res.status(404).json({
+                success: false,
+                message: "Customer bills not found."
+            });
+        }
+
+        // Calculate using integer paise to avoid floating-point errors.
+        const toPaise = value =>
+            Math.round(Number(value || 0) * 100);
+
+        const totalPurchasePaise = bills.reduce(
+            (sum, bill) => sum + toPaise(bill.grand_total),
+            0
+        );
+
+        const totalPaidPaise = bills.reduce(
+            (sum, bill) => sum + toPaise(bill.paid_amount),
+            0
+        );
+
+        const pendingBills = bills.filter(
+            bill => toPaise(bill.due_amount) > 0
+        );
+
+        const totalDuePaise = pendingBills.reduce(
+            (sum, bill) => sum + toPaise(bill.due_amount),
+            0
+        );
+
+        if (totalDuePaise <= 0) {
+            return res.status(400).json({
                 success: false,
                 message: "या ग्राहकाची कोणतीही बाकी रक्कम नाही."
             });
         }
 
+        const totalPurchase = totalPurchasePaise / 100;
+        const totalPaid = totalPaidPaise / 100;
+        const totalDue = totalDuePaise / 100;
 
-        // Calculate actual pending amounts from database.
-        const totalPurchase = bills.reduce(
-            (sum, bill) =>
-                sum + Number(bill.grand_total || 0),
-            0
-        );
-
-        const totalPaid = bills.reduce(
-            (sum, bill) =>
-                sum + Number(bill.paid_amount || 0),
-            0
-        );
-
-        const totalDue = bills.reduce(
-            (sum, bill) =>
-                sum + Number(bill.due_amount || 0),
-            0
-        );
-
-
-        if (
-            !Number.isFinite(totalDue) ||
-            totalDue <= 0
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid pending balance."
-            });
-        }
-
-
-        // Use the customer's actual name from the database.
         const customerName = bills[0].customer_name;
 
-        // Collect pending bill numbers.
-        const billNumbers = bills
+        const billNumbers = pendingBills
             .map(bill => bill.bill_number)
             .join(", ");
 
-
-        // Send WhatsApp message through Meta.
+        // Send reminder through WhatsApp Cloud API.
         const result = await sendDueReminder({
-
             recipientPhone: normalizedRecipientPhone,
-
             customerName,
-
             billNumbers,
-
             totalPurchase,
-
             totalPaid,
-
             totalDue
-
         });
-
 
         return res.status(200).json({
             success: true,
-
-            message: "WhatsApp reminder submitted successfully.",
-
+            message: "WhatsApp reminder accepted by Meta.",
             messageId: result.messageId,
-
             totalDue
         });
 
-
     } catch (error) {
-
         console.error(
             "WhatsApp Due Reminder Error:",
             error.message
@@ -170,8 +140,183 @@ const sendWhatsAppDueReminder = async (req, res) => {
         });
     }
 };
+const sendWhatsAppBillPdf = async (req, res) => {
 
+    try {
+
+        const {
+            billId,
+            recipientPhone
+        } = req.body;
+
+
+        // Validate bill ID.
+        if (!billId || !Number.isInteger(Number(billId)) || Number(billId) <= 0) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Invalid bill ID."
+            });
+
+        }
+
+
+        // Validate recipient mobile.
+        const normalizedRecipientPhone =
+            normalizeIndianMobile(recipientPhone);
+
+        if (!normalizedRecipientPhone) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Invalid recipient mobile number."
+            });
+
+        }
+
+
+        // Validate uploaded PDF.
+        if (!req.file) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Bill PDF is required."
+            });
+
+        }
+
+
+        if (req.file.mimetype !== "application/pdf") {
+
+            return res.status(400).json({
+                success: false,
+                message: "Only PDF files are allowed."
+            });
+
+        }
+
+
+        // Verify actual PDF file signature.
+        if (
+            req.file.buffer.length < 5 ||
+            req.file.buffer.subarray(0, 5).toString() !== "%PDF-"
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Invalid PDF file."
+            });
+
+        }
+
+
+        // Fetch actual bill details from database.
+        const [bills] = await pool.execute(
+            `SELECT
+    id,
+    bill_number,
+    bill_date,
+    customer_name,
+    grand_total,
+    paid_amount,
+    due_amount
+ FROM sh_bills
+ WHERE id = ?
+ LIMIT 1`,
+            [Number(billId)]
+        );
+
+
+        if (bills.length === 0) {
+
+            return res.status(404).json({
+                success: false,
+                message: "Bill not found."
+            });
+
+        }
+
+
+        const bill = bills[0];
+
+
+        // Format date as DD/MM/YYYY.
+        const billDate = (() => {
+
+            if (typeof bill.bill_date === "string") {
+
+                const datePart = bill.bill_date.slice(0, 10);
+                const parts = datePart.split("-");
+
+                if (parts.length === 3) {
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+
+            }
+
+            return new Date(bill.bill_date).toLocaleDateString("en-GB", {
+                timeZone: "Asia/Kolkata"
+            });
+
+        })();
+
+
+        // Send PDF through WhatsApp.
+        const result = await sendBillPdf({
+
+    recipientPhone: normalizedRecipientPhone,
+
+    pdfBuffer: req.file.buffer,
+
+    customerName: bill.customer_name,
+
+    billNumber: bill.bill_number,
+
+    billDate,
+
+    grandTotal: bill.grand_total,
+
+    paidAmount: bill.paid_amount,
+
+    dueAmount: bill.due_amount
+
+});
+
+        return res.status(200).json({
+
+            success: true,
+
+            message: "Bill PDF sent successfully through WhatsApp.",
+
+            messageId: result.messageId,
+
+            billNumber: bill.bill_number
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "WhatsApp Bill PDF Error:",
+            error.message
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: error.message ||
+                "Failed to send bill PDF through WhatsApp."
+
+        });
+
+    }
+
+};
 
 module.exports = {
-    sendWhatsAppDueReminder
+    sendWhatsAppDueReminder,
+    sendWhatsAppBillPdf
 };
