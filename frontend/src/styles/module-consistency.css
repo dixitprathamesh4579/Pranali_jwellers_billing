@@ -57,13 +57,52 @@
 }
 .module-host :is(.da-table-wrap,.gi-customer-table-wrapper,.gi-history-table-wrapper) { max-width: 100%; overflow-x: auto; }
 
-/* Prevent module-specific content from creating accidental horizontal overflow. */
-.module-host, .module-host * { min-width: 0; }
-.module-host img, .module-host svg { max-width: 100%; }
+/* Keep flex/grid children shrinkable without overriding intentional table widths. */
+.module-host, .module-host > *, .module-host :is(section,article,form,header,footer,main) { min-width: 0; }
+.module-host img, .module-host svg { max-width: 100%; height: auto; }
+.module-host :is(.da-table-wrap,.gi-customer-table-wrapper,.gi-history-table-wrapper,.shcustomers-table-wrapper,.shcustomer-history-table-wrapper) {
+  width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-inline: contain;
+}
+.module-host :is(.da-table,.gi-customer-table,.gi-history-table,.shcustomers-table,.shcustomer-table) {
+  min-width: max-content;
+}
+.module-host :is(input,select,textarea) { max-width: 100%; }
 @media (max-width: 760px) {
   :root { --pj-control-height: 39px; --pj-button-height: 38px; }
   .module-host :is(.welcome-row,.da-heading,.gi-page-header,.gi-customer-header,.gi-history-header,.gi-stats-header,.shcustomers-header,.shbill-hero-heading) {
     min-height: 0; margin-bottom: 16px; align-items: flex-start;
   }
   .module-host :is(.da-heading h1,.gi-page-header h1,.gi-customer-header h1,.gi-history-header h1,.gi-stats-header h2,.shcustomers-header h1,.shbill-hero-heading h1,.welcome-row h2) { font-size: 23px; }
+}
+
+
+/* Responsive recovery layer: preserve tablet/mobile layouts in every module. */
+@media (max-width: 1024px) {
+  .page-stage, .module-stage { min-width: 0; }
+  .module-host { width: 100%; min-width: 0; }
+  .module-host :is(.shbill-layout,.gi-layout) { grid-template-columns: minmax(0,1fr) !important; }
+}
+@media (max-width: 760px) {
+  .app-main-no-sidebar { width: 100%; min-width: 0; }
+  .page-stage, .module-stage { width: 100%; max-width: 100%; padding-left: 12px; padding-right: 12px; }
+  .module-host { overflow: visible !important; }
+  .module-host > * { width: 100%; max-width: 100%; }
+  .module-host :is(.da-summary-grid,.gi-stats-grid,.gi-view-grid,.shbill-fields-grid,.history-details-grid) {
+    grid-template-columns: minmax(0,1fr) !important;
+  }
+  .module-host :is(.da-table-wrap,.gi-customer-table-wrapper,.gi-history-table-wrapper,.shcustomers-table-wrapper,.shcustomer-history-table-wrapper) {
+    margin-right: 0; max-width: 100%;
+  }
+  .module-host :is(button,input,select,textarea) { max-width: 100%; }
+  .mobile-nav { display: grid; }
+}
+@media (max-width: 420px) {
+  .page-stage, .module-stage { padding-left: 10px; padding-right: 10px; }
+  .module-host :is(.da-heading,.gi-page-header,.gi-customer-header,.gi-history-header,.gi-stats-header,.shcustomers-header,.shbill-hero-heading) {
+    flex-wrap: wrap; align-items: flex-start;
+  }
+  .module-host :is(.da-heading button,.gi-page-header button,.gi-history-header button,.gi-stats-header button,.shcustomers-header button) {
+    max-width: 100%; white-space: normal;
+  }
 }
