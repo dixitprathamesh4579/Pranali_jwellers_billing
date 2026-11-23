@@ -3,6 +3,8 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { jsPDF } from "jspdf";
 
 import autoTable from "jspdf-autotable";
+import pranaliLogo from "../assets/pranali-jewellers-logo.png?inline";
+import bisHallmarkLogo from "../assets/bis-hallmark-logo.png?inline";
 
 import "./NewSHBill.css";
 
@@ -939,11 +941,16 @@ export default function NewSHBill({ onNavigate }) {
 
     doc.rect(7, 7, W - 14, H - 14);
 
-    // Shop header
+    // Shop header with the supplied Pranali Jewellers and BIS hallmark logos
 
     doc.setFillColor(250, 245, 234);
 
     doc.rect(8, 8, W - 16, 37, "F");
+
+    // Brand logo on the left and BIS hallmark on the right.
+    // Both are embedded as inline image data so the PDF remains self-contained.
+    doc.addImage(pranaliLogo, "PNG", 12, 11, 23, 23, undefined, "FAST");
+    doc.addImage(bisHallmarkLogo, "PNG", 175, 13, 23, 16, undefined, "FAST");
 
     doc.setTextColor(125, 83, 20);
 
@@ -954,6 +961,7 @@ export default function NewSHBill({ onNavigate }) {
     doc.text(SHOP.name, W / 2, 17, {
 
       align: "center",
+      maxWidth: 132,
 
     });
 
