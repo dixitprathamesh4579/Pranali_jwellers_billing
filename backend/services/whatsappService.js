@@ -44,8 +44,8 @@ const getWhatsAppConfig = () => {
 // Generate UPI QR code for the exact outstanding amount.
 const generateUPIQR = async (amount, billNumbers) => {
 
-    const upiId = process.env.REMINDER_UPI_ID;
-    const payeeName = process.env.REMINDER_PAYEE_NAME;
+    const upiId = process.env.SHOP_UPI_ID;
+    const payeeName = process.env.SHOP_UPI_NAME;
 
     if (!upiId || !payeeName) {
         throw new Error("UPI payment configuration is incomplete.");
