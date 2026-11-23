@@ -3,7 +3,6 @@ const { verifyDeleteCaptcha } = require("../utils/deleteCaptcha");
 
 const {
     generateGINumber,
-    calculateGIInterest,
     calculateGIBalance,
     calculateGIBalanceFromTransactions
 } = require("../services/giService");
@@ -136,52 +135,31 @@ const createGI = async (req, res) => {
 
         const giNumber = await generateGINumber(connection);
 
-        // 5. FIND EXISTING CUSTOMER
+        // ==========================================
+        // 5. ALWAYS CREATE A NEW CUSTOMER RECORD
+        // ==========================================
 
-        const [existingCustomers] = await connection.execute(
-            `SELECT id
-             FROM gi_customers
-             WHERE phone = ?
-             LIMIT 1`,
-            [phone]
+
+
+
+        const [customerResult] = await connection.execute(
+            `INSERT INTO gi_customers
+    (
+        name,
+        phone,
+        address,
+        id_reference
+    )
+    VALUES (?, ?, ?, ?)`,
+            [
+                customer.name.trim(),
+                phone,
+                customer.address || null,
+                customer.idReference || null
+            ]
         );
 
-        let customerId;
-
-        if (existingCustomers.length > 0) {
-
-            customerId = existingCustomers[0].id;
-
-            await connection.execute(
-                `UPDATE gi_customers
-                 SET name = ?,
-                     address = ?,
-                     id_reference = ?
-                 WHERE id = ?`,
-                [
-                    customer.name.trim(),
-                    customer.address || null,
-                    customer.idReference || null,
-                    customerId
-                ]
-            );
-
-        } else {
-
-            const [customerResult] = await connection.execute(
-                `INSERT INTO gi_customers
-                 (name, phone, address, id_reference)
-                 VALUES (?, ?, ?, ?)`,
-                [
-                    customer.name.trim(),
-                    phone,
-                    customer.address || null,
-                    customer.idReference || null
-                ]
-            );
-
-            customerId = customerResult.insertId;
-        }
+        const customerId = customerResult.insertId;
 
         // 6. CREATE GI ACCOUNT
 
@@ -332,7 +310,7 @@ const createGI = async (req, res) => {
 
 const getAllGICustomers = async (req, res) => {
     try {
-        
+
         const {
             search = "",
             filter = "all"
@@ -381,7 +359,7 @@ const getAllGICustomers = async (req, res) => {
             )
         `;
 
-        
+
         const queryParams = [
             searchText,
             searchValue,
@@ -403,7 +381,7 @@ const getAllGICustomers = async (req, res) => {
             sql,
             queryParams
         );
-     
+
 
         // 3. RETURN EMPTY RESPONSE
         if (accounts.length === 0) {
@@ -433,7 +411,7 @@ const getAllGICustomers = async (req, res) => {
             `,
             accountIds
         );
- 
+
         // 6. FETCH ALL TRANSACTIONS IN ONE QUERY
         const [transactions] = await pool.query(
             `

@@ -1,0 +1,250 @@
+/* =========================================
+   PRANALI JEWELLERS — GLOBAL THEME
+========================================= */
+
+:root {
+    --sh-primary: #192d4d;
+    --sh-primary-light: #29466b;
+
+    --sh-gold: #bd9144;
+    --sh-gold-light: #f8eed9;
+
+    --sh-page-bg: #f5f7fa;
+    --sh-card-bg: #ffffff;
+
+    --sh-text: #26364d;
+    --sh-muted: #8290a5;
+
+    --sh-border: #e5eaf1;
+
+    --sh-success: #27956b;
+    --sh-danger: #dc2626;
+
+    --sh-radius-sm: 8px;
+    --sh-radius-md: 12px;
+    --sh-radius-lg: 14px;
+
+    --sh-shadow:
+        0 3px 14px rgb(23 43 73 / 4%);
+
+    --sh-page-padding: 24px;
+    --sh-card-padding: 22px;
+
+    --sh-transition: 0.2s ease;
+}
+
+/* Common page foundation */
+
+.shbill-page,
+.shcustomers-page {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    background: var(--sh-page-bg);
+    color: var(--sh-text);
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Common cards */
+
+.shbill-card,
+.shbill-summary-card,
+.shcustomers-card,
+.shcustomer-stat-card {
+    background: var(--sh-card-bg);
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius-lg);
+    box-shadow: var(--sh-shadow);
+}
+
+/* Common headings */
+
+.shbill-hero-heading h1,
+.shcustomers-header h1 {
+    color: var(--sh-primary);
+    font-weight: 800;
+}
+
+/* Common buttons */
+
+.shbill-primary-button,
+.shbill-add-button,
+.shcustomer-submit-payment {
+    background: var(--sh-primary);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--sh-radius-sm);
+    font-weight: 700;
+    transition: var(--sh-transition);
+}
+
+.shbill-primary-button:hover,
+.shbill-add-button:hover,
+.shcustomer-submit-payment:hover {
+    background: var(--sh-primary-light);
+}
+
+/* Common form controls */
+
+.shbill-field input,
+.shbill-field select,
+.shbill-field textarea,
+.shcustomer-payment-modal input,
+.shcustomer-payment-modal select,
+.shcustomer-payment-modal textarea {
+    border-color: var(--sh-border);
+    border-radius: var(--sh-radius-sm);
+}
+
+.shbill-field input:focus,
+.shbill-field select:focus,
+.shbill-field textarea:focus,
+.shcustomer-payment-modal input:focus,
+.shcustomer-payment-modal select:focus,
+.shcustomer-payment-modal textarea:focus {
+    border-color: var(--sh-gold);
+    outline: none;
+}
+
+/* Common responsive foundation */
+
+@media (max-width: 650px) {
+    :root {
+        --sh-page-padding: 14px;
+        --sh-card-padding: 14px;
+    }
+
+    .shcustomers-page {
+        padding: var(--sh-page-padding);
+    }
+}
+
+/* =========================================================
+   APPLICATION-WIDE THEME LAYER
+   Applies the Pranali Jewellers navy + gold theme to every
+   screen/module, including legacy pages with their own CSS.
+   ========================================================= */
+:root {
+  --green: var(--sh-primary);
+  --green2: var(--sh-primary-light);
+  --gold: var(--sh-gold);
+  --ink: var(--sh-text);
+  --muted: var(--sh-muted);
+  --line: var(--sh-border);
+  --paper: var(--sh-card-bg);
+  --bg: var(--sh-page-bg);
+  --shadow: var(--sh-shadow);
+  color-scheme: light;
+}
+
+html, body, #root { min-height: 100%; }
+body { background: var(--sh-page-bg); color: var(--sh-text); }
+#root, .app-frame, .app-frame-no-sidebar, .app-main, .app-main-no-sidebar,
+.page-stage, .module-stage, .module-host, .dashboard-page, .more-page {
+  color: var(--sh-text);
+}
+.app-frame, .app-frame-no-sidebar, body:has(.login-container) {
+  background: var(--sh-page-bg);
+}
+
+/* Shared surfaces and cards across dashboard and all modules */
+.metric-card, .surface-card, .module-launcher-section,
+.module-launcher-card, .more-module-card, .account-settings-card,
+.shbill-card, .shbill-summary-card, .shcustomers-card,
+.shcustomer-stat-card, .gi-card, .gi-stat-card, .daily-account-card,
+.dashboard-card, .login-card, .login-box {
+  background: var(--sh-card-bg);
+  border-color: var(--sh-border);
+  box-shadow: var(--sh-shadow);
+}
+.metric-card, .surface-card, .module-launcher-section,
+.module-launcher-card, .more-module-card, .account-settings-card {
+  border-radius: var(--sh-radius-lg);
+}
+
+/* Headings, body copy and labels */
+.page-heading h1, .welcome-row h1, .more-welcome h1,
+.section-head h2, .note-card h2, .shbill-hero-heading h1,
+.shcustomers-header h1, .module-host h1, .module-host h2 {
+  color: var(--sh-primary);
+}
+.page-heading p, .welcome-row p, .more-welcome p,
+.metric-copy span, .metric-copy small, .eyebrow,
+.module-host .muted, .module-host .help-text {
+  color: var(--sh-muted);
+}
+
+/* Brand/navigation surfaces */
+.sidebar { background: linear-gradient(160deg, #192d4d, #10213b); }
+.brand strong, .topbar-brand-mark strong { color: #e8c477; }
+.brand-symbol, .topbar-brand-mark > span { color: #e8c477; }
+.nav-item.active { background: var(--sh-gold-light); color: var(--sh-primary); }
+.desktop-nav-item.active, .mobile-nav button.selected { color: var(--sh-primary); }
+.desktop-nav-item.active { background: var(--sh-gold-light); }
+.mobile-nav button.selected span { background: var(--sh-gold-light); }
+.topbar, .topbar-clean, .desktop-module-nav, .mobile-nav {
+  background-color: rgba(255,255,255,.97);
+  border-color: var(--sh-border);
+}
+.mobile-nav { box-shadow: 0 -5px 20px rgba(23,43,73,.07); }
+
+/* Primary and secondary actions */
+.primary-action, .shbill-primary-button, .shbill-add-button,
+.shcustomer-submit-payment, .module-host button.primary,
+.module-host .btn-primary, .login-container button[type="submit"] {
+  background: var(--sh-primary);
+  border-color: var(--sh-primary);
+  color: #fff;
+}
+.primary-action:hover, .shbill-primary-button:hover,
+.shbill-add-button:hover, .shcustomer-submit-payment:hover,
+.module-host button.primary:hover, .module-host .btn-primary:hover,
+.login-container button[type="submit"]:hover {
+  background: var(--sh-primary-light);
+  border-color: var(--sh-primary-light);
+}
+.text-action, .desktop-nav-item:hover { color: var(--sh-primary); }
+.module-launcher-card:hover, .more-module-card:hover {
+  border-color: #d8c39c;
+  box-shadow: 0 7px 18px rgba(23,43,73,.09);
+}
+
+/* Form controls on every screen */
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+  accent-color: var(--sh-gold);
+}
+.module-host input, .module-host select, .module-host textarea,
+.login-container input, .shbill-field input, .shbill-field select,
+.shbill-field textarea, .shcustomer-payment-modal input,
+.shcustomer-payment-modal select, .shcustomer-payment-modal textarea {
+  border-color: var(--sh-border);
+  border-radius: var(--sh-radius-sm);
+  color: var(--sh-text);
+}
+.module-host input:focus, .module-host select:focus,
+.module-host textarea:focus, .login-container input:focus,
+.shbill-field input:focus, .shbill-field select:focus,
+.shbill-field textarea:focus, .shcustomer-payment-modal input:focus,
+.shcustomer-payment-modal select:focus,
+.shcustomer-payment-modal textarea:focus {
+  border-color: var(--sh-gold);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(189,145,68,.14);
+}
+input[type="checkbox"], input[type="radio"] { accent-color: var(--sh-primary); }
+
+/* Tables and separators */
+.module-host table, .surface-card table { border-color: var(--sh-border); }
+.module-host th, .surface-card th { background: #f7f5f0; color: #68758a; }
+.module-host td, .surface-card td { border-color: #edf0f4; color: var(--sh-text); }
+.module-host tr:hover td { background: #fbfaf7; }
+
+/* Keep semantic status colors intact while aligning neutral UI */
+.module-host .success, .module-host .text-success { color: var(--sh-success); }
+.module-host .danger, .module-host .text-danger { color: var(--sh-danger); }
+
+@media (max-width: 760px) {
+  .module-host { min-width: 0; }
+  .module-host > * { max-width: 100%; }
+}

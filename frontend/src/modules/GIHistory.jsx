@@ -98,9 +98,7 @@ function GIHistory() {
         0
     );
 
-    // =================================
-    // RENDER
-    // =================================
+
 
     return (
 
@@ -110,12 +108,10 @@ function GIHistory() {
 
             <div className="gi-history-header">
 
-                <div>
-                    <h1>GI History</h1>
+               <div>
+                    <span className="gi-eyebrow">PRANALI JEWELLERS</span>
+                    <h2><em>Girvi Customer History</em></h2>
 
-                    <p>
-                        View completed Girvi accounts and payment records.
-                    </p>
                 </div>
 
                 <button

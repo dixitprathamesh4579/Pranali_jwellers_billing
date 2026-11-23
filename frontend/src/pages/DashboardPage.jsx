@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "../utils/api.js";
+import "./Dashboard.css";
 
 const money = n => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(Number(n) || 0);
 export default function DashboardPage({ onNavigate }) {
@@ -25,7 +26,7 @@ export default function DashboardPage({ onNavigate }) {
         })(); return () => { live = false }
     }, []);
     const cards = [["Sales recorded", money(data.sales), "▤", "gold", "Across fetched bills"], ["SH customers", data.customers, "♙", "mint", "Registered customers"], ["Active Girvi", data.active, "◇", "peach", "Open accounts"], ["Completed GI", data.completed, "✓", "lavender", "Closed accounts"]];
-    return <div className="dashboard-page"><div className="welcome-row"><div><span className="eyebrow">YOUR BUSINESS AT A GLANCE</span><h1>Welcome back <em>✦</em></h1><p>Here’s what’s happening in your jewellery store.</p></div><button className="primary-action" onClick={() => onNavigate("New SH Bill")}>＋ <span>Create bill</span></button></div>
+    return <div className="dashboard-page"><div className="welcome-row"><div><span className="gi-eyebrow">PRANALI JEWELLERS</span><h2><em>Pranali Jewellers Dashboard </em></h2></div><button className="primary-action" onClick={() => onNavigate("New SH Bill")}>＋ <span>Create bill</span></button></div>
         <section className="metric-grid">{cards.map(([label, value, icon, color, note]) => <article className="metric-card" key={label}><div className={`metric-icon ${color}`}>{icon}</div><div className="metric-copy"><span>{label}</span><strong>{loading ? "—" : value}</strong><small>{note}</small></div></article>)}</section>
         {error && <div className="inline-alert">{error} <button onClick={() => location.reload()}>Retry</button></div>}
         <section className="module-launcher-section"><div className="section-head"><div><span className="eyebrow">YOUR WORKSPACE</span><h2>Shop modules</h2></div><span className="module-count">7 modules</span></div><div className="module-launcher-grid">{[["New SH Bill", "＋", "Create sales invoices", "gold"], ["SH Customers", "♙", "Manage sales customers", "mint"], ["New GI", "◇", "Register pledged jewellery", "peach"], ["GI Customers", "♧", "Manage active accounts", "lavender"], ["GI History", "◷", "Completed Girvi records", "gold"], ["GI Statistics", "▥", "Monthly investment insights", "mint"]].map(([name, icon, desc, tone]) => <button className="module-launcher-card" key={name} onClick={() => onNavigate(name)}><span className={`module-launcher-icon ${tone}`}>{icon}</span><span className="module-launcher-copy"><b>{name}</b><small>{desc}</small></span><i>↗</i></button>)}</div></section>

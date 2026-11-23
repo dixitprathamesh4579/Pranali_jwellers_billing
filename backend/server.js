@@ -386,13 +386,14 @@ app.post("/api/whatsapp/webhook", (req, res) => {
 });
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Backend running at http://localhost:${PORT}`);
-});
+
 app.get("/api/health", (req, res) => {
     return res.status(200).json({
         success: true,
         message: "Backend server is running",
         timestamp: new Date().toISOString()
     });
+});
+app.listen(PORT, () => {
+    console.log(`Backend running at http://localhost:${PORT}`);
 });

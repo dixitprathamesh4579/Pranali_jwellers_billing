@@ -185,9 +185,11 @@ export default function DailyAccounts() {
         <section className="da-page">
             <div className="da-heading">
                 <div>
-                    <h1>Daily Accounts</h1>
-                    <p>Track your shop's income, sales, expenses and investments.</p>
+                    <span className="gi-eyebrow">PRANALI JEWELLERS</span>
+                    <h2><em>Daily Accounts</em></h2>
+
                 </div>
+
                 <button className="da-primary-btn" onClick={openAddForm}>+ Add Transaction</button>
             </div>
 

@@ -92,10 +92,12 @@ function GIStatistics() {
 
             {/* HEADER */}
             <div className="gi-stats-header">
-                <div>
-                    <h2>GI Statistics</h2>
-                    <p>Overview of Girvi accounts, payments and recovery</p>
+                 <div>
+                    <span className="gi-eyebrow">PRANALI JEWELLERS</span>
+                    <h2><em>Girvi Statistics</em></h2>
+
                 </div>
+
 
                 <button
                     className="gi-stats-refresh"

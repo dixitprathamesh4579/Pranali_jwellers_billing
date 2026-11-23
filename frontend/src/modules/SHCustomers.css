@@ -1,37 +1,81 @@
+/* =========================================================
+   PRANALI JEWELLERS — CUSTOMERS
+   Standardized navy and gold theme
+   ========================================================= */
+
 .shcustomers-page {
-    padding: 28px;
-    color: #192d4d;
+    --sh-ink: #192d4d;
+    --sh-ink-soft: #29466b;
+    --sh-gold: #bd9144;
+    --sh-gold-soft: #f8eed9;
+    --sh-text: #26364d;
+    --sh-muted: #8290a5;
+    --sh-line: #e5eaf1;
+    --sh-bg: #f5f7fa;
+    --sh-white: #ffffff;
+    --sh-success: #27956b;
+    --sh-danger: #dc2626;
+
+    box-sizing: border-box;
     width: 100%;
     min-width: 0;
+    padding: 28px;
+    color: var(--sh-ink);
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
+
+.shcustomers-page *,
+.shcustomers-page *::before,
+.shcustomers-page *::after {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .shcustomers-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
     gap: 15px;
+    margin-bottom: 25px;
 }
 
 .shcustomers-header h1 {
-    font-size: 27px;
     margin: 0 0 7px;
-    color: #192d4d;
+    color: var(--sh-ink);
+    font-size: 27px;
+    font-weight: 800;
 }
 
 .shcustomers-header p {
-    color: #8290a5;
     margin: 0;
+    color: var(--sh-muted);
+    font-size: 13px;
 }
 
 .shcustomers-refresh {
     padding: 11px 18px;
     border: 1px solid #d9e1ec;
-    background: white;
-    color: #192d4d;
     border-radius: 9px;
+    background: var(--sh-white);
+    color: var(--sh-ink);
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
+    transition: .2s ease;
 }
+
+.shcustomers-refresh:hover {
+    border-color: var(--sh-gold);
+    background: var(--sh-gold-soft);
+}
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
 
 .shcustomers-stats {
     display: grid;
@@ -44,104 +88,117 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 20px;
-    background: white;
-    border: 1px solid #e5eaf1;
-    border-radius: 13px;
     min-width: 0;
+    padding: 20px;
+    border: 1px solid var(--sh-line);
+    border-radius: 13px;
+    background: var(--sh-white);
 }
 
 .shcustomer-stat-icon {
+    display: grid;
+    flex: 0 0 43px;
     width: 43px;
     height: 43px;
-    display: grid;
     place-items: center;
-    flex-shrink: 0;
     border-radius: 11px;
-    background: #f8eed9;
+    background: var(--sh-gold-soft);
     color: #a97822;
     font-size: 21px;
 }
 
 .shcustomer-stat-card p {
-    font-size: 12px;
-    color: #8290a5;
     margin: 0 0 7px;
+    color: var(--sh-muted);
+    font-size: 12px;
 }
 
 .shcustomer-stat-card h2 {
-    font-size: 19px;
     margin: 0;
-    color: #192d4d;
+    color: var(--sh-ink);
+    font-size: 19px;
     overflow-wrap: anywhere;
 }
 
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
 .shcustomers-card {
-    background: white;
-    border: 1px solid #e5eaf1;
-    border-radius: 14px;
-    padding: 22px;
     min-width: 0;
+    padding: 22px;
+    border: 1px solid var(--sh-line);
+    border-radius: 14px;
+    background: var(--sh-white);
 }
 
 .shcustomers-list-heading {
     display: flex;
     justify-content: space-between;
+    gap: 12px;
     margin-bottom: 20px;
 }
 
 .shcustomers-list-heading h2 {
     margin: 0 0 6px;
+    color: var(--sh-ink);
     font-size: 19px;
 }
 
 .shcustomers-list-heading p {
     margin: 0;
+    color: var(--sh-muted);
     font-size: 13px;
-    color: #8290a5;
 }
+
+/* =========================================================
+   SEARCH AND FILTERS
+   ========================================================= */
 
 .shcustomers-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 15px;
     flex-wrap: wrap;
+    gap: 15px;
     margin-bottom: 20px;
 }
 
 .shcustomers-search {
     display: flex;
+    flex: 1 1 260px;
     align-items: center;
     gap: 10px;
+    min-width: 0;
+    max-width: 480px;
+    height: 43px;
+    padding: 0 12px;
     border: 1px solid #dce3ed;
     border-radius: 9px;
-    padding: 0 12px;
-    height: 43px;
-    flex: 1;
-    min-width: 220px;
-    max-width: 480px;
+    background: var(--sh-white);
 }
 
 .shcustomers-search span {
+    color: var(--sh-muted);
     font-size: 22px;
-    color: #8290a5;
 }
 
 .shcustomers-search input {
+    width: 100%;
+    min-width: 0;
     border: none;
     outline: none;
-    width: 100%;
+    background: transparent;
+    color: var(--sh-ink);
     font-size: 13px;
-    color: #192d4d;
 }
 
 .shcustomers-search button {
     border: none;
     background: transparent;
+    color: var(--sh-muted);
     font-size: 20px;
     cursor: pointer;
-    color: #8290a5;
 }
 
 .shcustomers-filters {
@@ -151,21 +208,30 @@
 }
 
 .shcustomers-filters button {
-    border: 1px solid #dce3ed;
-    background: white;
     padding: 10px 13px;
+    border: 1px solid #dce3ed;
     border-radius: 8px;
+    background: var(--sh-white);
     color: #52647d;
-    cursor: pointer;
     font-size: 12px;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.shcustomers-filters button:hover {
+    border-color: var(--sh-gold);
 }
 
 .shcustomers-filters button.active {
-    background: #f8eed9;
     border-color: #ecd6a8;
+    background: var(--sh-gold-soft);
     color: #956719;
     font-weight: 600;
 }
+
+/* =========================================================
+   CUSTOMER TABLE
+   ========================================================= */
 
 .shcustomers-table-wrapper,
 .shcustomer-history-table-wrapper {
@@ -180,19 +246,19 @@
 }
 
 .shcustomers-table th {
+    padding: 15px 12px;
     background: #f7f8fa;
     color: #738198;
     font-size: 11px;
     font-weight: 600;
     text-align: left;
-    padding: 15px 12px;
 }
 
 .shcustomers-table td {
     padding: 15px 12px;
     border-bottom: 1px solid #edf0f4;
-    font-size: 12px;
     color: #52647d;
+    font-size: 12px;
 }
 
 .shcustomers-table tbody tr:hover {
@@ -206,119 +272,24 @@
 }
 
 .shcustomer-name strong {
-    color: #192d4d;
+    color: var(--sh-ink);
     font-size: 13px;
 }
 
 .shcustomer-avatar,
 .shcustomer-profile-avatar {
-    width: 34px;
-    height: 34px;
     display: grid;
+    flex-shrink: 0;
     place-items: center;
     border-radius: 50%;
-    background: #f8eed9;
+    background: var(--sh-gold-soft);
     color: #a97822;
     font-weight: 700;
 }
 
-.shcustomer-due {
-    color: #d34d4d !important;
-    font-weight: 600;
-}
-
-.shcustomer-paid {
-    color: #27956b !important;
-    font-weight: 600;
-}
-
-.shcustomer-view-button {
-    border: 1px solid #e7d5ad;
-    color: #966a20;
-    background: #fbf5e9;
-    padding: 8px 11px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 11px;
-}
-
-.shcustomers-empty {
-    text-align: center;
-    padding: 35px !important;
-    color: #8290a5 !important;
-}
-
-.shcustomers-error {
-    background: #fff0f0;
-    color: #c03939;
-    border: 1px solid #f2cccc;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    font-size: 13px;
-}
-
-.shcustomers-table-footer {
-    margin-top: 15px;
-    font-size: 12px;
-    color: #8290a5;
-}
-
-.shcustomer-modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    background: rgba(15, 29, 48, 0.55);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.shcustomer-modal {
-    background: white;
-    width: 100%;
-    max-width: 850px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 25px;
-    border-radius: 15px;
-}
-
-.shcustomer-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 22px;
-}
-
-.shcustomer-modal-header h2 {
-    margin: 0 0 6px;
-    font-size: 21px;
-}
-
-.shcustomer-modal-header p {
-    margin: 0;
-    color: #8290a5;
-    font-size: 12px;
-}
-
-.shcustomer-modal-header button {
-    border: none;
-    background: transparent;
-    font-size: 27px;
-    cursor: pointer;
-    color: #52647d;
-}
-
-.shcustomer-profile {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 18px;
-    background: #fcfaf5;
-    border-radius: 10px;
-    margin-bottom: 20px;
+.shcustomer-avatar {
+    width: 34px;
+    height: 34px;
 }
 
 .shcustomer-profile-avatar {
@@ -327,14 +298,131 @@
     font-size: 21px;
 }
 
+.shcustomer-due {
+    color: #d34d4d !important;
+    font-weight: 600;
+}
+
+.shcustomer-paid {
+    color: var(--sh-success) !important;
+    font-weight: 600;
+}
+
+.shcustomer-view-button {
+    padding: 8px 11px;
+    border: 1px solid #e7d5ad;
+    border-radius: 7px;
+    background: #fbf5e9;
+    color: #966a20;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.shcustomers-empty {
+    padding: 35px !important;
+    color: var(--sh-muted) !important;
+    text-align: center;
+}
+
+.shcustomers-error {
+    margin-bottom: 15px;
+    padding: 12px;
+    border: 1px solid #f2cccc;
+    border-radius: 8px;
+    background: #fff0f0;
+    color: #c03939;
+    font-size: 13px;
+}
+
+.shcustomers-table-footer {
+    margin-top: 15px;
+    color: var(--sh-muted);
+    font-size: 12px;
+}
+
+/* =========================================================
+   COMMON MODAL
+   ========================================================= */
+
+.shcustomer-modal-overlay {
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgba(15, 29, 48, .55);
+}
+
+.shcustomer-modal,
+.shcustomer-payment-modal {
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 25px;
+    border-radius: 15px;
+    background: var(--sh-white);
+}
+
+.shcustomer-modal {
+    max-width: 850px;
+}
+
+.shcustomer-payment-modal {
+    max-width: 520px;
+}
+
+.shcustomer-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.shcustomer-modal-header h2 {
+    margin: 0 0 6px;
+    color: var(--sh-ink);
+    font-size: 21px;
+}
+
+.shcustomer-modal-header p {
+    margin: 0;
+    color: var(--sh-muted);
+    font-size: 12px;
+}
+
+.shcustomer-modal-header button {
+    border: none;
+    background: transparent;
+    color: #52647d;
+    font-size: 27px;
+    cursor: pointer;
+}
+
+/* =========================================================
+   CUSTOMER PROFILE
+   ========================================================= */
+
+.shcustomer-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 18px;
+    border-radius: 10px;
+    background: #fcfaf5;
+}
+
 .shcustomer-profile h3 {
     margin: 0 0 5px;
-    color: #192d4d;
+    color: var(--sh-ink);
 }
 
 .shcustomer-profile p {
     margin: 3px 0;
-    color: #8290a5;
+    color: var(--sh-muted);
     font-size: 12px;
 }
 
@@ -346,30 +434,475 @@
 }
 
 .shcustomer-history-stats div {
-    padding: 15px;
-    background: #f7f8fa;
-    border-radius: 9px;
     display: flex;
     flex-direction: column;
     gap: 9px;
+    min-width: 0;
+    padding: 15px;
+    border-radius: 9px;
+    background: #f7f8fa;
 }
 
 .shcustomer-history-stats span {
+    color: var(--sh-muted);
     font-size: 12px;
-    color: #8290a5;
 }
 
 .shcustomer-history-stats strong {
+    color: var(--sh-ink);
     font-size: 17px;
-    color: #192d4d;
     overflow-wrap: anywhere;
 }
 
 .shcustomer-history-title {
-    font-size: 16px;
     margin-bottom: 15px;
-    color: #192d4d;
+    color: var(--sh-ink);
+    font-size: 16px;
 }
+
+/* =========================================================
+   CUSTOMER ACTIONS
+   ========================================================= */
+
+.shcustomer-actions,
+.shcustomer-list-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.shcustomer-payment-button,
+.shcustomer-history-button {
+    padding: 8px 10px;
+    border-radius: 7px;
+    font-size: 11px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.shcustomer-payment-button {
+    border: 1px solid #ecd6a8;
+    background: var(--sh-gold-soft);
+    color: #956719;
+}
+
+.shcustomer-history-button {
+    border: 1px solid #dce3ed;
+    background: #f1f5fa;
+    color: #52647d;
+}
+
+/* =========================================================
+   PAYMENT MODAL
+   ========================================================= */
+
+.shcustomer-payment-modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.shcustomer-payment-modal label {
+    margin-top: 7px;
+    color: #52647d;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.shcustomer-payment-modal input,
+.shcustomer-payment-modal select,
+.shcustomer-payment-modal textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #dce3ed;
+    border-radius: 8px;
+    outline: none;
+    color: var(--sh-ink);
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.shcustomer-payment-modal input:focus,
+.shcustomer-payment-modal select:focus,
+.shcustomer-payment-modal textarea:focus {
+    border-color: var(--sh-gold);
+    box-shadow: 0 0 0 3px rgb(189 145 68 / 12%);
+}
+
+.shcustomer-payment-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.shcustomer-payment-summary div {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f7f8fa;
+}
+
+.shcustomer-payment-summary span {
+    color: var(--sh-muted);
+    font-size: 11px;
+}
+
+.shcustomer-payment-summary strong {
+    color: var(--sh-ink);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.shcustomer-payment-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.shcustomer-cancel-button,
+.shcustomer-submit-payment {
+    padding: 11px 17px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.shcustomer-cancel-button {
+    border: 1px solid #dce3ed;
+    background: var(--sh-white);
+    color: #52647d;
+}
+
+.shcustomer-submit-payment {
+    border: none;
+    background: var(--sh-ink);
+    color: var(--sh-white);
+}
+
+.shcustomer-submit-payment:hover {
+    background: var(--sh-ink-soft);
+}
+
+.shcustomer-submit-payment:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   DELETE BILL
+   ========================================================= */
+
+.shcustomer-delete-button {
+    padding: 7px 12px;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    background: #fff0f0;
+    color: var(--sh-danger);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.shcustomer-delete-button:hover {
+    background: var(--sh-danger);
+    color: var(--sh-white);
+}
+
+.shcustomer-delete-modal {
+    width: 95%;
+    max-width: 480px;
+}
+
+.shcustomer-delete-warning {
+    margin: 15px 0;
+    padding: 14px;
+    border: 1px solid #fecaca;
+    border-radius: 9px;
+    background: #fff5f5;
+    color: #991b1b;
+}
+
+.shcustomer-delete-warning strong {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 15px;
+}
+
+.shcustomer-delete-warning p {
+    margin: 5px 0;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.shcustomer-delete-bill-info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+    padding: 15px;
+    border-radius: 9px;
+    background: #f8fafc;
+}
+
+.shcustomer-delete-bill-info div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.shcustomer-delete-bill-info span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.shcustomer-delete-bill-info strong {
+    color: #1e293b;
+    font-size: 14px;
+}
+
+/* =========================================================
+   CAPTCHA
+   ========================================================= */
+
+.shcustomer-captcha-box {
+    margin-top: 10px;
+}
+
+.shcustomer-captcha-question {
+    margin-bottom: 12px;
+    padding: 15px;
+    border: 1px dashed #94a3b8;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #1e293b;
+    font-size: 21px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.shcustomer-captcha-box input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    outline: none;
+    font-size: 15px;
+}
+
+.shcustomer-captcha-box input:focus {
+    border-color: var(--sh-gold);
+}
+
+.shcustomer-confirm-delete {
+    padding: 11px 17px;
+    border: none;
+    border-radius: 7px;
+    background: var(--sh-danger);
+    color: var(--sh-white);
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.shcustomer-confirm-delete:hover {
+    background: #b91c1c;
+}
+
+.shcustomer-confirm-delete:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   COMPLETE BILL DETAILS
+   ========================================================= */
+
+.shcustomer-bill-detail-modal {
+    max-width: 900px;
+}
+
+.shcustomer-bill-detail-content {
+    overflow: auto;
+}
+
+.shcustomer-bill-detail-content h3 {
+    margin: 20px 0 12px;
+    color: var(--sh-ink);
+}
+
+.shcustomer-bill-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.shcustomer-bill-detail-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid #edf0f4;
+    border-radius: 9px;
+    background: #f7f8fa;
+}
+
+.shcustomer-bill-detail-grid span {
+    color: var(--sh-muted);
+    font-size: 12px;
+}
+
+.shcustomer-bill-detail-grid strong {
+    color: var(--sh-ink);
+    overflow-wrap: anywhere;
+}
+
+.shcustomer-bill-detail-grid .wide {
+    grid-column: 1 / -1;
+}
+
+.shcustomer-bill-detail-grid.financial {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.shcustomer-payment-success-text {
+    padding: 12px 0;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   WHATSAPP REMINDER
+   Desktop and mobile styles are both enabled.
+   ========================================================= */
+
+.shcustomer-whatsapp-button {
+    padding: 8px 11px;
+    border: 1px solid #b8e7c8;
+    border-radius: 7px;
+    background: #e8f8ed;
+    color: #168044;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.shcustomer-whatsapp-button:hover {
+    background: #d5f3df;
+}
+
+.shcustomer-whatsapp-button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.shcustomer-reminder-modal {
+    max-width: 580px;
+}
+
+.shcustomer-reminder-customer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding: 14px;
+    border-radius: 9px;
+    background: #f7f8fa;
+}
+
+.shcustomer-reminder-customer strong {
+    color: var(--sh-ink);
+}
+
+.shcustomer-reminder-customer span {
+    color: #d34d4d;
+    font-weight: 700;
+}
+
+.shcustomer-reminder-hint {
+    margin-top: 8px;
+    color: var(--sh-muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.shcustomer-reminder-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 22px 0;
+    padding: 18px;
+    border: 1px solid #e7d5ad;
+    border-radius: 10px;
+    background: #fcfaf5;
+}
+
+.shcustomer-reminder-qr h3 {
+    margin: 0;
+    color: var(--sh-ink);
+}
+
+.shcustomer-reminder-qr img {
+    width: 230px;
+    max-width: 100%;
+    height: auto;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--sh-white);
+}
+
+.shcustomer-reminder-qr strong {
+    color: #168044;
+    font-size: 20px;
+}
+
+.shcustomer-reminder-qr span {
+    color: var(--sh-muted);
+    font-size: 12px;
+}
+
+.shcustomer-reminder-message {
+    margin-top: 18px;
+}
+
+.shcustomer-reminder-message h3 {
+    color: var(--sh-ink);
+    font-size: 15px;
+}
+
+.shcustomer-reminder-message pre {
+    max-height: 280px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 15px;
+    border: 1px solid var(--sh-line);
+    border-radius: 9px;
+    background: #f7f8fa;
+    color: #52647d;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
 
 @media (max-width: 1100px) {
     .shcustomers-stats {
@@ -391,7 +924,7 @@
     }
 
     .shcustomers-stats {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .shcustomers-card {
@@ -407,508 +940,53 @@
     }
 
     .shcustomer-history-stats {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
-    .shcustomer-modal {
-        padding: 16px;
-    }
-}
-
-/* PAYMENT ACTIONS */
-
-.shcustomer-actions {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-}
-
-.shcustomer-payment-button,
-.shcustomer-history-button {
-    padding: 8px 10px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 11px;
-    white-space: nowrap;
-}
-
-.shcustomer-payment-button {
-    background: #f8eed9;
-    color: #956719;
-    border: 1px solid #ecd6a8;
-}
-
-.shcustomer-history-button {
-    background: #f1f5fa;
-    color: #52647d;
-    border: 1px solid #dce3ed;
-}
-
-/* PAYMENT MODAL */
-
-.shcustomer-payment-modal {
-    background: white;
-    width: 100%;
-    max-width: 520px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 25px;
-    border-radius: 15px;
-}
-
-.shcustomer-payment-modal form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.shcustomer-payment-modal label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #52647d;
-    margin-top: 7px;
-}
-
-.shcustomer-payment-modal input,
-.shcustomer-payment-modal select,
-.shcustomer-payment-modal textarea {
-    width: 100%;
-    padding: 11px 12px;
-    border: 1px solid #dce3ed;
-    border-radius: 8px;
-    outline: none;
-    font-size: 13px;
-    color: #192d4d;
-    font-family: inherit;
-    box-sizing: border-box;
-}
-
-.shcustomer-payment-modal input:focus,
-.shcustomer-payment-modal select:focus,
-.shcustomer-payment-modal textarea:focus {
-    border-color: #c49a4a;
-}
-
-.shcustomer-payment-summary {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.shcustomer-payment-summary div {
-    background: #f7f8fa;
-    padding: 12px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    min-width: 0;
-}
-
-.shcustomer-payment-summary span {
-    color: #8290a5;
-    font-size: 11px;
-}
-
-.shcustomer-payment-summary strong {
-    color: #192d4d;
-    font-size: 13px;
-    overflow-wrap: anywhere;
-}
-
-.shcustomer-payment-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.shcustomer-cancel-button,
-.shcustomer-submit-payment {
-    padding: 11px 17px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.shcustomer-cancel-button {
-    background: white;
-    color: #52647d;
-    border: 1px solid #dce3ed;
-}
-
-.shcustomer-submit-payment {
-    background: #192d4d;
-    color: white;
-    border: none;
-}
-
-.shcustomer-submit-payment:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-@media (max-width: 650px) {
+    .shcustomer-modal,
     .shcustomer-payment-modal {
         padding: 16px;
     }
 
     .shcustomer-payment-summary {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .shcustomer-actions {
         flex-direction: column;
         align-items: flex-start;
     }
-}
 
-/* =========================================
-   DELETE BILL BUTTON
-========================================= */
-
-.shcustomer-delete-button {
-    background: #fff0f0;
-    color: #dc2626;
-    border: 1px solid #fecaca;
-    padding: 7px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.shcustomer-delete-button:hover {
-    background: #dc2626;
-    color: #fff;
-}
-
-
-/* =========================================
-   DELETE MODAL
-========================================= */
-
-.shcustomer-delete-modal {
-    max-width: 480px;
-    width: 95%;
-}
-
-.shcustomer-delete-warning {
-    background: #fff5f5;
-    border: 1px solid #fecaca;
-    border-radius: 9px;
-    padding: 14px;
-    margin: 15px 0;
-    color: #991b1b;
-}
-
-.shcustomer-delete-warning strong {
-    display: block;
-    margin-bottom: 7px;
-    font-size: 15px;
-}
-
-.shcustomer-delete-warning p {
-    font-size: 13px;
-    line-height: 1.6;
-    margin: 5px 0;
-}
-
-.shcustomer-delete-bill-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 15px;
-    background: #f8fafc;
-    border-radius: 9px;
-    margin-bottom: 18px;
-}
-
-.shcustomer-delete-bill-info div {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.shcustomer-delete-bill-info span {
-    color: #64748b;
-    font-size: 12px;
-}
-
-.shcustomer-delete-bill-info strong {
-    color: #1e293b;
-    font-size: 14px;
-}
-
-
-/* =========================================
-   CAPTCHA
-========================================= */
-
-.shcustomer-captcha-box {
-    margin-top: 10px;
-}
-
-.shcustomer-captcha-question {
-    background: #f1f5f9;
-    border: 1px dashed #94a3b8;
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 21px;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 12px;
-}
-
-.shcustomer-captcha-box input {
-    width: 100%;
-    padding: 11px;
-    border: 1px solid #cbd5e1;
-    border-radius: 7px;
-    font-size: 15px;
-    outline: none;
-}
-
-.shcustomer-captcha-box input:focus {
-    border-color: #64748b;
-}
-
-
-/* =========================================
-   CONFIRM DELETE BUTTON
-========================================= */
-
-.shcustomer-confirm-delete {
-    background: #dc2626;
-    color: white;
-    border: none;
-    padding: 11px 17px;
-    border-radius: 7px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.shcustomer-confirm-delete:hover {
-    background: #b91c1c;
-}
-
-.shcustomer-confirm-delete:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* COMPLETE BILL DETAILS */
-.shcustomer-bill-detail-modal {
-    max-width: 900px;
-}
-
-.shcustomer-bill-detail-content {
-    overflow: auto;
-}
-
-.shcustomer-bill-detail-content h3 {
-    margin: 20px 0 12px;
-    color: #192d4d;
-}
-
-.shcustomer-bill-detail-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin-bottom: 18px;
-}
-
-.shcustomer-bill-detail-grid>div {
-    background: #f7f8fa;
-    border: 1px solid #edf0f4;
-    border-radius: 9px;
-    padding: 13px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 0;
-}
-
-.shcustomer-bill-detail-grid span {
-    color: #8290a5;
-    font-size: 12px;
-}
-
-.shcustomer-bill-detail-grid strong {
-    color: #192d4d;
-    overflow-wrap: anywhere;
-}
-
-.shcustomer-bill-detail-grid .wide {
-    grid-column: 1/-1;
-}
-
-.shcustomer-bill-detail-grid.financial {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.shcustomer-payment-success-text {
-    padding: 12px 0;
-    line-height: 1.6;
-}
-
-.shcustomer-actions {
-    flex-wrap: wrap;
-}
-
-@media(max-width:650px) {
-    .shcustomer-bill-detail-modal {
+    .shcustomer-bill-detail-modal,
+    .shcustomer-reminder-modal {
         max-width: 100%;
     }
 
     .shcustomer-bill-detail-grid,
     .shcustomer-bill-detail-grid.financial {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .shcustomer-bill-detail-grid .wide {
         grid-column: auto;
     }
 
-    /* =========================================
-   WHATSAPP REMINDER
-========================================= */
-
     .shcustomer-list-actions {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .shcustomer-whatsapp-button {
-        background: #e8f8ed;
-        color: #168044;
-        border: 1px solid #b8e7c8;
-        padding: 8px 11px;
-        border-radius: 7px;
-        cursor: pointer;
-        font-size: 11px;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    .shcustomer-whatsapp-button:hover {
-        background: #d5f3df;
-    }
-
-    .shcustomer-whatsapp-button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    .shcustomer-reminder-modal {
-        max-width: 580px;
-    }
-
-    .shcustomer-reminder-customer {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        flex-wrap: wrap;
-        padding: 14px;
-        background: #f7f8fa;
-        border-radius: 9px;
-        margin-bottom: 18px;
-    }
-
-    .shcustomer-reminder-customer strong {
-        color: #192d4d;
-    }
-
-    .shcustomer-reminder-customer span {
-        color: #d34d4d;
-        font-weight: 700;
-    }
-
-    .shcustomer-reminder-hint {
-        font-size: 12px;
-        color: #8290a5;
-        line-height: 1.6;
-        margin-top: 8px;
-    }
-
-    .shcustomer-reminder-qr {
-        display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        margin: 22px 0;
-        padding: 18px;
-        background: #fcfaf5;
-        border: 1px solid #e7d5ad;
-        border-radius: 10px;
+        align-items: stretch;
     }
 
-    .shcustomer-reminder-qr h3 {
-        margin: 0;
-        color: #192d4d;
+    .shcustomer-reminder-modal .shcustomer-payment-actions {
+        flex-wrap: wrap;
     }
+}
 
-    .shcustomer-reminder-qr img {
-        width: 230px;
-        max-width: 100%;
-        height: auto;
-        background: white;
-        padding: 8px;
-        border-radius: 8px;
-    }
-
-    .shcustomer-reminder-qr strong {
-        color: #168044;
-        font-size: 20px;
-    }
-
-    .shcustomer-reminder-qr span {
-        color: #8290a5;
-        font-size: 12px;
-    }
-
-    .shcustomer-reminder-message {
-        margin-top: 18px;
-    }
-
-    .shcustomer-reminder-message h3 {
-        color: #192d4d;
-        font-size: 15px;
-    }
-
-    .shcustomer-reminder-message pre {
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-        font-family: inherit;
-        font-size: 13px;
-        line-height: 1.7;
-        color: #52647d;
-        background: #f7f8fa;
-        border: 1px solid #e5eaf1;
-        border-radius: 9px;
-        padding: 15px;
-        max-height: 280px;
-        overflow-y: auto;
-    }
-
-    @media(max-width:650px) {
-        .shcustomer-list-actions {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .shcustomer-reminder-modal {
-            max-width: 100%;
-        }
-
-        .shcustomer-reminder-modal .shcustomer-payment-actions {
-            flex-wrap: wrap;
-        }
+@media (prefers-reduced-motion: reduce) {
+    .shcustomers-page *,
+    .shcustomers-page *::before,
+    .shcustomers-page *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
     }
 }

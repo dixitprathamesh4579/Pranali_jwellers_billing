@@ -8,16 +8,11 @@ const {
     sendWhatsAppDueReminder
 } = require("../controllers/whatsappController");
 
-
-// Protect all WhatsApp API routes.
-router.use(authenticateToken);
-
-
-// Send payment reminder.
+// Protect only the reminder endpoint.
 router.post(
     "/send-due-reminder",
+    authenticateToken,
     sendWhatsAppDueReminder
 );
-
 
 module.exports = router;

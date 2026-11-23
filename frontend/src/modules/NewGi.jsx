@@ -249,16 +249,8 @@ export default function NewGIBill() {
             <div className="gi-page-header">
                 <div>
                     <span className="gi-eyebrow">PRANALI JEWELLERS</span>
-                    <h1>New GI Entry</h1>
-                    <p>Register a new Girvi transaction.</p>
-                </div>
+                    <h2><em>New Girvi Entry</em></h2>
 
-                <div className="gi-number-card">
-                    <span>GI Number</span>
-                    <strong>
-                        {savedGINumber || "Generated on Save"}
-                    </strong>
-                    <small>Generated automatically</small>
                 </div>
             </div>
 

@@ -321,13 +321,12 @@ function GICustomer() {
     return (
         <div className="gi-customer-page">
 
-            {/* Page Header */}
-            <div className="gi-customer-header">
-                <div>
-                    <h1>GI Customers</h1>
-                    <p>Manage Girvi accounts, customer details and payments.</p>
+
+            <div>
+                    <span className="gi-eyebrow">PRANALI JEWELLERS</span>
+                    <h2><em>Girvi Customer Management</em></h2>
+
                 </div>
-            </div>
 
             {/* Summary Cards */}
             <div className="gi-customer-stats">

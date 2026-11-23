@@ -6,7 +6,6 @@ import autoTable from "jspdf-autotable";
 
 import "./NewSHBill.css";
 
-import BillHeader from "../components/BillHeader.jsx";
 
 import BillPageHeading from "../components/BillPageHeading.jsx";
 
@@ -1925,11 +1924,10 @@ export default function NewSHBill({ onNavigate }) {
 
   return (
 
-    <div className="shbill-page">
+    <div className="shbill-container">
 
-      <BillHeader />
-
-      <BillPageHeading billNumber={billNumber} />
+      <span className="gi-eyebrow">PRANALI JEWELLERS</span>
+      <h2><em>Create New Customer Bill</em></h2>
 
       <form
 

@@ -1,12 +1,41 @@
+/* =========================================================
+   PRANALI JEWELLERS — GI STATISTICS
+   Clean, responsive and standardized stylesheet
+   ========================================================= */
+
 .gi-statistics-page {
+    --gi-stats-primary: #192d4d;
+    --gi-stats-primary-soft: #29466b;
+    --gi-stats-gold: #a97822;
+    --gi-stats-gold-light: #f8eed9;
+    --gi-stats-background: #f5f7fa;
+    --gi-stats-white: #ffffff;
+    --gi-stats-text: #26364d;
+    --gi-stats-muted: #8290a5;
+    --gi-stats-border: #e5eaf1;
+    --gi-stats-success: #23965b;
+    --gi-stats-blue: #3678d7;
+    --gi-stats-danger: #d84c4c;
+
     width: 100%;
+    min-width: 0;
+    min-height: 100vh;
     padding: 25px;
     box-sizing: border-box;
-    color: #252525;
+    color: var(--gi-stats-text);
+    background: var(--gi-stats-background);
     font-family: inherit;
 }
 
-/* HEADER */
+.gi-statistics-page *,
+.gi-statistics-page *::before,
+.gi-statistics-page *::after {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .gi-stats-header {
     display: flex;
@@ -17,156 +46,181 @@
 }
 
 .gi-stats-header h2 {
+    margin: 0 0 7px;
+    color: var(--gi-stats-primary);
     font-size: 25px;
     font-weight: 700;
-    margin: 0 0 7px;
 }
 
 .gi-stats-header p {
     margin: 0;
-    color: #777;
+    color: var(--gi-stats-muted);
     font-size: 14px;
+    line-height: 1.5;
 }
 
 .gi-stats-refresh {
-    background: #252525;
-    color: white;
-    border: none;
     padding: 11px 18px;
+    color: var(--gi-stats-white);
+    background: var(--gi-stats-primary);
+    border: none;
     border-radius: 7px;
-    cursor: pointer;
     font-size: 13px;
     font-weight: 600;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.2s ease, opacity 0.2s ease;
 }
 
-.gi-stats-refresh:hover {
-    background: #444;
+.gi-stats-refresh:hover:not(:disabled) {
+    background: var(--gi-stats-primary-soft);
 }
 
-/* SECTION TITLE */
+.gi-stats-refresh:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   SECTION TITLE
+   ========================================================= */
 
 .gi-stats-section-title {
     margin: 28px 0 15px;
 }
 
 .gi-stats-section-title h3 {
+    margin: 0;
+    color: var(--gi-stats-primary);
     font-size: 17px;
     font-weight: 700;
-    margin: 0;
 }
 
-/* STATISTICS GRID */
+/* =========================================================
+   STATISTICS GRID
+   ========================================================= */
 
 .gi-stats-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 18px;
+    min-width: 0;
 }
 
 .gi-stat-card {
-    background: #fff;
-    border: 1px solid #eaeaea;
-    border-radius: 11px;
-    padding: 22px;
     display: flex;
     align-items: center;
     gap: 17px;
     min-width: 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.035);
-    transition: transform 0.2s, box-shadow 0.2s;
+    padding: 22px;
+    background: var(--gi-stats-white);
+    border: 1px solid var(--gi-stats-border);
+    border-radius: 11px;
+    box-shadow: 0 2px 8px rgba(25, 45, 77, 0.035);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .gi-stat-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 5px 15px rgba(25, 45, 77, 0.07);
 }
 
 .gi-stat-card p {
     margin: 0 0 9px;
-    color: #777;
+    color: var(--gi-stats-muted);
     font-size: 13px;
 }
 
 .gi-stat-card h2 {
     margin: 0;
+    color: var(--gi-stats-primary);
     font-size: 21px;
     font-weight: 700;
     overflow-wrap: anywhere;
 }
 
 .gi-stat-highlight {
-    border-color: #d9c49a;
     background: #fffdf8;
+    border-color: #d9c49a;
 }
 
-/* ICONS */
+/* =========================================================
+   STATISTICS ICONS
+   ========================================================= */
 
 .gi-stat-icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
     width: 48px;
     height: 48px;
     min-width: 48px;
     border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: 22px;
     font-weight: 700;
 }
 
 .gi-stat-icon.purple {
-    background: #f0eaff;
     color: #7852c8;
+    background: #f0eaff;
 }
 
 .gi-stat-icon.green {
+    color: var(--gi-stats-success);
     background: #e5f7ed;
-    color: #23965b;
 }
 
 .gi-stat-icon.blue {
+    color: var(--gi-stats-blue);
     background: #e7f1ff;
-    color: #3678d7;
 }
 
 .gi-stat-icon.orange {
-    background: #fff1df;
     color: #db8a23;
+    background: #fff1df;
 }
 
 .gi-stat-icon.red {
+    color: var(--gi-stats-danger);
     background: #ffebeb;
-    color: #d84c4c;
 }
 
 .gi-stat-icon.dark {
-    background: #f2ead9;
-    color: #99752d;
+    color: var(--gi-stats-gold);
+    background: var(--gi-stats-gold-light);
 }
 
-/* ANALYTICS */
+/* =========================================================
+   ANALYTICS LAYOUT
+   ========================================================= */
 
 .gi-stats-analytics {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
     margin-top: 15px;
-}
-
-.gi-analytics-card {
-    background: white;
-    border: 1px solid #eaeaea;
-    border-radius: 11px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.035);
     min-width: 0;
 }
 
-.gi-analytics-card h3 {
-    font-size: 16px;
-    margin: 0 0 25px;
+.gi-analytics-card {
+    min-width: 0;
+    padding: 24px;
+    background: var(--gi-stats-white);
+    border: 1px solid var(--gi-stats-border);
+    border-radius: 11px;
+    box-shadow: 0 2px 8px rgba(25, 45, 77, 0.035);
 }
 
-/* PROGRESS BARS */
+.gi-analytics-card h3 {
+    margin: 0 0 25px;
+    color: var(--gi-stats-primary);
+    font-size: 16px;
+}
+
+/* =========================================================
+   PROGRESS BARS
+   ========================================================= */
 
 .gi-progress-item {
     margin-bottom: 22px;
@@ -175,24 +229,25 @@
 .gi-progress-label {
     display: flex;
     justify-content: space-between;
+    gap: 10px;
     margin-bottom: 10px;
     font-size: 13px;
 }
 
 .gi-progress-label span {
-    color: #666;
+    color: var(--gi-stats-muted);
 }
 
 .gi-progress-label strong {
-    color: #252525;
+    color: var(--gi-stats-primary);
 }
 
 .gi-progress-track {
     width: 100%;
     height: 10px;
+    overflow: hidden;
     background: #eeeeee;
     border-radius: 20px;
-    overflow: hidden;
 }
 
 .gi-progress-fill {
@@ -202,35 +257,43 @@
 }
 
 .active-fill {
-    background: #23965b;
+    background: var(--gi-stats-success);
 }
 
 .completed-fill {
-    background: #3678d7;
+    background: var(--gi-stats-blue);
 }
+
+/* =========================================================
+   ACCOUNT TOTAL
+   ========================================================= */
 
 .gi-account-total {
     display: flex;
     justify-content: space-between;
-    border-top: 1px solid #eee;
-    padding-top: 17px;
+    gap: 12px;
     margin-top: 25px;
+    padding-top: 17px;
+    border-top: 1px solid var(--gi-stats-border);
+    color: var(--gi-stats-primary);
     font-size: 14px;
 }
 
-/* RECOVERY */
+/* =========================================================
+   RECOVERY ANALYTICS
+   ========================================================= */
 
 .gi-recovery-percentage {
+    margin-bottom: 7px;
+    color: var(--gi-stats-success);
     font-size: 38px;
     font-weight: 750;
-    margin-bottom: 7px;
-    color: #23965b;
 }
 
 .gi-recovery-subtitle {
-    color: #777;
-    font-size: 12px;
     margin-bottom: 22px;
+    color: var(--gi-stats-muted);
+    font-size: 12px;
     line-height: 1.5;
 }
 
@@ -239,7 +302,7 @@
 }
 
 .recovery-fill {
-    background: #23965b;
+    background: var(--gi-stats-success);
 }
 
 .gi-recovery-details {
@@ -257,32 +320,35 @@
 }
 
 .gi-recovery-details span {
-    color: #777;
+    color: var(--gi-stats-muted);
     font-size: 12px;
 }
 
 .gi-recovery-details strong {
+    color: var(--gi-stats-primary);
     font-size: 14px;
     overflow-wrap: anywhere;
 }
 
-/* LOADING */
+/* =========================================================
+   LOADING STATE
+   ========================================================= */
 
 .gi-stats-loading {
-    min-height: 350px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #777;
     gap: 15px;
+    min-height: 350px;
+    color: var(--gi-stats-muted);
 }
 
 .gi-stats-spinner {
     width: 35px;
     height: 35px;
-    border: 4px solid #eee;
-    border-top-color: #99752d;
+    border: 4px solid #eeeeee;
+    border-top-color: var(--gi-stats-gold);
     border-radius: 50%;
     animation: giStatsSpin 0.8s linear infinite;
 }
@@ -293,35 +359,49 @@
     }
 }
 
-/* ERROR */
+/* =========================================================
+   ERROR STATE
+   ========================================================= */
 
 .gi-stats-error {
     margin: 30px;
     padding: 30px;
-    text-align: center;
-    background: white;
-    border: 1px solid #eee;
+    background: var(--gi-stats-white);
+    border: 1px solid var(--gi-stats-border);
     border-radius: 10px;
+    text-align: center;
 }
 
 .gi-stats-error h3 {
     margin-top: 0;
+    color: var(--gi-stats-primary);
 }
 
 .gi-stats-error p {
-    color: #d84c4c;
+    color: var(--gi-stats-danger);
+    line-height: 1.5;
 }
 
 .gi-stats-error button {
-    background: #252525;
-    color: white;
+    padding: 10px 20px;
+    color: var(--gi-stats-white);
+    background: var(--gi-stats-primary);
     border: none;
     border-radius: 6px;
-    padding: 10px 20px;
+    font-family: inherit;
+    font-size: 13px;
     cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.2s ease;
 }
 
-/* RESPONSIVE */
+.gi-stats-error button:hover {
+    background: var(--gi-stats-primary-soft);
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
 
 @media (max-width: 1000px) {
     .gi-stats-grid {
@@ -329,61 +409,119 @@
     }
 
     .gi-stats-analytics {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 
-@media (max-width: 600px) {
-    .gi-stat-card {
-        padding: 15px;
-        gap: 10px;
-    }
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
 
-    .gi-stats-page {
-        padding: 15px;
+@media (max-width: 600px) {
+    .gi-statistics-page {
+        padding: 14px 11px;
     }
 
     .gi-stats-header {
-        align-items: flex-start;
-    }
-
-    .gi-stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .gi-stat-card h2 {
-        font-size: 19px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 22px;
     }
 
     .gi-stats-header h2 {
         font-size: 21px;
     }
 
+    .gi-stats-header p {
+        font-size: 12px;
+    }
+
+    .gi-stats-refresh {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .gi-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .gi-stat-card {
+        gap: 10px;
+        padding: 13px;
+    }
+
+    .gi-stat-card h2 {
+        font-size: 17px;
+    }
+
+    .gi-stat-card p {
+        font-size: 11px;
+    }
+
     .gi-stat-icon {
-        width: 42px;
-        height: 42px;
-        min-width: 42px;
+        width: 37px;
+        height: 37px;
+        min-width: 37px;
+        border-radius: 9px;
+        font-size: 18px;
+    }
+
+    .gi-stats-analytics {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
     }
 
     .gi-analytics-card {
         padding: 18px;
     }
+
+    .gi-analytics-card h3 {
+        margin-bottom: 20px;
+    }
+
+    .gi-recovery-details {
+        flex-wrap: wrap;
+    }
+
+    .gi-stats-error {
+        margin: 15px 0;
+        padding: 22px 15px;
+    }
 }
 
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+   ========================================================= */
 
-/* ===== Mobile usability improvements ===== */
-.gi-stats-page { min-width: 0; }
-@media (max-width: 600px) {
-  .gi-stats-page { padding: 14px 11px; }
-  .gi-stats-header { flex-direction: column; align-items: stretch; }
-  .gi-stats-refresh { width: 100%; min-height: 44px; }
-  .gi-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
-  .gi-stat-card { padding: 13px; min-width: 0; }
-  .gi-stat-card h2 { font-size: 17px; overflow-wrap: anywhere; }
-  .gi-stat-icon { width: 37px; height: 37px; min-width: 37px; }
-  .gi-stats-analytics { grid-template-columns: minmax(0, 1fr); }
-  .gi-recovery-details { flex-wrap: wrap; }
-}
 @media (max-width: 370px) {
-  .gi-stats-grid { grid-template-columns: 1fr; }
+    .gi-stats-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .gi-stat-card {
+        padding: 15px;
+    }
+
+    .gi-stat-card h2 {
+        font-size: 19px;
+    }
+}
+
+/* =========================================================
+   ACCESSIBILITY — REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .gi-stat-card,
+    .gi-progress-fill,
+    .gi-stats-spinner {
+        animation: none;
+        transition: none;
+    }
+
+    .gi-stat-card:hover {
+        transform: none;
+    }
 }

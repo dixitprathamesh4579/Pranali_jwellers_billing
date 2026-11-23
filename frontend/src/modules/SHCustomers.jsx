@@ -1173,7 +1173,7 @@ window.addEventListener("afterprint",()=>window.close());
             if (!response.ok) {
                 throw new Error(
                     result.message ||
-                    "ग्राहकाची बिल माहिती मिळवता आली नाही."
+                    "Unable to fetch customer bills for reminder."
                 );
             }
 
@@ -1199,7 +1199,7 @@ window.addEventListener("afterprint",()=>window.close());
 
             if (totalDue <= 0) {
                 throw new Error(
-                    "या ग्राहकाची कोणतीही बाकी रक्कम नाही."
+                    "No pending dues found for this customer."
                 );
             }
 
@@ -1218,7 +1218,7 @@ window.addEventListener("afterprint",()=>window.close());
             console.error("WhatsApp Reminder Preparation Error:", err);
 
             setReminderError(
-                err.message || "Reminder तयार करता आला नाही."
+                err.message || "Unable to prepare WhatsApp reminder."
             );
 
         } finally {
@@ -1244,7 +1244,7 @@ window.addEventListener("afterprint",()=>window.close());
 
         if (!/^[6-9]\d{9}$/.test(mobile)) {
             setReminderError(
-                "कृपया योग्य 10 अंकी भारतीय मोबाईल नंबर टाका."
+                "Please enter a valid 10-digit Indian mobile number."
             );
 
             return;
@@ -1252,7 +1252,7 @@ window.addEventListener("afterprint",()=>window.close());
 
         if (!reminderDueData || reminderDueData.totalDue <= 0) {
             setReminderError(
-                "बाकी रक्कम उपलब्ध नाही."
+                "No pending dues found for this customer."
             );
 
             return;
@@ -1303,12 +1303,12 @@ window.addEventListener("afterprint",()=>window.close());
             if (!response.ok) {
                 throw new Error(
                     result.message ||
-                    "WhatsApp संदेश पाठवता आला नाही."
+                    "Unable to send WhatsApp reminder."
                 );
             }
 
             alert(
-                "WhatsApp Reminder यशस्वीरित्या पाठवला!"
+                "WhatsApp Reminder sent successfully!"
             );
 
             setReminderCustomer(null);
@@ -1325,7 +1325,7 @@ window.addEventListener("afterprint",()=>window.close());
 
             setReminderError(
                 err.message ||
-                "WhatsApp संदेश पाठवताना समस्या आली."
+                "Unable to send WhatsApp reminder."
             );
 
         } finally {
@@ -1389,12 +1389,8 @@ window.addEventListener("afterprint",()=>window.close());
 
             <div className="shcustomers-header">
                 <div>
-                    <h1>SH Customers</h1>
-
-                    <p>
-                        Manage your jewellery customers and their
-                        billing records.
-                    </p>
+                    <span className="gi-eyebrow">PRANALI JEWELLERS</span>
+                    <h2><em>Shop Customers</em></h2>
                 </div>
 
                 <button
@@ -2771,7 +2767,7 @@ window.addEventListener("afterprint",()=>window.close());
                                 <h2>WhatsApp Payment Reminder</h2>
 
                                 <p>
-                                    मराठी पेमेंट रिमाइंडर
+                                    Send a WhatsApp reminder to the customer for their pending dues.
                                 </p>
                             </div>
 
@@ -2796,7 +2792,7 @@ window.addEventListener("afterprint",()=>window.close());
 
                             {reminderDueData && (
                                 <span>
-                                    बाकी रक्कम:{" "}
+                                    Pending Amount:{" "}
                                     {money(reminderDueData.totalDue)}
                                 </span>
                             )}
@@ -2808,7 +2804,7 @@ window.addEventListener("afterprint",()=>window.close());
 
                         {reminderLoading && (
                             <p>
-                                ग्राहकाची बिल माहिती मिळवत आहे...
+                                Preparing WhatsApp reminder...
                             </p>
                         )}
 
@@ -2819,14 +2815,14 @@ window.addEventListener("afterprint",()=>window.close());
 
                             <>
                                 <label>
-                                    ग्राहकाचा मोबाईल नंबर तपासा
+                                    check and confirm the mobile number to send the WhatsApp reminder:  
                                 </label>
 
                                 <input
                                     type="tel"
                                     value={reminderPhone}
                                     maxLength={13}
-                                    placeholder="10 अंकी मोबाईल नंबर"
+                                    placeholder="Enter 10-digit mobile number"
                                     disabled={
                                         reminderMobileConfirmed ||
                                         reminderSending
@@ -2838,9 +2834,7 @@ window.addEventListener("afterprint",()=>window.close());
                                 />
 
                                 <p className="shcustomer-reminder-hint">
-                                    मोबाईल नंबर चुकीचा असल्यास येथे बदल करू शकता.
-                                    हा बदल ग्राहकाच्या सेव्ह केलेल्या नंबरमध्ये
-                                    होणार नाही.
+                                    Mobile number should be a valid 10-digit Indian number. The reminder will be sent to this number via WhatsApp.
                                 </p>
                             </>
 
@@ -2947,8 +2941,7 @@ window.addEventListener("afterprint",()=>window.close());
 
                         {reminderMobileConfirmed && (
                             <p className="shcustomer-reminder-hint">
-                                कृपया संदेशातील माहिती तपासून WhatsApp
-                                Reminder पाठवा.
+                               Check all details before sending. The message will be sent to the confirmed mobile number.
                             </p>
                         )}
 
