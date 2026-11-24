@@ -33,6 +33,18 @@ const sendWhatsAppDueReminder = async (req, res) => {
 
         const normalizedRecipientPhone =
             normalizeIndianMobile(recipientPhone);
+        console.log("Customer Phone from frontend:", customerPhone);
+        console.log("Recipient Phone from frontend:", recipientPhone);
+
+        console.log(
+            "Normalized Customer Phone:",
+            normalizeIndianMobile(customerPhone)
+        );
+
+        console.log(
+            "Normalized Recipient Phone:",
+            normalizeIndianMobile(recipientPhone)
+        );
 
         if (!normalizedCustomerPhone) {
             return res.status(400).json({
@@ -96,7 +108,7 @@ const sendWhatsAppDueReminder = async (req, res) => {
         if (totalDuePaise <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "या ग्राहकाची कोणतीही बाकी रक्कम नाही."
+                message: "No pending dues for this customer."
             });
         }
 
@@ -264,23 +276,23 @@ const sendWhatsAppBillPdf = async (req, res) => {
         // Send PDF through WhatsApp.
         const result = await sendBillPdf({
 
-    recipientPhone: normalizedRecipientPhone,
+            recipientPhone: normalizedRecipientPhone,
 
-    pdfBuffer: req.file.buffer,
+            pdfBuffer: req.file.buffer,
 
-    customerName: bill.customer_name,
+            customerName: bill.customer_name,
 
-    billNumber: bill.bill_number,
+            billNumber: bill.bill_number,
 
-    billDate,
+            billDate,
 
-    grandTotal: bill.grand_total,
+            grandTotal: bill.grand_total,
 
-    paidAmount: bill.paid_amount,
+            paidAmount: bill.paid_amount,
 
-    dueAmount: bill.due_amount
+            dueAmount: bill.due_amount
 
-});
+        });
 
         return res.status(200).json({
 
