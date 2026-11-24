@@ -46,12 +46,7 @@ const sendWhatsAppDueReminder = async (req, res) => {
             normalizeIndianMobile(recipientPhone)
         );
 
-        if (!normalizedCustomerPhone) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid customer mobile number."
-            });
-        }
+
 
         if (!normalizedRecipientPhone) {
             return res.status(400).json({
@@ -72,7 +67,7 @@ const sendWhatsAppDueReminder = async (req, res) => {
              FROM sh_bills
              WHERE customer_phone = ?
              ORDER BY bill_date ASC, id ASC`,
-            [normalizedCustomerPhone.slice(2)]
+            [customerPhone]
         );
 
         if (bills.length === 0) {
