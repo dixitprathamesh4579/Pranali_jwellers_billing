@@ -148,51 +148,57 @@ function GICustomer() {
     // DELETE ONLY THE SELECTED GI ACCOUNT
     const handleDeleteGI = async (e) => {
         e.preventDefault();
+
         if (!deleteGI || !deleteCaptcha) return;
 
         if (!captchaAnswer.trim()) {
             setDeleteError("Enter the CAPTCHA answer to continue.");
             return;
         }
-        const response = await apiFetch(`/gi/${deleteGI.gi_id}`, {
-            method: "DELETE",
-            body: JSON.stringify({
-                captchaToken: deleteCaptcha.token,
-                captchaAnswer
-            })
-        });
-        if (!confirmed) return;
 
         try {
             setDeleteLoading(true);
             setDeleteError("");
 
-            const response = await fetch(
-                `https://pranali-jwellers-billing.onrender.com/api/gi/${deleteGI.gi_id}`,
-                {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        captchaToken: deleteCaptcha.token,
-                        captchaAnswer
-                    })
-                }
-            );
+            // DELETE SELECTED GI ACCOUNT
+            const response = await apiFetch(`/gi/${deleteGI.gi_id}`, {
+                method: "DELETE",
+                body: JSON.stringify({
+                    captchaToken: deleteCaptcha.token,
+                    captchaAnswer: captchaAnswer.trim()
+                })
+            });
 
             const result = await response.json();
+
             if (!response.ok || !result.success) {
-                throw new Error(result.message || "Unable to delete GI account.");
+                throw new Error(
+                    result.message || "Unable to delete GI account."
+                );
             }
 
+            // CLOSE DELETE MODAL
             setDeleteGI(null);
+
+            // RESET CAPTCHA
             setDeleteCaptcha(null);
             setCaptchaAnswer("");
+            setDeleteError("");
+
+            // REFRESH CUSTOMER LIST
             await fetchCustomers();
 
+            // SUCCESS MESSAGE
             window.alert("Selected GI account deleted successfully.");
+
         } catch (err) {
-            setDeleteError(err.message || "GI account deletion failed.");
+
+            setDeleteError(
+                err.message || "GI account deletion failed."
+            );
+
         } finally {
+
             setDeleteLoading(false);
         }
     };
@@ -323,10 +329,10 @@ function GICustomer() {
 
 
             <div>
-                    <span className="gi-eyebrow">PRANALI JEWELLERS</span>
-                    <h2><em>Girvi Customer Management</em></h2>
+                <span className="gi-eyebrow">PRANALI JEWELLERS</span>
+                <h2><em>Girvi Customer Management</em></h2>
 
-                </div>
+            </div>
 
             {/* Summary Cards */}
             <div className="gi-customer-stats">

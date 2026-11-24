@@ -336,10 +336,7 @@ export default function NewSHBill({ onNavigate }) {
             return "Please enter customer name.";
         }
 
-        if (!/^[0-9]{10}$/.test(customer.phone)) {
-            return "Please enter a valid 10-digit mobile number.";
-        }
-
+       
         if (!billDate) {
             return "Please select bill date.";
         }
@@ -1394,24 +1391,24 @@ export default function NewSHBill({ onNavigate }) {
 
     // Open recipient confirmation modal.
 
-    const openWhatsAppConfirmation = () => {
-        const phone = normalizeWhatsAppPhone(customer.phone);
+   const openWhatsAppConfirmation = () => {
 
-        if (!phone) {
-            setNotice(
-                "Please enter a valid 10-digit mobile number."
-            );
+    // Pre-fill the confirmation field if a number is available.
+    const digits = String(customer.phone || "").replace(/\D/g, "");
 
-            setNoticeType("error");
-            return;
-        }
+    const phone =
+        digits.length === 12 && digits.startsWith("91")
+            ? digits.slice(2)
+            : digits.slice(0, 10);
 
-        setWhatsAppPhone(phone.slice(2));
+    setWhatsAppPhone(phone);
 
-        setWhatsAppModalOpen(true);
+    // Always open confirmation popup.
+    // Do not validate the outer customer mobile field here.
+    setWhatsAppModalOpen(true);
 
-        clearNotice();
-    };
+    clearNotice();
+};
 
     // Send bill PDF through WhatsApp.
 
