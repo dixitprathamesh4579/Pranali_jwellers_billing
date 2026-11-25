@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+    useCallback,
+    useEffect,
+    useState,
+    useRef
+} from "react";
 import { apiFetch } from "../utils/api.js";
 import "./WhatsAppChats.css";
 
@@ -15,19 +20,7 @@ const formatTime = (date) => {
     });
 };
 
-const formatDate = (date) => {
-    if (!date) return "";
 
-    const messageDate = new Date(date);
-
-    if (isNaN(messageDate.getTime())) return "";
-
-    return messageDate.toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-    });
-};
 
 const WhatsAppChats = () => {
     const [conversations, setConversations] = useState([]);
@@ -271,6 +264,86 @@ const WhatsAppChats = () => {
         }
     };
 
+    // ==========================================
+    // DELETE CONVERSATION
+    // ==========================================
+
+    const handleDeleteConversation = async (event, conversation) => {
+        event.stopPropagation();
+
+        const confirmed = window.confirm(
+            `Delete conversation with ${conversation.customer_name ||
+            conversation.whatsapp_phone
+            }?\n\nAll stored messages in this conversation will also be deleted.`
+        );
+
+        if (!confirmed) return;
+
+        try {
+            const response = await apiFetch(
+                `/whatsapp/conversations/${conversation.id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to delete conversation."
+                );
+            }
+
+            // Clear selected chat if it was deleted.
+            if (selectedConversation?.id === conversation.id) {
+                setSelectedConversation(null);
+                setMessages([]);
+            }
+
+            // Refresh conversation list.
+            await fetchConversations();
+
+        } catch (error) {
+            alert(error.message || "Unable to delete conversation.");
+        }
+    };
+
+    // Long press delete controls
+    const [activeDeleteConversation, setActiveDeleteConversation] = useState(null);
+
+    const longPressTimer = useRef(null);
+    const longPressTriggered = useRef(false);
+
+    const startLongPress = (conversationId) => {
+        longPressTriggered.current = false;
+
+        clearTimeout(longPressTimer.current);
+
+        longPressTimer.current = setTimeout(() => {
+            setActiveDeleteConversation(conversationId);
+            longPressTriggered.current = true;
+        }, 600);
+    };
+
+    const cancelLongPress = () => {
+        clearTimeout(longPressTimer.current);
+    };
+
+    const handleConversationClick = (conversation) => {
+        if (longPressTriggered.current) {
+            longPressTriggered.current = false;
+            return;
+        }
+
+        setActiveDeleteConversation(null);
+        handleSelectConversation(conversation);
+        useEffect(() => {
+            return () => {
+                clearTimeout(longPressTimer.current);
+            };
+        }, []);
+    };
     return (
         <div className="whatsapp-chats-page">
 
@@ -429,9 +502,23 @@ const WhatsAppChats = () => {
                                 className={`whatsapp-conversation-item ${selectedConversation?.id === conversation.id
                                     ? "active"
                                     : ""
+                                    } ${activeDeleteConversation === conversation.id
+                                        ? "show-delete"
+                                        : ""
                                     }`}
+                                onPointerDown={() =>
+                                    startLongPress(conversation.id)
+                                }
+                                onPointerUp={cancelLongPress}
+                                onPointerLeave={cancelLongPress}
+                                onPointerCancel={cancelLongPress}
+                                onContextMenu={(event) => {
+                                    event.preventDefault();
+                                    setActiveDeleteConversation(conversation.id);
+                                    cancelLongPress();
+                                }}
                                 onClick={() =>
-                                    handleSelectConversation(conversation)
+                                    handleConversationClick(conversation)
                                 }
                             >
                                 <div className="whatsapp-avatar">
@@ -443,24 +530,13 @@ const WhatsAppChats = () => {
                                 </div>
 
                                 <div className="whatsapp-conversation-info">
-                                    <div className="whatsapp-conversation-top">
-                                        <strong>
+
+                                    {/* CUSTOMER NAME */}
+                                    <div className="whatsapp-conversation-bottom">
+                                        <strong className="whatsapp-customer-name">
                                             {conversation.customer_name ||
                                                 conversation.whatsapp_phone}
                                         </strong>
-
-                                        <span>
-                                            {formatTime(
-                                                conversation.last_message_at
-                                            )}
-                                        </span>
-                                    </div>
-
-                                    <div className="whatsapp-conversation-bottom">
-                                        <p>
-                                            {conversation.last_message ||
-                                                "No messages"}
-                                        </p>
 
                                         {Number(conversation.unread_count) > 0 && (
                                             <span className="whatsapp-unread-badge">
@@ -469,13 +545,44 @@ const WhatsAppChats = () => {
                                         )}
                                     </div>
 
+                                    {/* LAST MESSAGE */}
+                                    <p className="whatsapp-last-message">
+                                        {conversation.last_message || "No messages"}
+                                    </p>
+
+                                    {/* MOBILE NUMBER */}
                                     <small>
                                         {conversation.whatsapp_phone}
                                     </small>
+
                                 </div>
+
+                                {/* DELETE BUTTON - VISIBLE AFTER LONG PRESS */}
+                                <div className="whatsapp-conversation-actions">
+                                    <button
+                                        type="button"
+                                        className="whatsapp-delete-chat-btn"
+                                        title="Delete conversation"
+                                        onPointerDown={(event) => {
+                                            event.stopPropagation();
+                                            cancelLongPress();
+                                        }}
+                                        onClick={async (event) => {
+                                            event.stopPropagation();
+
+                                            await handleDeleteConversation(event, conversation);
+
+                                            setActiveDeleteConversation(null);
+                                        }}
+                                    >
+                                        🗑
+                                    </button>
+                                </div>
+
                             </div>
                         ))
                     )}
+
                 </div>
 
                 {/* RIGHT CHAT WINDOW */}

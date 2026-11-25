@@ -11,7 +11,8 @@ const {
     getConversationMessages,
     markConversationAsRead,
     sendChatMessage,
-    createConversation
+    createConversation,
+    deleteConversation
 } = require("../controllers/whatsappChatController");
 
 // Existing WhatsApp controllers
@@ -88,6 +89,12 @@ router.post(
     "/conversations/:id/messages",
     authenticateToken,
     sendChatMessage
+);
+
+router.delete(
+    "/conversations/:id",
+    authenticateToken,
+    deleteConversation
 );
 
 

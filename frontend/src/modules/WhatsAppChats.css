@@ -873,3 +873,61 @@
         font-size: 10px;
     }
 }
+
+/* ==========================================
+   LONG PRESS DELETE CHAT
+========================================== */
+
+.whatsapp-conversation-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.whatsapp-delete-chat-btn {
+    display: none;
+    border: none;
+    background: #fff0f0;
+    color: #d32f2f;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 6px 8px;
+    border-radius: 6px;
+}
+
+.whatsapp-conversation-item.show-delete
+.whatsapp-delete-chat-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.whatsapp-delete-chat-btn:hover {
+    background: #ffdddd;
+}
+
+/* Prevent accidental text selection during long press */
+.whatsapp-conversation-item {
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
+}
+
+.whatsapp-customer-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.whatsapp-last-message {
+    font-size: 13px;
+    color: #777;
+    margin: 5px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

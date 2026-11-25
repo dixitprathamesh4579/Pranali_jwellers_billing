@@ -383,11 +383,57 @@ const createConversation = async (req, res) => {
         });
     }
 };
+// ==========================================
+// DELETE WHATSAPP CONVERSATION
+// ==========================================
+
+const deleteConversation = async (req, res) => {
+    try {
+        const conversationId = Number(req.params.id);
+
+        if (
+            !Number.isSafeInteger(conversationId) ||
+            conversationId <= 0
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid conversation ID."
+            });
+        }
+
+        const [result] = await pool.execute(
+            `DELETE FROM whatsapp_conversations
+             WHERE id = ?`,
+            [conversationId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Conversation not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Conversation deleted successfully."
+        });
+
+    } catch (error) {
+        console.error("Delete WhatsApp conversation error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to delete conversation."
+        });
+    }
+};
 
 module.exports = {
     getConversations,
     getConversationMessages,
     markConversationAsRead,
     sendChatMessage,
-    createConversation
+    createConversation,
+    deleteConversation
 };
