@@ -2,15 +2,32 @@ const items = [
   ["Overview", "⌂", "Home"],
   ["New SH Bill", "＋", "SH Bill"],
   ["SH Customers", "♙", "Customers"],
-  ["WhatsApp Chats", "☏", "WhatsApp"],
   ["New GI", "◇", "New GI"],
   ["More", "•••", "More"],
 ];
 export default function MobileNav({ active, onNavigate }) {
-  const selected = ["GI Customers", "GI History", "GI Statistics", "DailyAccounts", "More"].includes(active) ? "More" : active;
-  return <nav className="mobile-nav" aria-label="Mobile navigation">
-    {items.map(([name, icon, label]) => <button key={name} className={selected === name ? "selected" : ""} onClick={() => onNavigate(name)} aria-current={selected === name ? "page" : undefined}>
-      <span>{icon}</span><small>{label}</small>
-    </button>)}
-  </nav>;
+  const selected = [
+    "GI Customers",
+    "GI History",
+    "GI Statistics",
+    "DailyAccounts",
+    "WhatsApp Chats",
+    "More"
+  ].includes(active) ? "More" : active;
+
+  return (
+    <nav className="mobile-nav" aria-label="Mobile navigation">
+      {items.map(([name, icon, label]) => (
+        <button
+          key={name}
+          className={selected === name ? "selected" : ""}
+          onClick={() => onNavigate(name)}
+          aria-current={selected === name ? "page" : undefined}
+        >
+          <span>{icon}</span>
+          <small>{label}</small>
+        </button>
+      ))}
+    </nav>
+  );
 }
