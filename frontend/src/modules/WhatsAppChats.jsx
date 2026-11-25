@@ -142,6 +142,12 @@ const WhatsAppChats = () => {
     const [messageInput, setMessageInput] = useState("");
     const [sendingMessage, setSendingMessage] = useState(false);
     const [sendError, setSendError] = useState("");
+    // New Chat states
+    const [showNewChatModal, setShowNewChatModal] = useState(false);
+    const [newChatPhone, setNewChatPhone] = useState("");
+    const [newChatName, setNewChatName] = useState("");
+    const [creatingChat, setCreatingChat] = useState(false);
+    const [newChatError, setNewChatError] = useState("");
     const handleSendMessage = async () => {
         const message = messageInput.trim();
 
@@ -192,12 +198,79 @@ const WhatsAppChats = () => {
             setSendingMessage(false);
         }
     };
+
+    // ==========================================
+    // CREATE NEW WHATSAPP CONVERSATION
+    // ==========================================
+
+    const handleCreateConversation = async (event) => {
+        event.preventDefault();
+
+        if (!newChatPhone.trim()) {
+            setNewChatError("Please enter a WhatsApp mobile number.");
+            return;
+        }
+
+        setCreatingChat(true);
+        setNewChatError("");
+
+        try {
+            const response = await apiFetch("/whatsapp/conversations", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    phone: newChatPhone.trim(),
+                    customer_name: newChatName.trim(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to create conversation."
+                );
+            }
+
+            if (!data.conversation) {
+                throw new Error("Conversation was not returned by the server.");
+            }
+
+            const conversation = data.conversation;
+
+            // Close modal and clear form.
+            setShowNewChatModal(false);
+            setNewChatPhone("");
+            setNewChatName("");
+            setNewChatError("");
+
+            // Open the newly created conversation.
+            setSelectedConversation(conversation);
+            setMessages([]);
+            setLoadingMessages(true);
+
+            // Refresh sidebar and fetch messages.
+            await fetchConversations();
+            await fetchMessages(conversation.id);
+
+        } catch (error) {
+            setNewChatError(
+                error.message || "Unable to create conversation."
+            );
+        } finally {
+            setCreatingChat(false);
+        }
+    };
+
     const handleMessageKeyDown = (event) => {
         if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
             handleSendMessage();
         }
     };
+
     return (
         <div className="whatsapp-chats-page">
 
@@ -212,7 +285,105 @@ const WhatsAppChats = () => {
                     {conversations.length} Conversations
                 </div>
             </div>
+            {/* ==========================================
+    NEW CHAT MODAL
+========================================== */}
 
+            {showNewChatModal && (
+                <div
+                    className="whatsapp-new-chat-overlay"
+                    onClick={(event) => {
+                        if (
+                            event.target === event.currentTarget &&
+                            !creatingChat
+                        ) {
+                            setShowNewChatModal(false);
+                        }
+                    }}
+                >
+
+                    <div className="whatsapp-new-chat-modal">
+
+                        <h3>Start New Chat</h3>
+
+                        <p>
+                            Enter the customer's WhatsApp mobile number
+                            to start a conversation.
+                        </p>
+
+                        <form onSubmit={handleCreateConversation}>
+
+                            <label>
+                                Customer Name (Optional)
+                            </label>
+
+                            <input
+                                type="text"
+                                placeholder="Enter customer name"
+                                value={newChatName}
+                                onChange={(e) =>
+                                    setNewChatName(e.target.value)
+                                }
+                                maxLength={150}
+                                disabled={creatingChat}
+                            />
+
+                            <label>
+                                WhatsApp Mobile Number *
+                            </label>
+
+                            <input
+                                type="tel"
+                                placeholder="Enter 10-digit mobile number"
+                                value={newChatPhone}
+                                onChange={(e) =>
+                                    setNewChatPhone(e.target.value)
+                                }
+                                maxLength={16}
+                                required
+                                disabled={creatingChat}
+                            />
+
+                            {newChatError && (
+                                <div className="whatsapp-new-chat-error">
+                                    {newChatError}
+                                </div>
+                            )}
+
+                            <div className="whatsapp-new-chat-actions">
+
+                                <button
+                                    type="button"
+                                    className="whatsapp-new-chat-cancel"
+                                    disabled={creatingChat}
+                                    onClick={() =>
+                                        setShowNewChatModal(false)
+                                    }
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    className="whatsapp-new-chat-create"
+                                    disabled={
+                                        creatingChat ||
+                                        !newChatPhone.trim()
+                                    }
+                                >
+                                    {creatingChat
+                                        ? "Creating..."
+                                        : "Create Chat"}
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+            )}
             {error && (
                 <div className="whatsapp-chat-error">
                     {error}
@@ -225,7 +396,22 @@ const WhatsAppChats = () => {
                 <div className="whatsapp-conversations">
 
                     <div className="whatsapp-conversations-heading">
+
                         <h3>Messages</h3>
+
+                        <button
+                            type="button"
+                            className="whatsapp-new-chat-btn"
+                            onClick={() => {
+                                setNewChatPhone("");
+                                setNewChatName("");
+                                setNewChatError("");
+                                setShowNewChatModal(true);
+                            }}
+                        >
+                            + New Chat
+                        </button>
+
                     </div>
 
                     {loadingConversations ? (
@@ -241,8 +427,8 @@ const WhatsAppChats = () => {
                             <div
                                 key={conversation.id}
                                 className={`whatsapp-conversation-item ${selectedConversation?.id === conversation.id
-                                        ? "active"
-                                        : ""
+                                    ? "active"
+                                    : ""
                                     }`}
                                 onClick={() =>
                                     handleSelectConversation(conversation)
@@ -346,8 +532,8 @@ const WhatsAppChats = () => {
                                         <div
                                             key={message.id}
                                             className={`whatsapp-message-row ${message.direction === "OUTBOUND"
-                                                    ? "outgoing"
-                                                    : "incoming"
+                                                ? "outgoing"
+                                                : "incoming"
                                                 }`}
                                         >
                                             <div className="whatsapp-message-bubble">

@@ -731,3 +731,145 @@
 .whatsapp-messages::-webkit-scrollbar-track {
     background: transparent;
 }
+
+/* ==========================================
+   NEW CHAT BUTTON
+========================================== */
+
+.whatsapp-conversations-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.whatsapp-new-chat-btn {
+    border: none;
+    background: #16834b;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.whatsapp-new-chat-btn:hover {
+    background: #116b3c;
+}
+
+
+/* ==========================================
+   NEW CHAT MODAL
+========================================== */
+
+.whatsapp-new-chat-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    z-index: 9999;
+}
+
+.whatsapp-new-chat-modal {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    padding: 24px;
+    border-radius: 13px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+}
+
+.whatsapp-new-chat-modal h3 {
+    margin: 0 0 8px;
+    font-size: 19px;
+    color: #252525;
+}
+
+.whatsapp-new-chat-modal p {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 20px;
+}
+
+.whatsapp-new-chat-modal label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+.whatsapp-new-chat-modal input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+    font-size: 14px;
+    outline: none;
+}
+
+.whatsapp-new-chat-modal input:focus {
+    border-color: #20a45a;
+}
+
+.whatsapp-new-chat-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.whatsapp-new-chat-actions button {
+    padding: 10px 17px;
+    border: none;
+    border-radius: 7px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.whatsapp-new-chat-cancel {
+    background: #eee;
+    color: #444;
+}
+
+.whatsapp-new-chat-create {
+    background: #16834b;
+    color: white;
+}
+
+.whatsapp-new-chat-create:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.whatsapp-new-chat-error {
+    color: #c62828;
+    background: #fff0f0;
+    padding: 9px;
+    border-radius: 7px;
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+
+
+/* ==========================================
+   MOBILE MODAL
+========================================== */
+
+@media (max-width: 480px) {
+    .whatsapp-new-chat-modal {
+        padding: 19px;
+    }
+
+    .whatsapp-new-chat-btn {
+        padding: 7px 9px;
+        font-size: 10px;
+    }
+}

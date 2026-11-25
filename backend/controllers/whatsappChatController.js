@@ -340,9 +340,9 @@ const createConversation = async (req, res) => {
             });
         }
 
-        const cleanName = customer_name
-            ? String(customer_name).trim().slice(0, 150)
-            : null;
+      const cleanName = String(customer_name || "")
+    .trim()
+    .slice(0, 150) || null;
 
         const [result] = await pool.query(
             `
