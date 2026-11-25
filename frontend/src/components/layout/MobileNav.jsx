@@ -2,6 +2,7 @@ const items = [
   ["Overview", "⌂", "Home"],
   ["New SH Bill", "＋", "SH Bill"],
   ["SH Customers", "♙", "Customers"],
+  ["WhatsApp Chats", "☏", "WhatsApp"],
   ["New GI", "◇", "New GI"],
   ["More", "•••", "More"],
 ];
