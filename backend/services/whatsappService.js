@@ -596,10 +596,81 @@ const sendBillPdf = async ({
 
 
 // =====================================================
+// WHATSAPP CHAT - SEND TEXT MESSAGE
+// =====================================================
+
+const sendTextMessage = async ({
+    recipientPhone,
+    message
+}) => {
+
+    const {
+        token,
+        phoneNumberId,
+        apiVersion
+    } = getWhatsAppConfig();
+
+    if (!recipientPhone) {
+        throw new Error("Recipient WhatsApp number is required.");
+    }
+
+    const text = String(message || "").trim();
+
+    if (!text) {
+        throw new Error("Message cannot be empty.");
+    }
+
+    if (text.length > 4096) {
+        throw new Error("Message cannot exceed 4096 characters.");
+    }
+
+    const url =
+        `https://graph.facebook.com/${apiVersion}/${phoneNumberId}/messages`;
+
+    const payload = {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: recipientPhone,
+        type: "text",
+        text: {
+            preview_url: false,
+            body: text
+        }
+    };
+
+    const response = await fetch(url, {
+        method: "POST",
+
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.messages?.[0]?.id) {
+
+        console.error("WhatsApp Text Message Error:", result);
+
+        throw new Error(
+            result.error?.message ||
+            "Unable to send WhatsApp message."
+        );
+
+    }
+
+    return result.messages[0].id;
+};
+
+// =====================================================
 // EXPORTS
 // =====================================================
 
 module.exports = {
     sendDueReminder,
-    sendBillPdf
+    sendBillPdf,
+    sendTextMessage
 };

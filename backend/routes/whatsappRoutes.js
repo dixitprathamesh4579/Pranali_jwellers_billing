@@ -6,7 +6,8 @@ const router = express.Router();
 const {
     getConversations,
     getConversationMessages,
-    markConversationAsRead
+    markConversationAsRead,
+    sendChatMessage
 } = require("../controllers/whatsappChatController");
 
 const authenticateToken = require("../middleware/authmiddleware");
@@ -64,5 +65,11 @@ router.patch(
     authenticateToken,
     markConversationAsRead
 );
+router.post(
+    "/conversations/:id/messages",
+    authenticateToken,
+    sendChatMessage
+);
+
 
 module.exports = router;

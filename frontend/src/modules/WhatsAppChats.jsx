@@ -139,6 +139,65 @@ const WhatsAppChats = () => {
         return () => clearInterval(interval);
     }, [selectedConversation?.id, fetchMessages]);
 
+    const [messageInput, setMessageInput] = useState("");
+    const [sendingMessage, setSendingMessage] = useState(false);
+    const [sendError, setSendError] = useState("");
+    const handleSendMessage = async () => {
+        const message = messageInput.trim();
+
+        if (!message || !selectedConversation || sendingMessage) {
+            return;
+        }
+
+        setSendingMessage(true);
+        setSendError("");
+
+        try {
+            const response = await apiFetch(
+                `/whatsapp/conversations/${selectedConversation.id}/messages`,
+                {
+                    method: "POST",
+                    body: JSON.stringify({ message })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to send message."
+                );
+            }
+
+            // Clear input after successful sending.
+            setMessageInput("");
+
+            // Immediately display the sent message.
+            if (data.sentMessage) {
+                setMessages(previous => [
+                    ...previous,
+                    data.sentMessage
+                ]);
+            }
+
+            // Refresh conversation list.
+            await fetchConversations();
+
+            // Refresh messages to get the latest database records.
+            await fetchMessages(selectedConversation.id);
+
+        } catch (error) {
+            setSendError(error.message || "Unable to send message.");
+        } finally {
+            setSendingMessage(false);
+        }
+    };
+    const handleMessageKeyDown = (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            handleSendMessage();
+        }
+    };
     return (
         <div className="whatsapp-chats-page">
 
@@ -181,11 +240,10 @@ const WhatsAppChats = () => {
                         conversations.map((conversation) => (
                             <div
                                 key={conversation.id}
-                                className={`whatsapp-conversation-item ${
-                                    selectedConversation?.id === conversation.id
+                                className={`whatsapp-conversation-item ${selectedConversation?.id === conversation.id
                                         ? "active"
                                         : ""
-                                }`}
+                                    }`}
                                 onClick={() =>
                                     handleSelectConversation(conversation)
                                 }
@@ -287,11 +345,10 @@ const WhatsAppChats = () => {
                                     messages.map((message) => (
                                         <div
                                             key={message.id}
-                                            className={`whatsapp-message-row ${
-                                                message.direction === "OUTBOUND"
+                                            className={`whatsapp-message-row ${message.direction === "OUTBOUND"
                                                     ? "outgoing"
                                                     : "incoming"
-                                            }`}
+                                                }`}
                                         >
                                             <div className="whatsapp-message-bubble">
                                                 <p>
@@ -309,10 +366,43 @@ const WhatsAppChats = () => {
                             </div>
 
                             {/* INPUT PLACEHOLDER */}
-                            <div className="whatsapp-chat-input-placeholder">
-                                <span>
-                                    Message sending will be added in the next step.
-                                </span>
+                            <div className="whatsapp-chat-input-area">
+
+                                {sendError && (
+                                    <div className="whatsapp-send-error">
+                                        {sendError}
+                                    </div>
+                                )}
+
+                                <div className="whatsapp-chat-input-row">
+
+                                    <textarea
+                                        value={messageInput}
+                                        onChange={(e) => setMessageInput(e.target.value)}
+                                        onKeyDown={handleMessageKeyDown}
+                                        placeholder="Type a message..."
+                                        rows={1}
+                                        maxLength={4096}
+                                        disabled={sendingMessage}
+                                    />
+
+                                    <button
+                                        type="button"
+                                        onClick={handleSendMessage}
+                                        disabled={
+                                            !messageInput.trim() ||
+                                            sendingMessage
+                                        }
+                                    >
+                                        {sendingMessage ? "Sending..." : "Send"}
+                                    </button>
+
+                                </div>
+
+                                <small>
+                                    Enter to send · Shift + Enter for a new line
+                                </small>
+
                             </div>
                         </>
                     )}

@@ -1,4 +1,7 @@
 const pool = require("../config/db");
+const {
+    sendTextMessage
+} = require("../services/whatsappService");
 
 // ==========================================
 // GET ALL WHATSAPP CONVERSATIONS
@@ -168,8 +171,155 @@ const markConversationAsRead = async (req, res) => {
 };
 
 
+// =====================================================
+// SEND WHATSAPP CHAT MESSAGE
+// =====================================================
+
+const sendChatMessage = async (req, res) => {
+
+    let connection;
+
+    try {
+
+        const conversationId = Number(req.params.id);
+
+        const message = String(req.body.message || "").trim();
+
+        if (
+            !Number.isInteger(conversationId) ||
+            conversationId <= 0
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid conversation ID."
+            });
+        }
+
+        if (!message) {
+            return res.status(400).json({
+                success: false,
+                message: "Message cannot be empty."
+            });
+        }
+
+        if (message.length > 4096) {
+            return res.status(400).json({
+                success: false,
+                message: "Message cannot exceed 4096 characters."
+            });
+        }
+
+        // Find conversation.
+        const [conversations] = await pool.execute(
+            `SELECT id, whatsapp_phone
+             FROM whatsapp_conversations
+             WHERE id = ?
+             LIMIT 1`,
+            [conversationId]
+        );
+
+        if (conversations.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Conversation not found."
+            });
+        }
+
+        const recipientPhone =
+            String(conversations[0].whatsapp_phone).replace(/\D/g, "");
+
+        if (!/^91[6-9]\d{9}$/.test(recipientPhone)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid WhatsApp recipient number."
+            });
+        }
+
+        // Send message through Meta.
+        const whatsappMessageId = await sendTextMessage({
+            recipientPhone,
+            message
+        });
+
+        // Save outgoing message.
+        connection = await pool.getConnection();
+
+        await connection.beginTransaction();
+
+        const [insertResult] = await connection.execute(
+            `INSERT INTO whatsapp_messages
+            (
+                conversation_id,
+                whatsapp_message_id,
+                direction,
+                message_type,
+                message_text,
+                message_status,
+                \`timestamp\`
+            )
+            VALUES (?, ?, 'OUTBOUND', 'TEXT', ?, 'SENT', NOW())`,
+            [
+                conversationId,
+                whatsappMessageId,
+                message
+            ]
+        );
+
+        // Update conversation's latest message.
+        await connection.execute(
+            `UPDATE whatsapp_conversations
+             SET last_message = ?,
+                 last_message_at = NOW()
+             WHERE id = ?`,
+            [message, conversationId]
+        );
+
+        await connection.commit();
+
+        return res.status(200).json({
+            success: true,
+            message: "WhatsApp message sent successfully.",
+            whatsappMessageId,
+            sentMessage: {
+                id: insertResult.insertId,
+                conversation_id: conversationId,
+                whatsapp_message_id: whatsappMessageId,
+                direction: "OUTBOUND",
+                message_type: "TEXT",
+                message_text: message,
+                message_status: "SENT"
+            }
+        });
+
+    } catch (error) {
+
+        if (connection) {
+            await connection.rollback();
+        }
+
+        console.error(
+            "WhatsApp Chat Send Error:",
+            error.message
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: error.message ||
+                "Failed to send WhatsApp message."
+        });
+
+    } finally {
+
+        if (connection) {
+            connection.release();
+        }
+
+    }
+};
+
 module.exports = {
     getConversations,
     getConversationMessages,
-    markConversationAsRead
+    markConversationAsRead,
+    sendChatMessage
 };
