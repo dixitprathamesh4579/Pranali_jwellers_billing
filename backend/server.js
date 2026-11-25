@@ -9,6 +9,10 @@ if (!process.env.JWT_SECRET) {
     process.exit(1);
 }
 
+const {
+    processWhatsAppWebhook
+} = require("./services/whatsappWebhookService");
+
 const pool = require("./config/db");
 const { sendOtpEmail } = require("./services/emailService");
 
@@ -314,8 +318,10 @@ app.get("/api/whatsapp/webhook", (req, res) => {
 
 
 // Meta webhook events (POST)
-app.post("/api/whatsapp/webhook", (req, res) => {
+app.post("/api/whatsapp/webhook", async (req, res) => {
+
     try {
+
         const appSecret = process.env.WHATSAPP_APP_SECRET;
 
         if (!appSecret) {
@@ -341,49 +347,35 @@ app.post("/api/whatsapp/webhook", (req, res) => {
 
         if (
             receivedBuffer.length !== expectedBuffer.length ||
-            !crypto.timingSafeEqual(receivedBuffer, expectedBuffer)
+            !crypto.timingSafeEqual(
+                receivedBuffer,
+                expectedBuffer
+            )
         ) {
             console.warn("Invalid WhatsApp webhook signature.");
             return res.sendStatus(401);
         }
 
-        // Process WhatsApp webhook events.
-        const body = req.body;
-
-        if (body.object === "whatsapp_business_account") {
-            for (const entry of body.entry || []) {
-                for (const change of entry.changes || []) {
-                    const value = change.value || {};
-
-                    // Incoming messages
-                    for (const message of value.messages || []) {
-                        console.log("WhatsApp incoming message:", {
-                            from: message.from,
-                            messageId: message.id,
-                            type: message.type
-                        });
-                    }
-
-                    // Message delivery/read/failure statuses
-                    for (const status of value.statuses || []) {
-                        console.log("WhatsApp message status:", {
-                            messageId: status.id,
-                            status: status.status,
-                            recipient: status.recipient_id,
-                            timestamp: status.timestamp
-                        });
-                    }
-                }
-            }
-        }
+        // Save incoming messages and update message statuses.
+        await processWhatsAppWebhook(req.body);
 
         return res.sendStatus(200);
 
     } catch (error) {
-        console.error("WhatsApp webhook error:", error.message);
+
+        console.error(
+            "WhatsApp webhook processing error:",
+            error
+        );
+
+        // Return 500 so Meta can retry webhook delivery.
         return res.sendStatus(500);
+
     }
+
 });
+
+
 const PORT = process.env.PORT || 5000;
 
 

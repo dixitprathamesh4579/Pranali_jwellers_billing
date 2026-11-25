@@ -20,7 +20,42 @@ const normalizeIndianMobile = (value) => {
     return `91${mobile}`;
 };
 
+// Format bill date as DD/MM/YYYY.
+const formatBillDate = (value) => {
+    if (!value) return "";
 
+    const date = String(value).slice(0, 10);
+    const parts = date.split("-");
+
+    if (parts.length !== 3) return date;
+
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+};
+
+
+// Extract item names from bill JSON.
+// Extract item names from bill JSON.
+const extractItemNames = (items) => {
+    try {
+        const parsedItems =
+            typeof items === "string"
+                ? JSON.parse(items)
+                : items;
+
+        if (!Array.isArray(parsedItems)) {
+            return "";
+        }
+
+        return parsedItems
+            .map(item => item.name)
+            .filter(Boolean)
+            .join(", ");
+
+    } catch (error) {
+        console.error("Item JSON parsing error:", error.message);
+        return "";
+    }
+};
 const sendWhatsAppDueReminder = async (req, res) => {
     try {
         const {
@@ -58,18 +93,19 @@ const sendWhatsAppDueReminder = async (req, res) => {
         // Fetch ALL customer bills.
         const [bills] = await pool.execute(
             `SELECT
-                id,
-                bill_number,
-                customer_name,
-                grand_total,
-                paid_amount,
-                due_amount
-             FROM sh_bills
-             WHERE customer_phone = ?
-             ORDER BY bill_date ASC, id ASC`,
+        id,
+        bill_number,
+        bill_date,
+        customer_name,
+        items,
+        grand_total,
+        paid_amount,
+        due_amount
+     FROM sh_bills
+     WHERE customer_phone = ?
+     ORDER BY bill_date ASC, id ASC`,
             [customerPhone]
         );
-
         if (bills.length === 0) {
             return res.status(404).json({
                 success: false,
@@ -113,20 +149,30 @@ const sendWhatsAppDueReminder = async (req, res) => {
 
         const customerName = bills[0].customer_name;
 
+        // Extract details from all pending bills.
         const billNumbers = pendingBills
             .map(bill => bill.bill_number)
             .join(", ");
 
+        const billDates = pendingBills
+            .map(bill => formatBillDate(bill.bill_date))
+            .join(", ");
+
+        const itemNames = pendingBills
+            .map(bill => extractItemNames(bill.items))
+            .filter(Boolean)
+            .join(", ");
         // Send reminder through WhatsApp Cloud API.
         const result = await sendDueReminder({
             recipientPhone: normalizedRecipientPhone,
             customerName,
             billNumbers,
+            billDates,
+            itemNames,
             totalPurchase,
             totalPaid,
             totalDue
         });
-
         return res.status(200).json({
             success: true,
             message: "WhatsApp reminder accepted by Meta.",

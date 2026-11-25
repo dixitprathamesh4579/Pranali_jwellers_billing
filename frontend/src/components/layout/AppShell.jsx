@@ -10,6 +10,7 @@ import GICustomer from "../../modules/GICustomer.jsx";
 import GIHistory from "../../modules/GIHistory.jsx";
 import GIStatistics from "../../modules/GIStatistics.jsx";
 import DailyAccounts from "../../modules/DailyAccounts.jsx";
+import WhatsAppChats from "../../modules/WhatsAppChats.jsx";
 
 const pageTitles = {
   Overview: "Dashboard",
@@ -19,6 +20,7 @@ const pageTitles = {
   "GI Customers": "Active Girvi accounts",
   "GI History": "Girvi history",
   "GI Statistics": "Girvi statistics",
+  "WhatsApp Chats": "WhatsApp Customer Support",
   More: "More modules",
 };
 
@@ -38,6 +40,7 @@ export default function AppShell({ user, onLogout }) {
     "GI History": <GIHistory />,
     "GI Statistics": <GIStatistics />,
     "DailyAccounts": <DailyAccounts />,  
+    "WhatsApp Chats": <WhatsAppChats />,
     More: <MorePage onNavigate={navigate} onLogout={onLogout} user={user} />,
   }[active];
 
@@ -49,7 +52,7 @@ export default function AppShell({ user, onLogout }) {
           {[
             ["Overview", "⌂"], ["New SH Bill", "＋"], ["SH Customers", "♙"],
             ["New GI", "◇"], ["GI Customers", "♧"], ["GI History", "◷"],
-            ["GI Statistics", "▥"],["DailyAccounts", "✎"], 
+            ["GI Statistics", "▥"],["DailyAccounts", "✎"], ["WhatsApp Chats", "☏"],
           ].map(([name, icon]) => (
             <button key={name} className={active === name ? "desktop-nav-item active" : "desktop-nav-item"} onClick={() => navigate(name)}>
               <span>{icon}</span>{name}

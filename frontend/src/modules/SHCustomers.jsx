@@ -1336,17 +1336,48 @@ window.addEventListener("afterprint",()=>window.close());
 
     // ---------------- MARATHI MESSAGE PREVIEW ----------------
 
-    const getMarathiReminderMessage = () => {
-        if (!reminderCustomer || !reminderDueData) {
-            return "";
-        }
+const getMarathiReminderMessage = () => {
+    if (!reminderCustomer || !reminderDueData) {
+        return "";
+    }
 
-        const pendingBillNumbers =
-            reminderDueData.pendingBills
-                .map(bill => bill.bill_number)
-                .join(", ");
+    const pendingBills = reminderDueData.pendingBills;
 
-        return `🙏 ॥ श्री गणेशाय नमः ॥
+    const pendingBillNumbers = pendingBills
+        .map(bill => bill.bill_number)
+        .join(", ");
+
+    const pendingBillDates = pendingBills
+        .map(bill => {
+            if (!bill.bill_date) return "-";
+
+            const date = String(bill.bill_date).slice(0, 10);
+            const parts = date.split("-");
+
+            return parts.length === 3
+                ? `${parts[2]}/${parts[1]}/${parts[0]}`
+                : date;
+        })
+        .join(", ");
+
+    const pendingItemNames = pendingBills
+        .flatMap(bill => {
+            try {
+                const items = typeof bill.items === "string"
+                    ? JSON.parse(bill.items)
+                    : bill.items;
+
+                return Array.isArray(items)
+                    ? items.map(item => item.name).filter(Boolean)
+                    : [];
+
+            } catch {
+                return [];
+            }
+        })
+        .join(", ");
+
+    return `🙏 ॥ श्री गणेशाय नमः ॥
 
 🌸 *प्रणाली ज्वेलर्स, दिघंची* 🌸
 
@@ -1359,9 +1390,11 @@ window.addEventListener("afterprint",()=>window.close());
 🧾 *बिलाचा तपशील*
 
 ▪️ बिल क्रमांक: ${pendingBillNumbers || "-"}
+▪️ बिल तारीख: ${pendingBillDates || "-"}
+▪️ वस्तूचे नाव: ${pendingItemNames || "-"}
 ▪️ एकूण बिल रक्कम: ${money(reminderDueData.totalPurchase)}
 ▪️ जमा रक्कम: ${money(reminderDueData.totalPaid)}
-▪️ *बाकी रक्कम: ${money(reminderDueData.totalDue)}*
+▪️ *बाकी रक्कम: ${money(reminderDueData.totalDue)}
 
 आपणास नम्र विनंती आहे की, कृपया आपल्या सोयीनुसार बाकी रक्कम जमा करावी.
 
@@ -1375,7 +1408,7 @@ window.addEventListener("afterprint",()=>window.close());
 💎 *प्रणाली ज्वेलर्स*
 📍 दिघंची, महाराष्ट्र
 📞 9421124579`;
-    };
+};
 
 
     // ========================================================

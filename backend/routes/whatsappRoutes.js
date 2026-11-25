@@ -3,6 +3,12 @@ const multer = require("multer");
 
 const router = express.Router();
 
+const {
+    getConversations,
+    getConversationMessages,
+    markConversationAsRead
+} = require("../controllers/whatsappChatController");
+
 const authenticateToken = require("../middleware/authmiddleware");
 
 const {
@@ -37,5 +43,26 @@ router.post(
     sendWhatsAppBillPdf
 );
 
+// ==========================================
+// WHATSAPP CUSTOMER CHAT ROUTES
+// ==========================================
+
+router.get(
+    "/conversations",
+    authenticateToken,
+    getConversations
+);
+
+router.get(
+    "/conversations/:id/messages",
+    authenticateToken,
+    getConversationMessages
+);
+
+router.patch(
+    "/conversations/:id/read",
+    authenticateToken,
+    markConversationAsRead
+);
 
 module.exports = router;

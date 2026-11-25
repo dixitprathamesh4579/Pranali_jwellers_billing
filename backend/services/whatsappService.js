@@ -132,11 +132,14 @@ const uploadWhatsAppMedia = async (mediaBuffer) => {
 
 
 // Send due reminder WhatsApp template.
+// Send due reminder WhatsApp template.
 const sendWhatsAppTemplate = async ({
     recipientPhone,
     mediaId,
     customerName,
     billNumbers,
+    billDates,
+    itemNames,
     totalPurchase,
     totalPaid,
     totalDue
@@ -202,26 +205,43 @@ const sendWhatsAppTemplate = async ({
 
                     parameters: [
 
+                        // {{1}} Customer Name
                         {
                             type: "text",
-                            text: String(customerName)
+                            text: String(customerName || "")
                         },
 
+                        // {{2}} Bill Number
                         {
                             type: "text",
-                            text: String(billNumbers)
+                            text: String(billNumbers || "")
                         },
 
+                        // {{3}} Bill Date
+                        {
+                            type: "text",
+                            text: String(billDates || "")
+                        },
+
+                        // {{4}} Item Name
+                        {
+                            type: "text",
+                            text: String(itemNames || "")
+                        },
+
+                        // {{5}} Total Bill Amount
                         {
                             type: "text",
                             text: formatMoney(totalPurchase)
                         },
 
+                        // {{6}} Paid Amount
                         {
                             type: "text",
                             text: formatMoney(totalPaid)
                         },
 
+                        // {{7}} Pending Amount
                         {
                             type: "text",
                             text: formatMoney(totalDue)
@@ -267,12 +287,14 @@ const sendWhatsAppTemplate = async ({
 
 };
 
-
+// Main function for sending due reminder.
 // Main function for sending due reminder.
 const sendDueReminder = async ({
     recipientPhone,
     customerName,
     billNumbers,
+    billDates,
+    itemNames,
     totalPurchase,
     totalPaid,
     totalDue
@@ -307,6 +329,10 @@ const sendDueReminder = async ({
         customerName,
 
         billNumbers,
+
+        billDates,
+
+        itemNames,
 
         totalPurchase,
 
@@ -541,25 +567,25 @@ const sendBillPdf = async ({
     // 2. Send document template.
     const messageId = await sendWhatsAppBillTemplate({
 
-    recipientPhone,
+        recipientPhone,
 
-    mediaId,
+        mediaId,
 
-    filename,
+        filename,
 
-    customerName,
+        customerName,
 
-    billNumber,
+        billNumber,
 
-    billDate,
+        billDate,
 
-    grandTotal,
+        grandTotal,
 
-    paidAmount,
+        paidAmount,
 
-    dueAmount
+        dueAmount
 
-});
+    });
 
     return {
         messageId,

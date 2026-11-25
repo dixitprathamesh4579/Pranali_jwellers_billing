@@ -1,0 +1,325 @@
+import React, { useCallback, useEffect, useState } from "react";
+import { apiFetch } from "../utils/api.js";
+import "./WhatsAppChats.css";
+
+const formatTime = (date) => {
+    if (!date) return "";
+
+    const messageDate = new Date(date);
+
+    if (isNaN(messageDate.getTime())) return "";
+
+    return messageDate.toLocaleTimeString("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+};
+
+const formatDate = (date) => {
+    if (!date) return "";
+
+    const messageDate = new Date(date);
+
+    if (isNaN(messageDate.getTime())) return "";
+
+    return messageDate.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    });
+};
+
+const WhatsAppChats = () => {
+    const [conversations, setConversations] = useState([]);
+    const [selectedConversation, setSelectedConversation] = useState(null);
+    const [messages, setMessages] = useState([]);
+
+    const [loadingConversations, setLoadingConversations] = useState(true);
+    const [loadingMessages, setLoadingMessages] = useState(false);
+
+    const [error, setError] = useState("");
+
+    // Fetch all conversations
+    const fetchConversations = useCallback(async () => {
+        try {
+            const response = await apiFetch("/whatsapp/conversations");
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch conversations.");
+            }
+
+            const data = await response.json();
+
+            setConversations(data.conversations || []);
+        } catch (err) {
+            setError(err.message || "Unable to load conversations.");
+        } finally {
+            setLoadingConversations(false);
+        }
+    }, []);
+
+    // Mark conversation as read
+    const markAsRead = async (conversationId) => {
+        try {
+            const response = await apiFetch(
+                `/whatsapp/conversations/${conversationId}/read`,
+                {
+                    method: "PATCH",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to mark conversation as read.");
+            }
+
+            setConversations((previous) =>
+                previous.map((conversation) =>
+                    conversation.id === conversationId
+                        ? { ...conversation, unread_count: 0 }
+                        : conversation
+                )
+            );
+        } catch (err) {
+            console.error("Mark as read error:", err);
+        }
+    };
+
+    // Fetch messages of selected conversation
+    const fetchMessages = useCallback(async (conversationId) => {
+        if (!conversationId) return;
+
+        try {
+            const response = await apiFetch(
+                `/whatsapp/conversations/${conversationId}/messages`
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch messages.");
+            }
+
+            const data = await response.json();
+
+            setMessages(data.messages || []);
+        } catch (err) {
+            console.error("Message fetch error:", err);
+        } finally {
+            setLoadingMessages(false);
+        }
+    }, []);
+
+    // Select conversation
+    const handleSelectConversation = async (conversation) => {
+        setSelectedConversation(conversation);
+        setMessages([]);
+        setLoadingMessages(true);
+
+        await markAsRead(conversation.id);
+        await fetchMessages(conversation.id);
+    };
+
+    // Initial fetch and automatic refresh
+    useEffect(() => {
+        fetchConversations();
+
+        const interval = setInterval(() => {
+            fetchConversations();
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [fetchConversations]);
+
+    // Refresh selected conversation messages
+    useEffect(() => {
+        if (!selectedConversation?.id) return;
+
+        const interval = setInterval(() => {
+            fetchMessages(selectedConversation.id);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [selectedConversation?.id, fetchMessages]);
+
+    return (
+        <div className="whatsapp-chats-page">
+
+            {/* HEADER */}
+            <div className="whatsapp-chats-header">
+                <div>
+                    <h2>WhatsApp Chats</h2>
+                    <p>Manage your customer conversations</p>
+                </div>
+
+                <div className="whatsapp-chat-total">
+                    {conversations.length} Conversations
+                </div>
+            </div>
+
+            {error && (
+                <div className="whatsapp-chat-error">
+                    {error}
+                </div>
+            )}
+
+            <div className="whatsapp-chat-container">
+
+                {/* LEFT SIDEBAR */}
+                <div className="whatsapp-conversations">
+
+                    <div className="whatsapp-conversations-heading">
+                        <h3>Messages</h3>
+                    </div>
+
+                    {loadingConversations ? (
+                        <div className="whatsapp-chat-empty">
+                            Loading conversations...
+                        </div>
+                    ) : conversations.length === 0 ? (
+                        <div className="whatsapp-chat-empty">
+                            No conversations yet.
+                        </div>
+                    ) : (
+                        conversations.map((conversation) => (
+                            <div
+                                key={conversation.id}
+                                className={`whatsapp-conversation-item ${
+                                    selectedConversation?.id === conversation.id
+                                        ? "active"
+                                        : ""
+                                }`}
+                                onClick={() =>
+                                    handleSelectConversation(conversation)
+                                }
+                            >
+                                <div className="whatsapp-avatar">
+                                    {(conversation.customer_name ||
+                                        conversation.whatsapp_phone ||
+                                        "?")
+                                        .charAt(0)
+                                        .toUpperCase()}
+                                </div>
+
+                                <div className="whatsapp-conversation-info">
+                                    <div className="whatsapp-conversation-top">
+                                        <strong>
+                                            {conversation.customer_name ||
+                                                conversation.whatsapp_phone}
+                                        </strong>
+
+                                        <span>
+                                            {formatTime(
+                                                conversation.last_message_at
+                                            )}
+                                        </span>
+                                    </div>
+
+                                    <div className="whatsapp-conversation-bottom">
+                                        <p>
+                                            {conversation.last_message ||
+                                                "No messages"}
+                                        </p>
+
+                                        {Number(conversation.unread_count) > 0 && (
+                                            <span className="whatsapp-unread-badge">
+                                                {conversation.unread_count}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <small>
+                                        {conversation.whatsapp_phone}
+                                    </small>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+
+                {/* RIGHT CHAT WINDOW */}
+                <div className="whatsapp-chat-window">
+
+                    {!selectedConversation ? (
+                        <div className="whatsapp-chat-welcome">
+                            <div className="whatsapp-welcome-icon">
+                                💬
+                            </div>
+
+                            <h3>WhatsApp Messages</h3>
+
+                            <p>
+                                Select a conversation to view messages.
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            {/* CHAT HEADER */}
+                            <div className="whatsapp-chat-header">
+                                <div className="whatsapp-avatar">
+                                    {(selectedConversation.customer_name ||
+                                        selectedConversation.whatsapp_phone)
+                                        .charAt(0)
+                                        .toUpperCase()}
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        {selectedConversation.customer_name ||
+                                            selectedConversation.whatsapp_phone}
+                                    </strong>
+
+                                    <p>
+                                        {selectedConversation.whatsapp_phone}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* MESSAGES */}
+                            <div className="whatsapp-messages">
+
+                                {loadingMessages ? (
+                                    <div className="whatsapp-chat-empty">
+                                        Loading messages...
+                                    </div>
+                                ) : messages.length === 0 ? (
+                                    <div className="whatsapp-chat-empty">
+                                        No messages in this conversation.
+                                    </div>
+                                ) : (
+                                    messages.map((message) => (
+                                        <div
+                                            key={message.id}
+                                            className={`whatsapp-message-row ${
+                                                message.direction === "OUTBOUND"
+                                                    ? "outgoing"
+                                                    : "incoming"
+                                            }`}
+                                        >
+                                            <div className="whatsapp-message-bubble">
+                                                <p>
+                                                    {message.message_text ||
+                                                        `[${message.message_type}]`}
+                                                </p>
+
+                                                <span>
+                                                    {formatTime(message.timestamp)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
+                            {/* INPUT PLACEHOLDER */}
+                            <div className="whatsapp-chat-input-placeholder">
+                                <span>
+                                    Message sending will be added in the next step.
+                                </span>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default WhatsAppChats;
