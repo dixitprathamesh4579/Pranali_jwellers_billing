@@ -7,7 +7,8 @@ const {
     getConversations,
     getConversationMessages,
     markConversationAsRead,
-    sendChatMessage
+    sendChatMessage,
+    createConversation
 } = require("../controllers/whatsappChatController");
 
 const authenticateToken = require("../middleware/authmiddleware");
@@ -70,6 +71,7 @@ router.post(
     authenticateToken,
     sendChatMessage
 );
+router.post("/conversations", authenticateToken, createConversation);
 
 
 module.exports = router;
