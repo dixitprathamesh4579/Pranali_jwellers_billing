@@ -317,9 +317,77 @@ const sendChatMessage = async (req, res) => {
     }
 };
 
+const createConversation = async (req, res) => {
+    try {
+        const { phone, customer_name } = req.body;
+
+        if (!phone) {
+            return res.status(400).json({
+                message: "WhatsApp mobile number is required."
+            });
+        }
+
+        // Normalize Indian mobile number.
+        let normalizedPhone = String(phone).replace(/\D/g, "");
+
+        if (normalizedPhone.length === 10) {
+            normalizedPhone = "91" + normalizedPhone;
+        }
+
+        if (!/^91[6-9]\d{9}$/.test(normalizedPhone)) {
+            return res.status(400).json({
+                message: "Please enter a valid Indian WhatsApp mobile number."
+            });
+        }
+
+        const cleanName = customer_name
+            ? String(customer_name).trim().slice(0, 150)
+            : null;
+
+        const [result] = await pool.query(
+            `
+            INSERT INTO whatsapp_conversations
+                (whatsapp_phone, customer_name)
+            VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE
+                customer_name = CASE
+                    WHEN VALUES(customer_name) IS NOT NULL
+                         AND VALUES(customer_name) != ''
+                    THEN VALUES(customer_name)
+                    ELSE customer_name
+                END
+            `,
+            [normalizedPhone, cleanName]
+        );
+
+        const [rows] = await pool.query(
+            `
+            SELECT *
+            FROM whatsapp_conversations
+            WHERE whatsapp_phone = ?
+            LIMIT 1
+            `,
+            [normalizedPhone]
+        );
+
+        return res.json({
+            success: true,
+            conversation: rows[0]
+        });
+
+    } catch (error) {
+        console.error("Create WhatsApp conversation error:", error);
+
+        return res.status(500).json({
+            message: "Failed to create WhatsApp conversation."
+        });
+    }
+};
+
 module.exports = {
     getConversations,
     getConversationMessages,
     markConversationAsRead,
-    sendChatMessage
+    sendChatMessage,
+    createConversation
 };
